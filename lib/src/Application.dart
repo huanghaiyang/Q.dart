@@ -6,14 +6,9 @@ import 'package:Q/src/Request.dart';
 import 'package:Q/src/Response.dart';
 
 class Application {
-  List<Middleware> middleware = new List();
+  List<Middleware> middleWares = new List();
   String env = 'development';
-  Context context;
-  Request request;
-  Response response;
   HttpServer server;
-
-  Application([this.context, this.request, this.response]);
 
   // ip/端口监听
   void listen(int port, {InternetAddress internetAddress}) async {
@@ -22,10 +17,41 @@ class Application {
         : InternetAddress.loopbackIPv4;
     this.server = await HttpServer.bind(internetAddress, port);
 
-    await for (var request in server) {}
+    await for (HttpRequest req in server) {
+      await this.handleRequest(this.createContext(req, req.response));
+    }
   }
 
   void use(Middleware middleware) {
-    this.middleware.add(middleware);
+    this.middleWares.add(middleware);
+  }
+
+  Future<Context> handleWithMiddleware(Context ctx, Function onFinished) async {
+    await for (Middleware middleware in Stream.fromIterable(this.middleWares)) {
+      await middleware.handle(ctx);
+    }
+    return ctx;
+  }
+
+  Future<Response> handleRequest(Context ctx) async {
+    await handleWithMiddleware(ctx, this.onFinished);
+    return ctx.response;
+  }
+
+  void onFinished(Response res, Function onerror) async {
+    // response及错误处理
+  }
+
+  createContext(HttpRequest req, HttpResponse res) {
+    Request request = new Request();
+    request.req = req;
+    Response response = new Response();
+    response.res = res;
+    Context context = new Context(request, response);
+    context.app = request.app = response.app = this;
+    request.ctx = response.ctx = context;
+    request.response = response;
+    response.request = request;
+    return context;
   }
 }
