@@ -34,9 +34,9 @@ class Application {
     return ctx;
   }
 
-  Future<Response> handleRequest(Context ctx) async {
+  Future<Context> handleRequest(Context ctx) async {
     await handleWithMiddleware(ctx, this.onFinished, this.onError);
-    return ctx.response;
+    return ctx;
   }
 
   void onFinished(Context ctx) async {}
