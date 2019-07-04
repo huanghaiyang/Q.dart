@@ -1,8 +1,5 @@
 import 'package:Q/src/Context.dart';
 
-class Middleware {
-  Future<Context> handle(Context ctx) async {
-    // 处理context
-    return ctx;
-  }
+abstract class Middleware {
+  Future<Context> handle(Context ctx, Function onFinished, Function onError);
 }

@@ -26,21 +26,22 @@ class Application {
     this.middleWares.add(middleware);
   }
 
-  Future<Context> handleWithMiddleware(Context ctx, Function onFinished) async {
+  Future<Context> handleWithMiddleware(
+      Context ctx, Function onFinished, Function onError) async {
     await for (Middleware middleware in Stream.fromIterable(this.middleWares)) {
-      await middleware.handle(ctx);
+      await middleware.handle(ctx, onFinished, onError);
     }
     return ctx;
   }
 
   Future<Response> handleRequest(Context ctx) async {
-    await handleWithMiddleware(ctx, this.onFinished);
+    await handleWithMiddleware(ctx, this.onFinished, this.onError);
     return ctx.response;
   }
 
-  void onFinished(Response res, Function onerror) async {
-    // response及错误处理
-  }
+  void onFinished(Context ctx) async {}
+
+  void onError(Context ctx) async {}
 
   createContext(HttpRequest req, HttpResponse res) {
     Request request = new Request();
