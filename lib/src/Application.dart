@@ -4,11 +4,13 @@ import 'package:Q/src/Context.dart';
 import 'package:Q/src/Middleware.dart';
 import 'package:Q/src/Request.dart';
 import 'package:Q/src/Response.dart';
+import 'package:Q/src/Router.dart';
 
 class Application {
   List<Middleware> middleWares = new List();
   String env = 'development';
   HttpServer server;
+  List<Router> routers = new List();
 
   // ip/端口监听
   void listen(int port, {InternetAddress internetAddress}) async {
@@ -18,7 +20,8 @@ class Application {
     this.server = await HttpServer.bind(internetAddress, port);
 
     await for (HttpRequest req in server) {
-      await this.handleRequest(this.createContext(req, req.response));
+      Context ctx = await this.matchRouter(req);
+      await this.handleRequest(ctx);
     }
   }
 
@@ -43,7 +46,7 @@ class Application {
 
   void onError(Context ctx) async {}
 
-  createContext(HttpRequest req, HttpResponse res) {
+  Context createContext(HttpRequest req, HttpResponse res) {
     Request request = new Request();
     request.req = req;
     Response response = new Response();
@@ -54,5 +57,24 @@ class Application {
     request.response = response;
     response.request = request;
     return context;
+  }
+
+  void addRouters(List<Router> routes) {
+    this.routers.addAll(routes);
+  }
+
+  void addRouter(Router router) {
+    this.routers.add(router);
+  }
+
+  Future<Context> matchRouter(HttpRequest req) async {
+    Router matchedRouter;
+    await for (Router router in Stream.fromIterable(this.routers)) {
+      bool matched = await router.match(req);
+      if (matched) {
+        matchedRouter = router;
+      }
+    }
+    return matchedRouter.dispatcher(this.createContext(req, req.response));
   }
 }
