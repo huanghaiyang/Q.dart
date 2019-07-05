@@ -6,6 +6,7 @@ class Context {
   Request request;
   Response response;
   Application app;
+  int status;
 
   Context([this.request, this.response, this.app]);
 
