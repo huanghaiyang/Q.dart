@@ -15,7 +15,19 @@ class Application {
   Map<MimeTypes, AbstractHttpMessageConverter> converters = Map();
 
   Application() {
+    initHandlers();
+    initConverters();
+  }
+
+  initHandlers() {
     this.handlers[HandlerMapper.NOT_FOUND_HANDLER] = NotFoundHandler();
+  }
+
+  initConverters() {
+    this.converters[MimeTypes.JSON] = JSONHttpMessageConverter.getInstance();
+    this.converters[MimeTypes.TEXT] = StringHttpMessageConverter.getInstance();
+    this.converters[MimeTypes.TEXT_PLAN] =
+        StringHttpMessageConverter.getInstance();
   }
 
   // ip/端口监听
