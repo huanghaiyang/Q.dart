@@ -71,14 +71,10 @@ class Application {
     return context;
   }
 
-  // 添加多个路由
-  void addRouters(List<Router> routes) {
-    this.routers.addAll(routes);
-  }
-
-  // 添加一个路由
-  void addRouter(Router router) {
+  router(Router router) {
     this.routers.add(router);
+    router.app = this;
+    router.converter = this.converters[router.mimeType];
   }
 
   // 匹配路由，并处理请求
@@ -98,12 +94,14 @@ class Application {
           await matchedRouter.handle(ctx, ctx.request.req, ctx.response.res);
       ResponseEntry responseEntry;
       if (!(result is ResponseEntry)) {
-        responseEntry = ResponseEntry(result: result, router: matchedRouter);
+        responseEntry = ResponseEntry(result);
       } else {
         responseEntry = result;
       }
       // 转换后的而结果，类型为String
-      String convertedResult = await responseEntry.convert();
+      String convertedResult = await matchedRouter.convert(responseEntry);
+      responseEntry.convertedResult = convertedResult;
+
       // TODO
     } else {
       await this.handlers[HandlerMapper.NOT_FOUND_HANDLER].handle(ctx);
