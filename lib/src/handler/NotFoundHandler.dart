@@ -7,7 +7,9 @@ class NotFoundHandler extends HandlerAdapter {
   @override
   Future<Context> handle(Context ctx) async {
     ctx.status = HttpStatus.notFound;
-    ctx.response.res.statusCode = ctx.status;
+    HttpResponse httpResponse = ctx.response.res;
+    httpResponse.statusCode = ctx.status;
+    await httpResponse.close();
     return ctx;
   }
 }

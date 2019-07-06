@@ -1,19 +1,33 @@
 import 'dart:io';
 
-import 'package:Q/src/handler/HandlerAdapter.dart';
+import 'package:Q/src/Application.dart';
+import 'package:Q/src/MimeTypes.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 class Router {
+  Application app;
   String path;
   RegExp pathRegex;
   bool hasMatch;
 
-  // 请求处理句柄
-  HandlerAdapter handlerAdapter;
+  // 处理函数
+  Function handle;
   Map params;
   String method;
 
-  Router(this.path, this.method, this.handlerAdapter, {Map params});
+  // 默认返回的格式为json
+  MimeTypes mimeType = MimeTypes.JSON;
+
+  Router(
+    this.path,
+    this.method,
+    Function handler, {
+    Map params,
+    MimeTypes mimeType,
+  }) {
+    this.params = params;
+    this.mimeType = mimeType;
+  }
 
   // 请求路径匹配
   Future<bool> match(HttpRequest request) async {
@@ -21,21 +35,5 @@ class Router {
     this.pathRegex = pathToRegExp(this.path);
     this.hasMatch = this.pathRegex.hasMatch(this.path);
     return this.hasMatch;
-  }
-
-  static get(String path, HandlerAdapter handlerAdapter, {Map params}) {
-    return Router(path, 'get', handlerAdapter, params: params);
-  }
-
-  static post(String path, HandlerAdapter handlerAdapter, Map params) {
-    return Router(path, 'post', handlerAdapter, params: params);
-  }
-
-  static put(String path, HandlerAdapter handlerAdapter, Map params) {
-    return Router(path, 'put', handlerAdapter, params: params);
-  }
-
-  static delete(String path, HandlerAdapter handlerAdapter, {Map params}) {
-    return Router(path, 'delete', handlerAdapter, params: params);
   }
 }

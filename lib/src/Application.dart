@@ -1,13 +1,6 @@
 import 'dart:io';
 
-import 'package:Q/src/Context.dart';
-import 'package:Q/src/Middleware.dart';
-import 'package:Q/src/Request.dart';
-import 'package:Q/src/Response.dart';
-import 'package:Q/src/Router.dart';
-import 'package:Q/src/handler/HandlerAdapter.dart';
-import 'package:Q/src/handler/HandlerMapper.dart';
-import 'package:Q/src/handler/NotFoundHandler.dart';
+import 'package:Q/Q.dart';
 
 class Application {
   List<Middleware> middleWares = List();
@@ -17,6 +10,9 @@ class Application {
 
   // default handlers
   Map<HandlerMapper, HandlerAdapter> handlers = Map();
+
+  // 转换器
+  Map<MimeTypes, AbstractHttpMessageConverter> converters = Map();
 
   Application() {
     this.handlers[HandlerMapper.NOT_FOUND_HANDLER] = NotFoundHandler();
@@ -88,6 +84,7 @@ class Application {
   // 匹配路由，并处理请求
   Future<Context> matchRouter(HttpRequest req) async {
     Router matchedRouter;
+    // 匹配路由
     await for (Router router in Stream.fromIterable(this.routers)) {
       bool hasMatch = await router.match(req);
       if (hasMatch) {
@@ -96,10 +93,29 @@ class Application {
     }
     Context ctx = this.createContext(req, req.response);
     if (matchedRouter != null) {
-      await matchedRouter.handlerAdapter.handle(ctx);
+      // 等待结果处理完成
+      dynamic result =
+          await matchedRouter.handle(ctx, ctx.request.req, ctx.response.res);
+      ResponseEntry responseEntry;
+      if (!(result is ResponseEntry)) {
+        responseEntry = ResponseEntry(result: result, router: matchedRouter);
+      } else {
+        responseEntry = result;
+      }
+      // 转换后的而结果，类型为String
+      String convertedResult = await responseEntry.convert();
+      // TODO
     } else {
       await this.handlers[HandlerMapper.NOT_FOUND_HANDLER].handle(ctx);
     }
     return ctx;
+  }
+
+  // 替换内置默认的handler
+  void replaceHandler(
+      HandlerMapper handlerMapper, HandlerAdapter handlerAdapter) {
+    if (this.handlers.containsKey(handlerMapper)) {
+      this.handlers[handlerMapper] = handlerAdapter;
+    }
   }
 }
