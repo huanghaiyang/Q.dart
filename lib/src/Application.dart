@@ -9,10 +9,10 @@ class Application {
   List<Router> routers = List();
 
   // default handlers
-  Map<HandlerMapper, HandlerAdapter> handlers = Map();
+  Map<int, HandlerAdapter> handlers = Map();
 
   // 转换器
-  Map<MimeTypes, AbstractHttpMessageConverter> converters = Map();
+  Map<ContentType, AbstractHttpMessageConverter> converters = Map();
 
   Application() {
     initHandlers();
@@ -20,13 +20,15 @@ class Application {
   }
 
   initHandlers() {
-    this.handlers[HandlerMapper.NOT_FOUND_HANDLER] = NotFoundHandler();
+    this.handlers[HttpStatus.notFound] = NotFoundHandler.getInstance();
+    this.handlers[HttpStatus.ok] = OKHandler.getInstance();
   }
 
   initConverters() {
-    this.converters[MimeTypes.JSON] = JSONHttpMessageConverter.getInstance();
-    this.converters[MimeTypes.TEXT] = StringHttpMessageConverter.getInstance();
-    this.converters[MimeTypes.TEXT_PLAN] =
+    this.converters[ContentType.json] = JSONHttpMessageConverter.getInstance();
+    this.converters[ContentType.text] =
+        StringHttpMessageConverter.getInstance();
+    this.converters[ContentType.html] =
         StringHttpMessageConverter.getInstance();
   }
 
@@ -38,8 +40,12 @@ class Application {
     this.server = await HttpServer.bind(internetAddress, port);
 
     await for (HttpRequest req in server) {
-      Context ctx = await this.matchRouter(req);
-      await this.handleRequest(ctx);
+      Context ctx = this.createContext(req, req.response);
+      await this.handleWithMiddleware(
+          ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
+      await this.matchRouter(ctx, req);
+      await this.handleWithMiddleware(
+          ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
     }
   }
 
@@ -49,17 +55,13 @@ class Application {
   }
 
   // response中间件
-  Future<Context> handleWithMiddleware(
-      Context ctx, Function onFinished, Function onError) async {
-    await for (Middleware middleware in Stream.fromIterable(this.middleWares)) {
+  Future<Context> handleWithMiddleware(Context ctx, MiddlewareType type,
+      Function onFinished, Function onError) async {
+    await for (Middleware middleware in Stream.fromIterable(this
+        .middleWares
+        .where((Middleware middleware) => middleware.type == type))) {
       await middleware.handle(ctx, onFinished, onError);
     }
-    return ctx;
-  }
-
-  // 请求处理
-  Future<Context> handleRequest(Context ctx) async {
-    await handleWithMiddleware(ctx, this.onFinished, this.onError);
     return ctx;
   }
 
@@ -86,11 +88,12 @@ class Application {
   router(Router router) {
     this.routers.add(router);
     router.app = this;
-    router.converter = this.converters[router.mimeType];
+    router.converter = this.converters[router.contentType];
+    router.handlerAdapter = this.handlers[HttpStatus.ok];
   }
 
   // 匹配路由，并处理请求
-  Future<Context> matchRouter(HttpRequest req) async {
+  Future<Context> matchRouter(Context ctx, HttpRequest req) async {
     Router matchedRouter;
     // 匹配路由
     await for (Router router in Stream.fromIterable(this.routers)) {
@@ -99,8 +102,8 @@ class Application {
         matchedRouter = router;
       }
     }
-    Context ctx = this.createContext(req, req.response);
     if (matchedRouter != null) {
+      ctx.router = matchedRouter;
       // 等待结果处理完成
       dynamic result =
           await matchedRouter.handle(ctx, ctx.request.req, ctx.response.res);
@@ -110,22 +113,31 @@ class Application {
       } else {
         responseEntry = result;
       }
+      ctx.response.responseEntry = responseEntry;
       // 转换后的而结果，类型为String
       String convertedResult = await matchedRouter.convert(responseEntry);
       responseEntry.convertedResult = convertedResult;
-
-      // TODO
+      // 写response,完成请求
+      await matchedRouter.write(ctx);
     } else {
-      await this.handlers[HandlerMapper.NOT_FOUND_HANDLER].handle(ctx);
+      // TODO throw router not found exception
+      await this.handlers[HttpStatus.notFound].handle(ctx);
     }
     return ctx;
   }
 
   // 替换内置默认的handler
-  void replaceHandler(
-      HandlerMapper handlerMapper, HandlerAdapter handlerAdapter) {
-    if (this.handlers.containsKey(handlerMapper)) {
-      this.handlers[handlerMapper] = handlerAdapter;
+  void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter) {
+    if (this.handlers.containsKey(httpStatus)) {
+      this.handlers[httpStatus] = handlerAdapter;
+    }
+  }
+
+  // 替换内置转换器
+  void replaceConverter(
+      ContentType type, AbstractHttpMessageConverter converter) {
+    if (this.converters.containsKey(type)) {
+      this.converters[type] = converter;
     }
   }
 }

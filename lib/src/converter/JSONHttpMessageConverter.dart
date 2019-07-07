@@ -1,6 +1,9 @@
+import 'dart:convert';
+import 'dart:core';
+
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 
-class JSONHttpMessageConverter extends AbstractHttpMessageConverter {
+class JSONHttpMessageConverter implements AbstractHttpMessageConverter {
   JSONHttpMessageConverter._();
 
   static JSONHttpMessageConverter _instance;
@@ -13,5 +16,7 @@ class JSONHttpMessageConverter extends AbstractHttpMessageConverter {
   }
 
   @override
-  Future convert([dynamic entry]) async {}
+  Future convert([dynamic entry]) async {
+    return json.encode(entry);
+  }
 }

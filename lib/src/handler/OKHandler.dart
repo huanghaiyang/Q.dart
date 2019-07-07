@@ -3,23 +3,24 @@ import 'dart:io';
 import 'package:Q/src/Context.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 
-class NotFoundHandler implements HandlerAdapter {
-  NotFoundHandler._();
+class OKHandler implements HandlerAdapter {
+  OKHandler._();
 
-  static NotFoundHandler _instance;
+  static OKHandler _instance;
 
-  static NotFoundHandler getInstance() {
+  static OKHandler getInstance() {
     if (_instance == null) {
-      _instance = NotFoundHandler._();
+      _instance = OKHandler._();
     }
     return _instance;
   }
 
   @override
   Future<Context> handle(Context ctx) async {
-    ctx.status = HttpStatus.notFound;
     HttpResponse httpResponse = ctx.response.res;
     httpResponse.statusCode = ctx.status;
+    httpResponse.headers.contentType = ctx.router.contentType;
+    httpResponse.write(ctx.response.responseEntry.convertedResult);
     await httpResponse.close();
     return ctx;
   }

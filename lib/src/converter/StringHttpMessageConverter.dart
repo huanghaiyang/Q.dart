@@ -1,6 +1,6 @@
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 
-class StringHttpMessageConverter extends AbstractHttpMessageConverter {
+class StringHttpMessageConverter implements AbstractHttpMessageConverter {
   StringHttpMessageConverter._();
 
   static StringHttpMessageConverter _instance;
