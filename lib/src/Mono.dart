@@ -1,3 +1,3 @@
-class Mono<Response> {
+class Mono<T> {
 
 }

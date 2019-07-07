@@ -1,3 +1,3 @@
-class Flux<Response> {
+class Flux<T> {
 
 }
