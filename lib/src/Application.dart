@@ -3,9 +3,16 @@ import 'dart:io';
 import 'package:Q/Q.dart';
 
 class Application {
-  List<Middleware> middleWares = List();
+  // 当前环境
   String env = 'development';
+
+  // 服务
   HttpServer server;
+
+// 中间件
+  List<Middleware> middleWares = List();
+
+  // 路由
   List<Router> routers = List();
 
   // default handlers
@@ -14,16 +21,22 @@ class Application {
   // 转换器
   Map<ContentType, AbstractHttpMessageConverter> converters = Map();
 
+  // 拦截器
+  List<AbstractInterceptor> interceptors = List();
+
   Application() {
     initHandlers();
     initConverters();
+    initInterceptors();
   }
 
+  // 初始化默认处理器
   initHandlers() {
     this.handlers[HttpStatus.notFound] = NotFoundHandler.getInstance();
     this.handlers[HttpStatus.ok] = OKHandler.getInstance();
   }
 
+  // 初始化转换器
   initConverters() {
     this.converters[ContentType.json] = JSONHttpMessageConverter.getInstance();
     this.converters[ContentType.text] =
@@ -32,18 +45,30 @@ class Application {
         StringHttpMessageConverter.getInstance();
   }
 
+  // 内置拦截器初始化
+  initInterceptors() {
+    this.interceptors.add(I18nInterceptor.getInstance());
+  }
+
   // ip/端口监听
   void listen(int port, {InternetAddress internetAddress}) async {
+    // 默认ipv4
     internetAddress = internetAddress != null
         ? internetAddress
         : InternetAddress.loopbackIPv4;
+    // 创建服务
     this.server = await HttpServer.bind(internetAddress, port);
 
+    // 处理请求
     await for (HttpRequest req in server) {
+      // 创建请求上下文
       Context ctx = this.createContext(req, req.response);
+      // 前置中间件处理
       await this.handleWithMiddleware(
           ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
+      // 匹配路由并处理请求
       await this.matchRouter(ctx, req);
+      // 后置中间件处理
       await this.handleWithMiddleware(
           ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
     }
@@ -85,6 +110,7 @@ class Application {
     return context;
   }
 
+  // 添加路由
   router(Router router) {
     this.routers.add(router);
     router.app = this;
@@ -139,5 +165,10 @@ class Application {
     if (this.converters.containsKey(type)) {
       this.converters[type] = converter;
     }
+  }
+
+  // 拦截器注册
+  void registryInterceptor(AbstractInterceptor interceptor) {
+    this.interceptors.add(interceptor);
   }
 }

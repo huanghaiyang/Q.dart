@@ -12,3 +12,4 @@ export 'src/Router.dart';
 export 'src/converter/Converter.dart';
 export 'src/exception/Exception.dart';
 export 'src/handler/Handler.dart';
+export 'src/interceptor/Interceptor.dart';
