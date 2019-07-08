@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Q/Q.dart';
+import 'package:curie/curie.dart';
 
 class Application {
   // 当前环境
@@ -61,16 +62,24 @@ class Application {
 
     // 处理请求
     await for (HttpRequest req in server) {
-      // 创建请求上下文
-      Context ctx = this.createContext(req, req.response);
-      // 前置中间件处理
-      await this.handleWithMiddleware(
-          ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
-      // 匹配路由并处理请求
-      await this.matchRouter(ctx, req);
-      // 后置中间件处理
-      await this.handleWithMiddleware(
-          ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
+      HttpResponse res = req.response;
+      // 处理拦截
+      bool suspend = await this.applyPreHandler(req, res);
+      // 如果返回false，则表示拦截器已经处理了当前请求，不需要再匹配路由、处理请求、消费中间件
+      if (suspend) {
+        // 创建请求上下文
+        Context ctx = this.createContext(req, res);
+        // 前置中间件处理
+        await this.handleWithMiddleware(
+            ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
+        // 匹配路由并处理请求
+        await this.matchRouter(ctx, req);
+        // 后置中间件处理
+        await this.handleWithMiddleware(
+            ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
+        // 执行后置拦截器方法
+        await this.applyPostHandler(req, res);
+      }
     }
   }
 
@@ -111,11 +120,16 @@ class Application {
   }
 
   // 添加路由
-  router(Router router) {
+  void route(Router router) {
     this.routers.add(router);
     router.app = this;
     router.converter = this.converters[router.contentType];
     router.handlerAdapter = this.handlers[HttpStatus.ok];
+  }
+
+  // 同时添加多个路由
+  void routes(List<Router> routers) {
+    routers.forEach((router) => this.route(router));
   }
 
   // 匹配路由，并处理请求
@@ -170,5 +184,34 @@ class Application {
   // 拦截器注册
   void registryInterceptor(AbstractInterceptor interceptor) {
     this.interceptors.add(interceptor);
+  }
+
+  // 注册多个拦截器
+  void registryInterceptors(List<AbstractInterceptor> interceptors) {
+    interceptors
+        .forEach((interceptor) => this.registryInterceptor(interceptor));
+  }
+
+  // 执行拦截器的preHandler
+  Future<bool> applyPreHandler(HttpRequest req, HttpResponse res) async {
+    List<Function> functions = List();
+    for (int i = 0; i < this.interceptors.length; i++) {
+      functions.add(() async {
+        return await  this.interceptors[i].preHandle(req, res);
+      });
+    }
+    bool suspend = await everySeries(functions);
+    return suspend;
+  }
+
+  // 执行拦截器的postHandler
+  void applyPostHandler(HttpRequest req, HttpResponse res) async {
+    List<Function> functions = List();
+    for (int i = this.interceptors.length - 1; i >= 0; i--) {
+      functions.add(() async {
+        return this.interceptors[i].postHandle(req, res);
+      });
+    }
+    await eachSeries(functions);
   }
 }

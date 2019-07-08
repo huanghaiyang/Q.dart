@@ -9,7 +9,7 @@ import 'package:Q/Q.dart';
 
 main() {
   Application app = Application();
-  app.router(Router("/users", 'get', (Context ctx,
+  app.route(Router("/users", 'get', (Context ctx,
       [HttpRequest req, HttpResponse res]) {
     return {'name': 'huang'};
   }));
