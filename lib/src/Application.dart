@@ -10,7 +10,7 @@ class Application {
   // 服务
   HttpServer server;
 
-// 中间件
+  // 中间件
   List<Middleware> middleWares = List();
 
   // 路由
@@ -197,7 +197,7 @@ class Application {
     List<Function> functions = List();
     for (int i = 0; i < this.interceptors.length; i++) {
       functions.add(() async {
-        return await  this.interceptors[i].preHandle(req, res);
+        return await this.interceptors[i].preHandle(req, res);
       });
     }
     bool suspend = await everySeries(functions);

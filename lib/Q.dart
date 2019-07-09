@@ -1,6 +1,8 @@
 library Q;
 
 export 'src/Application.dart';
+export 'src/ApplicationContext.dart';
+export 'src/Configuration.dart';
 export 'src/Context.dart';
 export 'src/Flux.dart';
 export 'src/Middleware.dart';
