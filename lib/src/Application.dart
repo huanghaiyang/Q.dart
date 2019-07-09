@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:Q/Q.dart';
@@ -25,10 +26,17 @@ class Application {
   // 拦截器
   List<AbstractInterceptor> interceptors = List();
 
+  // 资源
+  List<Resource> resources = List();
+
+  // 请求解析器
+  Map<ResolverType, AbstractResolver> resolvers = Map();
+
   Application() {
     initHandlers();
     initConverters();
     initInterceptors();
+    initResolvers();
   }
 
   // 初始化默认处理器
@@ -51,6 +59,11 @@ class Application {
     this.interceptors.add(I18nInterceptor.getInstance());
   }
 
+  // 初始化内置解析器
+  initResolvers() {
+    this.resolvers[ResolverType.MULTIPART] = MultipartResolver.getInstance();
+  }
+
   // ip/端口监听
   void listen(int port, {InternetAddress internetAddress}) async {
     // 默认ipv4
@@ -58,7 +71,8 @@ class Application {
         ? internetAddress
         : InternetAddress.loopbackIPv4;
     // 创建服务
-    this.server = await HttpServer.bind(internetAddress, port);
+    this.server =
+        await HttpServer.bind(internetAddress, port).catchError(this.onError);
 
     // 处理请求
     await for (HttpRequest req in server) {
@@ -68,7 +82,7 @@ class Application {
       // 如果返回false，则表示拦截器已经处理了当前请求，不需要再匹配路由、处理请求、消费中间件
       if (suspend) {
         // 创建请求上下文
-        Context ctx = this.createContext(req, res);
+        Context ctx = await this.createContext(req, res);
         // 前置中间件处理
         await this.handleWithMiddleware(
             ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
@@ -106,8 +120,8 @@ class Application {
   void onError(Context ctx) async {}
 
   // 创建上下文
-  Context createContext(HttpRequest req, HttpResponse res) {
-    Request request = Request();
+  Future<Context> createContext(HttpRequest req, HttpResponse res) async {
+    Request request = await this.resolveRequest(req);
     request.req = req;
     Response response = Response();
     response.res = res;
@@ -117,6 +131,33 @@ class Application {
     request.response = response;
     response.request = request;
     return context;
+  }
+
+  // 预处理请求
+  Future<Request> resolveRequest(HttpRequest req) async {
+    if (this.resolvers.isEmpty) return Request();
+    List<Function> functions = List();
+    List<ResolverType> keys = List.from(this.resolvers.keys);
+    for (int i = 0; i < keys.length; i++) {
+      ResolverType resolverType = keys[i];
+      functions.add(() async {
+        return await this.resolvers[resolverType].isMe(req);
+      });
+    }
+    Completer<Request> completer = Completer();
+    await someLimit(functions, 5, (Map<int, bool> result) {
+      if (result.values.every((v) => !v)) {
+        completer.complete(Request());
+      } else {
+        for (MapEntry entry in result.entries) {
+          if (entry.value) {
+            completer.complete(this.resolvers[keys[entry.key]].resolve(req));
+            break;
+          }
+        }
+      }
+    });
+    return completer.future;
   }
 
   // 添加路由
@@ -214,4 +255,7 @@ class Application {
     }
     await eachSeries(functions);
   }
+
+  // 资源维护
+  void resource(String pattern, Resource resource) {}
 }

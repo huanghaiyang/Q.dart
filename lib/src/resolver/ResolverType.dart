@@ -1,0 +1,1 @@
+enum ResolverType { MULTIPART }

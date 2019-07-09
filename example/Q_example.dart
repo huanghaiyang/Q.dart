@@ -8,5 +8,9 @@ main() {
       [HttpRequest req, HttpResponse res]) async {
     return {'name': 'huang'};
   }));
+  app.route(Router("/upload", 'post', (Context ctx,
+      [HttpRequest req, HttpResponse res]) async {
+    return {'name': 'huang'};
+  }));
   app.listen(8081);
 }
