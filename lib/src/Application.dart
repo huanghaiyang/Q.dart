@@ -62,6 +62,7 @@ class Application {
   // 初始化内置解析器
   initResolvers() {
     this.resolvers[ResolverType.MULTIPART] = MultipartResolver.getInstance();
+    this.resolvers[ResolverType.JSON] = JsonResolver.getInstance();
   }
 
   // ip/端口监听

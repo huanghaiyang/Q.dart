@@ -7,6 +7,9 @@ import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
+typedef routerHandleFunction = Future<dynamic> Function(Context,
+    [HttpRequest, HttpResponse]);
+
 class Router {
   Application app;
   String path;
@@ -15,7 +18,7 @@ class Router {
   bool hasMatch;
 
   // 处理函数
-  Function handle;
+  routerHandleFunction handle;
   Map params;
   String method = 'GET';
 
@@ -32,7 +35,7 @@ class Router {
       {this.params, this.contentType, this.converter, this.handlerAdapter}) {
     if (this.handle == null) {
       this.handle =
-          (Context ctx, HttpRequest req, HttpResponse res) async => ctx;
+          (Context ctx, [HttpRequest req, HttpResponse res]) async => null;
     }
     if (this.contentType == null) {
       this.contentType = ContentType.json;

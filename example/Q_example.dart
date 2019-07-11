@@ -12,5 +12,9 @@ main() {
       [HttpRequest req, HttpResponse res]) async {
     return {'name': 'huang'};
   }));
+  app.route(Router("/user", 'post', (Context ctx,
+      [HttpRequest req, HttpResponse res]) async {
+    return {'success': true};
+  }));
   app.listen(8081);
 }

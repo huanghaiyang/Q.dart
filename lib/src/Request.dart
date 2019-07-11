@@ -10,7 +10,9 @@ class Request {
   Context ctx;
   Response response;
 
-  Request([this.app, this.req, this.ctx, this.response]);
+  Map data;
+
+  Request({this.data});
 
   void onerror(Error error) async {}
 }

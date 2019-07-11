@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:Q/src/MultipartRequest.dart';
@@ -24,15 +25,13 @@ class MultipartResolver extends AbstractResolver {
         .startsWith(RegExp('multipart/form-data'));
   }
 
+  // int i0, 13表示换行
   @override
   Future<Request> resolve(HttpRequest req) async {
-    req.listen((List<int> bytes) {
-      print(bytes);
-    }, onDone: () {
-      print('done');
-    }, onError: (error) {
-      print(error);
-    }, cancelOnError: true);
+    req.listen((List<int> data) {
+      // TODO transform
+      print(String.fromCharCodes(data));
+    });
     MultipartRequest multipartRequest = MultipartRequest();
     return multipartRequest;
   }
