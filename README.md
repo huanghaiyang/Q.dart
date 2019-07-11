@@ -17,7 +17,7 @@ import 'package:Q/Q.dart';
 main() {
   Application app = Application();
   app.route(Router("/users", 'get', (Context ctx,
-      {HttpRequest req, HttpResponse res}) {
+      [HttpRequest req, HttpResponse res]) {
     return {'name': 'huang'};
   }));
   app.listen(8081);
