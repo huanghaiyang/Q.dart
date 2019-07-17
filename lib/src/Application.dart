@@ -77,7 +77,13 @@ class Application {
 
     // 处理请求
     await for (HttpRequest req in server) {
-      HttpResponse res = req.response;
+      await this.handleRequest(req);
+    }
+  }
+
+  Future<dynamic> handleRequest(HttpRequest req) async {
+    HttpResponse res = req.response;
+    try {
       // 处理拦截
       bool suspend = await this.applyPreHandler(req, res);
       // 如果返回false，则表示拦截器已经处理了当前请求，不需要再匹配路由、处理请求、消费中间件
@@ -95,6 +101,8 @@ class Application {
         // 执行后置拦截器方法
         await this.applyPostHandler(req, res);
       }
+    } catch (error) {
+      print(error);
     }
   }
 
