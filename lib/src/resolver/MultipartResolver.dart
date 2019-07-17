@@ -1,9 +1,9 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:Q/src/MultipartRequest.dart';
 import 'package:Q/src/Request.dart';
+import 'package:Q/src/multipart/MultipartTransformer.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 
 class MultipartResolver extends AbstractResolver {
@@ -29,8 +29,19 @@ class MultipartResolver extends AbstractResolver {
   @override
   Future<Request> resolve(HttpRequest req) async {
     req.listen((List<int> data) {
-      // TODO transform
-      print(String.fromCharCodes(data));
+      try {
+        MultipartTransformer multipartTransformer = MultipartTransformer();
+        multipartTransformer.transform(req, data);
+        multipartTransformer.partitions.forEach((p) {
+          print('+++++++++++++++++++++');
+          print(String.fromCharCodes(p));
+          print('+++++++++++++++++++++');
+        });
+      } catch (error) {
+        print(error);
+      }
+    }).onError((error) {
+      print(error);
     });
     MultipartRequest multipartRequest = MultipartRequest();
     return multipartRequest;
