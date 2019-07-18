@@ -32,11 +32,6 @@ class MultipartResolver extends AbstractResolver {
       try {
         MultipartTransformer multipartTransformer = MultipartTransformer();
         multipartTransformer.transform(req, data);
-        multipartTransformer.partitions.forEach((p) {
-          print('+++++++++++++++++++++');
-          print(String.fromCharCodes(p));
-          print('+++++++++++++++++++++');
-        });
       } catch (error) {
         print(error);
       }

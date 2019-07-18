@@ -7,8 +7,7 @@ import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
-typedef routerHandleFunction = Future<dynamic> Function(Context,
-    [HttpRequest, HttpResponse]);
+typedef routerHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
 
 class Router {
   Application app;
@@ -31,11 +30,9 @@ class Router {
   // response handler
   HandlerAdapter handlerAdapter;
 
-  Router(this.path, this.method, this.handle,
-      {this.params, this.contentType, this.converter, this.handlerAdapter}) {
+  Router(this.path, this.method, this.handle, {this.params, this.contentType, this.converter, this.handlerAdapter}) {
     if (this.handle == null) {
-      this.handle =
-          (Context ctx, [HttpRequest req, HttpResponse res]) async => null;
+      this.handle = (Context ctx, [HttpRequest req, HttpResponse res]) async => null;
     }
     if (this.contentType == null) {
       this.contentType = ContentType.json;
@@ -46,8 +43,7 @@ class Router {
   Future<bool> match(HttpRequest request) async {
     this.requestPath = request.uri.path;
     this.pathRegex = pathToRegExp(this.path);
-    this.hasMatch = this.pathRegex.hasMatch(this.requestPath) &&
-        request.method.toLowerCase() == this.method.toLowerCase();
+    this.hasMatch = this.pathRegex.hasMatch(this.requestPath) && request.method.toLowerCase() == this.method.toLowerCase();
     return this.hasMatch;
   }
 

@@ -8,7 +8,15 @@ List<int> HYPHEN = '-'.codeUnits;
 
 List<int> FIRST_BOUNDARY_PREFIX = List()..addAll(HYPHEN)..addAll(HYPHEN);
 
+List<List<int>> DELIMITER = [CR, LF, CR, LF];
+
 String HEADER_SEPARATOR = "\r\n";
+
+String CONTENT_DISPOSITION = 'Content-Disposition: form-data; ';
+
+String CONTENT_TYPE = 'Content-Type: ';
+
+String NAME_KEY = 'name';
 
 // 从请求头的请求类型中读取boundary
 List<int> boundary(HttpRequest req) {

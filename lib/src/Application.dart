@@ -48,10 +48,8 @@ class Application {
   // 初始化转换器
   initConverters() {
     this.converters[ContentType.json] = JSONHttpMessageConverter.getInstance();
-    this.converters[ContentType.text] =
-        StringHttpMessageConverter.getInstance();
-    this.converters[ContentType.html] =
-        StringHttpMessageConverter.getInstance();
+    this.converters[ContentType.text] = StringHttpMessageConverter.getInstance();
+    this.converters[ContentType.html] = StringHttpMessageConverter.getInstance();
   }
 
   // 内置拦截器初始化
@@ -68,12 +66,9 @@ class Application {
   // ip/端口监听
   void listen(int port, {InternetAddress internetAddress}) async {
     // 默认ipv4
-    internetAddress = internetAddress != null
-        ? internetAddress
-        : InternetAddress.loopbackIPv4;
+    internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;
     // 创建服务
-    this.server =
-        await HttpServer.bind(internetAddress, port).catchError(this.onError);
+    this.server = await HttpServer.bind(internetAddress, port).catchError(this.onError);
 
     // 处理请求
     await for (HttpRequest req in server) {
@@ -91,13 +86,11 @@ class Application {
         // 创建请求上下文
         Context ctx = await this.createContext(req, res);
         // 前置中间件处理
-        await this.handleWithMiddleware(
-            ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
+        await this.handleWithMiddleware(ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
         // 匹配路由并处理请求
         await this.matchRouter(ctx, req);
         // 后置中间件处理
-        await this.handleWithMiddleware(
-            ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
+        await this.handleWithMiddleware(ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
         // 执行后置拦截器方法
         await this.applyPostHandler(req, res);
       }
@@ -112,11 +105,8 @@ class Application {
   }
 
   // response中间件
-  Future<Context> handleWithMiddleware(Context ctx, MiddlewareType type,
-      Function onFinished, Function onError) async {
-    await for (Middleware middleware in Stream.fromIterable(this
-        .middleWares
-        .where((Middleware middleware) => middleware.type == type))) {
+  Future<Context> handleWithMiddleware(Context ctx, MiddlewareType type, Function onFinished, Function onError) async {
+    await for (Middleware middleware in Stream.fromIterable(this.middleWares.where((Middleware middleware) => middleware.type == type))) {
       await middleware.handle(ctx, onFinished, onError);
     }
     return ctx;
@@ -195,8 +185,7 @@ class Application {
     if (matchedRouter != null) {
       ctx.router = matchedRouter;
       // 等待结果处理完成
-      dynamic result =
-          await matchedRouter.handle(ctx, ctx.request.req, ctx.response.res);
+      dynamic result = await matchedRouter.handle(ctx, ctx.request.req, ctx.response.res);
       ResponseEntry responseEntry;
       if (!(result is ResponseEntry)) {
         responseEntry = ResponseEntry(result);
@@ -224,8 +213,7 @@ class Application {
   }
 
   // 替换内置转换器
-  void replaceConverter(
-      ContentType type, AbstractHttpMessageConverter converter) {
+  void replaceConverter(ContentType type, AbstractHttpMessageConverter converter) {
     if (this.converters.containsKey(type)) {
       this.converters[type] = converter;
     }
@@ -238,8 +226,7 @@ class Application {
 
   // 注册多个拦截器
   void registryInterceptors(List<AbstractInterceptor> interceptors) {
-    interceptors
-        .forEach((interceptor) => this.registryInterceptor(interceptor));
+    interceptors.forEach((interceptor) => this.registryInterceptor(interceptor));
   }
 
   // 执行拦截器的preHandler
