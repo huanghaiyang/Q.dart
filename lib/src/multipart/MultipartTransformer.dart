@@ -66,13 +66,14 @@ class MultipartTransformer {
       int splitIndex = knuthMorrisPrattMatcher.match(partition);
       String info = String.fromCharCodes(partition.getRange(0, splitIndex - knuthMorrisPrattMatcher.delimiter.length + 1));
       int contentTypeIndex = info.indexOf(RegExp(CONTENT_TYPE));
+      List<int> contentBytes = partition.sublist(splitIndex + 1, partition.length - 1);
       if (contentTypeIndex != -1) {
         props['contentType'] = info.substring(contentTypeIndex + CONTENT_TYPE.length);
         info = info.substring(CONTENT_DISPOSITION.length, contentTypeIndex).replaceAll(RegExp(HEADER_SEPARATOR), '');
-        props['content'] = partition.sublist(splitIndex + 1, partition.length - 1);
+        props['content'] = contentBytes;
       } else {
         info = info.substring(CONTENT_DISPOSITION.length);
-        props['content'] = String.fromCharCodes(partition.sublist(splitIndex + 1, partition.length - 1));
+        props['content'] = String.fromCharCodes(contentBytes);
       }
       info.split(RegExp("; ")).forEach((str) {
         List<String> kv = str.split(RegExp("="));
