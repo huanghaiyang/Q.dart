@@ -21,7 +21,6 @@ class OKHandler implements HandlerAdapter {
     httpResponse.statusCode = ctx.status;
     httpResponse.headers.contentType = ctx.router.contentType;
     httpResponse.write(ctx.response.responseEntry.convertedResult);
-    await httpResponse.close();
     return ctx;
   }
 }

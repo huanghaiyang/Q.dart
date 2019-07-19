@@ -69,10 +69,10 @@ class MultipartTransformer {
       if (contentTypeIndex != -1) {
         props['contentType'] = info.substring(contentTypeIndex + CONTENT_TYPE.length);
         info = info.substring(CONTENT_DISPOSITION.length, contentTypeIndex).replaceAll(RegExp(HEADER_SEPARATOR), '');
-        props['result'] = partition.sublist(splitIndex + 1, partition.length - 1);
+        props['content'] = partition.sublist(splitIndex + 1, partition.length - 1);
       } else {
         info = info.substring(CONTENT_DISPOSITION.length);
-        props['result'] = String.fromCharCodes(partition.sublist(splitIndex + 1, partition.length - 1));
+        props['content'] = String.fromCharCodes(partition.sublist(splitIndex + 1, partition.length - 1));
       }
       info.split(RegExp("; ")).forEach((str) {
         List<String> kv = str.split(RegExp("="));
@@ -87,7 +87,6 @@ class MultipartTransformer {
         result[name].add(props);
       }
     });
-    print(result);
     return result;
   }
 }

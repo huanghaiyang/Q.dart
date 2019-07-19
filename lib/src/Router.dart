@@ -7,7 +7,7 @@ import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
-typedef routerHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
+typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
 
 class Router {
   Application app;
@@ -17,7 +17,7 @@ class Router {
   bool hasMatch;
 
   // 处理函数
-  routerHandleFunction handle;
+  RouterHandleFunction handle;
   Map params;
   String method = 'GET';
 

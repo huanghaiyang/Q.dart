@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:Q/src/MultipartRequest.dart';
 import 'package:Q/src/Request.dart';
+import 'package:Q/src/multipart/MultipartHelper.dart';
 import 'package:Q/src/multipart/MultipartTransformer.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 
@@ -20,24 +21,15 @@ class MultipartResolver extends AbstractResolver {
 
   @override
   Future<bool> isMe(HttpRequest req) async {
-    return req.headers.contentType.mimeType
-        .toLowerCase()
-        .startsWith(RegExp('multipart/form-data'));
+    return req.headers.contentType.mimeType.toLowerCase().startsWith(RegExp('multipart/form-data'));
   }
 
   // int i0, 13表示换行
   @override
   Future<Request> resolve(HttpRequest req) async {
-    req.listen((List<int> data) {
-      try {
-        MultipartTransformer multipartTransformer = MultipartTransformer();
-        multipartTransformer.transform(req, data);
-      } catch (error) {
-        print(error);
-      }
-    }).onError((error) {
-      print(error);
-    });
+    List<int> data = concat(await req.toList());
+    MultipartTransformer multipartTransformer = MultipartTransformer();
+    await multipartTransformer.transform(req, data);
     MultipartRequest multipartRequest = MultipartRequest();
     return multipartRequest;
   }
