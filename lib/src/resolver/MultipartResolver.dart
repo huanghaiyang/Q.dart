@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Q/src/Request.dart';
-import 'package:Q/src/multipart/MultipartHelper.dart';
 import 'package:Q/src/multipart/MultipartTransformer.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 
@@ -27,8 +26,7 @@ class MultipartResolver extends AbstractResolver {
   @override
   Future<Request> resolve(HttpRequest req) async {
     List<int> requestData = concat(await req.toList());
-    MultipartTransformer multipartTransformer = MultipartTransformer();
-    Map data = await multipartTransformer.transform(req, requestData);
+    Map data = await transform(req, requestData);
     Request request = Request(data: data);
     return request;
   }
