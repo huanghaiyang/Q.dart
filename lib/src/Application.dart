@@ -2,9 +2,12 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Q/Q.dart';
+import 'package:Q/src/ApplicationContext.dart';
 import 'package:curie/curie.dart';
 
 class Application {
+  ApplicationContext applicationContext = ApplicationContext.getInstance();
+
   // 当前环境
   String env = 'development';
 
@@ -33,10 +36,10 @@ class Application {
   Map<ResolverType, AbstractResolver> resolvers = Map();
 
   Application() {
-    initHandlers();
-    initConverters();
-    initInterceptors();
-    initResolvers();
+    this.initHandlers();
+    this.initConverters();
+    this.initInterceptors();
+    this.initResolvers();
   }
 
   // 初始化默认处理器
@@ -55,6 +58,7 @@ class Application {
   // 内置拦截器初始化
   initInterceptors() {
     this.interceptors.add(I18nInterceptor.getInstance());
+    this.interceptors.add(UnSupportedContentTypeInterceptor.getInstance());
   }
 
   // 初始化内置解析器
@@ -78,7 +82,7 @@ class Application {
 
   // 请求处理
   Future<dynamic> handleRequest(HttpRequest req) async {
-    try{
+    try {
       HttpResponse res = req.response;
       // 处理拦截
       bool suspend = await this.applyPreHandler(req, res);
@@ -96,7 +100,7 @@ class Application {
         await this.applyPostHandler(req, res);
         await makeSureResponseRelease(res);
       }
-    }catch(error) {
+    } catch (error) {
       print(error);
     }
     return true;

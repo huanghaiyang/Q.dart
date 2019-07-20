@@ -16,6 +16,7 @@ export 'src/Sign.dart';
 export 'src/converter/Converter.dart';
 export 'src/exception/Exception.dart';
 export 'src/handler/Handler.dart';
+export 'src/helpers/Helpers.dart';
 export 'src/interceptor/Interceptor.dart';
 export 'src/multipart/Multipart.dart';
 export 'src/resolver/Resolver.dart';
