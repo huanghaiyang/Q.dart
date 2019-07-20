@@ -20,6 +20,7 @@ class Router {
   RouterHandleFunction handle;
   Map params;
   String method = 'GET';
+  Map<String, List<String>> query;
 
   // 默认返回的格式为json
   ContentType contentType = ContentType.json;
@@ -42,6 +43,7 @@ class Router {
   // 请求路径匹配
   Future<bool> match(HttpRequest request) async {
     this.requestPath = request.uri.path;
+    this.query = request.uri.queryParametersAll;
     this.pathRegex = pathToRegExp(this.path);
     this.hasMatch = this.pathRegex.hasMatch(this.requestPath) && request.method.toLowerCase() == this.method.toLowerCase();
     return this.hasMatch;
