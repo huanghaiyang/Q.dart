@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:Q/src/multipart/KnuthMorrisPrattMatcher.dart';
@@ -98,7 +99,7 @@ MultiValueMap mapResult(List<List<int>> partitions) {
       props['content'] = contentBytes;
     } else {
       info = info.substring(CONTENT_DISPOSITION.length);
-      props['content'] = String.fromCharCodes(contentBytes);
+      props['content'] = utf8.decode(contentBytes);
     }
     info.split(RegExp("; ")).forEach((str) {
       List<String> kv = str.split(RegExp("="));
