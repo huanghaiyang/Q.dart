@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Q/src/multipart/KnuthMorrisPrattMatcher.dart';
+import 'package:Q/src/multipart/MultiValueMap.dart';
 
 List<int> CR = '\r'.codeUnits;
 
@@ -47,13 +48,13 @@ List<int> concat(List<List<int>> byteArrays) {
   return result;
 }
 
-Future<Map<String, List<Map>>> transform(HttpRequest req, List<int> data) async {
+Future<MultiValueMap> transform(HttpRequest req, List<int> data) async {
   List<int> boundaryUnits = boundary(req);
   List<int> needle = concat([FIRST_BOUNDARY_PREFIX, boundaryUnits, CR, LF]);
   KnuthMorrisPrattMatcher matcher = KnuthMorrisPrattMatcher(needle);
   List<int> body = skipUntilFirstBoundary(data, matcher);
   List<List<int>> partitions = split(body, needle, matcher);
-  Map<String, List<Map>> result = mapResult(partitions);
+  MultiValueMap result = mapResult(partitions);
   return result;
 }
 
@@ -81,7 +82,7 @@ List<List<int>> split(List<int> data, List<int> needle, KnuthMorrisPrattMatcher 
   return partitions;
 }
 
-Map<String, List<Map>> mapResult(List<List<int>> partitions) {
+MultiValueMap mapResult(List<List<int>> partitions) {
   Map<String, List<Map>> result = Map();
 
   KnuthMorrisPrattMatcher knuthMorrisPrattMatcher = KnuthMorrisPrattMatcher(concat(DELIMITER));
@@ -112,5 +113,5 @@ Map<String, List<Map>> mapResult(List<List<int>> partitions) {
       result[name].add(props);
     }
   });
-  return result;
+  return MultiValueMap.from(result);
 }
