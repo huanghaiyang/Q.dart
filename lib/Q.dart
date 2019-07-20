@@ -12,6 +12,7 @@ export 'src/Resource.dart';
 export 'src/Response.dart';
 export 'src/ResponseEntry.dart';
 export 'src/Router.dart';
+export 'src/Sign.dart';
 export 'src/converter/Converter.dart';
 export 'src/exception/Exception.dart';
 export 'src/handler/Handler.dart';
