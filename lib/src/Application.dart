@@ -150,7 +150,7 @@ class Application {
     for (int i = 0; i < keys.length; i++) {
       ResolverType resolverType = keys[i];
       functions.add(() async {
-        return await this.resolvers[resolverType].isMe(req);
+        return await this.resolvers[resolverType].match(req);
       });
     }
     Completer<Request> completer = Completer();

@@ -18,7 +18,7 @@ class JsonResolver extends AbstractResolver {
   }
 
   @override
-  Future<bool> isMe(HttpRequest req) async {
+  Future<bool> match(HttpRequest req) async {
     return req.headers.contentType.mimeType.toLowerCase().startsWith(RegExp(ContentType.json.mimeType));
   }
 
