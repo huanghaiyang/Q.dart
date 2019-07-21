@@ -4,7 +4,6 @@ import 'package:Q/Q.dart';
 
 main() {
   Application app = Application();
-  app.applicationContext.configuration.addUnSupportContentType(ContentType("multipart", "form-data"));
   app.route(Router("/users", 'get', (Context ctx, [HttpRequest req, HttpResponse res]) async {
     return {'name': 'huang'};
   }));

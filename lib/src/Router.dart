@@ -7,6 +7,16 @@ import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
+String GET = 'get';
+
+String POST = 'post';
+
+String PUT = 'put';
+
+String DELETE = 'delete';
+
+String OPTIONS = 'options';
+
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
 
 class Router {
@@ -55,5 +65,21 @@ class Router {
 
   Future write(Context ctx) {
     return this.handlerAdapter.handle(ctx);
+  }
+
+  static get(String path, RouterHandleFunction handle, {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter}) {
+    return Router(path, GET, handle, params: params, contentType: contentType, converter: converter, handlerAdapter: handlerAdapter);
+  }
+
+  static post(String path, RouterHandleFunction handle, {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter}) {
+    return Router(path, POST, handle, params: params, contentType: contentType, converter: converter, handlerAdapter: handlerAdapter);
+  }
+
+  static delete(String path, RouterHandleFunction handle, {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter}) {
+    return Router(path, DELETE, handle, params: params, contentType: contentType, converter: converter, handlerAdapter: handlerAdapter);
+  }
+
+  static put(String path, RouterHandleFunction handle, {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter}) {
+    return Router(path, PUT, handle, params: params, contentType: contentType, converter: converter, handlerAdapter: handlerAdapter);
   }
 }

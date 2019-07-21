@@ -13,8 +13,4 @@ class Configuration {
   }
 
   List<ContentType> unSupportedContentTypes = List();
-
-  void addUnSupportContentType(ContentType contentType) {
-    this.unSupportedContentTypes.add(contentType);
-  }
 }
