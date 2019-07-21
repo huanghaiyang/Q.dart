@@ -1,6 +1,9 @@
 import 'dart:collection';
 import 'dart:io';
 
+import 'package:Q/src/query/CommonValue.dart';
+import 'package:Q/src/query/MultipartFile.dart';
+import 'package:Q/src/query/Value.dart';
 import 'package:Q/src/utils/FileUtil.dart';
 
 class MultiValueMap<K, V> implements LinkedHashMap<K, V> {
@@ -17,7 +20,7 @@ class MultiValueMap<K, V> implements LinkedHashMap<K, V> {
   }
 
   dynamic getFirstValue(K name) {
-    List values = this.getValues(name);
+    List<dynamic> values = this.getValues(name);
     if (values != null) {
       if (values.isNotEmpty) {
         return values.first;
@@ -31,8 +34,13 @@ class MultiValueMap<K, V> implements LinkedHashMap<K, V> {
   List<dynamic> getValues(K name) {
     if (this.containsKey(name)) {
       V values = this[name];
-      return List.from((values as List<Map>).map((value) {
-        return value['content'];
+      return List.from((values as List<Value>).map((value) {
+        if (value is CommonValue) {
+          return value.value;
+        } else if (value is MultipartFile) {
+          return value.bytes;
+        }
+        return null;
       }));
     }
     return null;

@@ -3,6 +3,9 @@ import 'dart:io';
 
 import 'package:Q/src/multipart/KnuthMorrisPrattMatcher.dart';
 import 'package:Q/src/multipart/MultiValueMap.dart';
+import 'package:Q/src/query/CommonValue.dart';
+import 'package:Q/src/query/MultipartFile.dart';
+import 'package:Q/src/query/Value.dart';
 
 List<int> CR = '\r'.codeUnits;
 
@@ -83,36 +86,47 @@ List<List<int>> split(List<int> data, List<int> needle, KnuthMorrisPrattMatcher 
   return partitions;
 }
 
+Map getProps(String info) {
+  Map namedMap = Map();
+  info.split(RegExp("; ")).forEach((str) {
+    List<String> kv = str.split(RegExp("="));
+    namedMap[kv[0]] = kv[1].substring(1, kv[1].length - 1);
+  });
+  return namedMap;
+}
+
 MultiValueMap mapResult(List<List<int>> partitions) {
-  Map<String, List<Map>> result = Map();
+  Map<String, List<Value>> result = Map();
 
   KnuthMorrisPrattMatcher knuthMorrisPrattMatcher = KnuthMorrisPrattMatcher(concat(DELIMITER));
   partitions.forEach((List<int> partition) {
-    Map props = Map();
+    Value value;
     int splitIndex = knuthMorrisPrattMatcher.match(partition);
     String info = String.fromCharCodes(partition.getRange(0, splitIndex - knuthMorrisPrattMatcher.delimiter.length + 1));
     int contentTypeIndex = info.indexOf(RegExp(CONTENT_TYPE));
     List<int> contentBytes = partition.sublist(splitIndex + 1, partition.length - 1);
     if (contentTypeIndex != -1) {
-      props['contentType'] = info.substring(contentTypeIndex + CONTENT_TYPE.length);
+      MultipartFile namedValue = MultipartFile();
+      namedValue.contentType = ContentType.parse(info.substring(contentTypeIndex + CONTENT_TYPE.length));
       info = info.substring(CONTENT_DISPOSITION.length, contentTypeIndex).replaceAll(RegExp(HEADER_SEPARATOR), '');
-      props['content'] = contentBytes;
+      namedValue.bytes = contentBytes;
+      namedValue.size = contentBytes.length;
+      Map props = getProps(info);
+      namedValue.name = props['name'];
+      namedValue.originName = props['filename'];
+      value = namedValue;
     } else {
       info = info.substring(CONTENT_DISPOSITION.length);
-      props['content'] = utf8.decode(contentBytes);
+      CommonValue namedValue = CommonValue();
+      namedValue.value = utf8.decode(contentBytes);
+      Map props = getProps(info);
+      namedValue.name = props['name'];
+      value = namedValue;
     }
-    info.split(RegExp("; ")).forEach((str) {
-      List<String> kv = str.split(RegExp("="));
-      props[kv[0]] = kv[1].substring(1, kv[1].length - 1);
-    });
-    if (props.containsKey(NAME_KEY)) {
-      String name = props[NAME_KEY];
-      if (!result.containsKey(name)) {
-        result[name] = List();
-      }
-      props.remove(NAME_KEY);
-      result[name].add(props);
+    if (!result.containsKey(value.name)) {
+      result[value.name] = List();
     }
+    result[value.name].add(value);
   });
   return MultiValueMap.from(result);
 }

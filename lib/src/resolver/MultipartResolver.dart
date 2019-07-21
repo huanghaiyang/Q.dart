@@ -28,6 +28,7 @@ class MultipartResolver extends AbstractResolver {
   Future<Request> resolve(HttpRequest req) async {
     List<int> requestData = concat(await req.toList());
     MultiValueMap data = await transform(req, requestData);
+    File file = await data.getFirstFile('files');
     Request request = Request(data: data);
     return request;
   }
