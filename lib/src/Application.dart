@@ -82,8 +82,8 @@ class Application {
 
   // 请求处理
   Future<dynamic> handleRequest(HttpRequest req) async {
+    HttpResponse res = req.response;
     try {
-      HttpResponse res = req.response;
       // 处理拦截
       bool suspend = await this.applyPreHandler(req, res);
       // 如果返回false，则表示拦截器已经处理了当前请求，不需要再匹配路由、处理请求、消费中间件
@@ -98,11 +98,11 @@ class Application {
         await this.handleWithMiddleware(ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
         // 执行后置拦截器方法
         await this.applyPostHandler(req, res);
-        await makeSureResponseRelease(res);
       }
     } catch (error) {
       print(error);
     }
+    await makeSureResponseRelease(res);
     return true;
   }
 

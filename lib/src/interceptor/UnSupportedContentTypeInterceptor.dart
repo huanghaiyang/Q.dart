@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:Q/src/helpers/UnSupportedContentTypeHelper.dart';
 import 'package:Q/src/interceptor/AbstractInterceptor.dart';
+import 'package:Q/src/views/UnSupportedContentTypeView.dart';
 
 class UnSupportedContentTypeInterceptor implements AbstractInterceptor {
   UnSupportedContentTypeInterceptor._();
@@ -17,7 +18,13 @@ class UnSupportedContentTypeInterceptor implements AbstractInterceptor {
 
   @override
   Future<bool> preHandle(HttpRequest req, HttpResponse res) async {
-    return UnSupportedContentTypeHelper.checkSupported(req);
+    bool passed = await UnSupportedContentTypeHelper.checkSupported(req);
+    if (!passed) {
+      res.write(UnSupportedContentTypeView().toRaw(req, res, extra: {
+        'unSupported': req.headers.contentType.mimeType
+      }));
+    }
+    return passed;
   }
 
   @override

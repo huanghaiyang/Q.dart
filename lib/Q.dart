@@ -21,3 +21,4 @@ export 'src/interceptor/Interceptor.dart';
 export 'src/multipart/Multipart.dart';
 export 'src/resolver/Resolver.dart';
 export 'src/utils/Utils.dart';
+export 'src/views/Views.dart';
