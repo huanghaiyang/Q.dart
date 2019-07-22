@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Q/src/Application.dart';
+import 'package:Q/src/Attribute.dart';
 import 'package:Q/src/Request.dart';
 import 'package:Q/src/Response.dart';
 import 'package:Q/src/Router.dart';
@@ -13,6 +14,7 @@ class Context {
   int status;
   String id;
   Router router;
+  Map<String, Attribute> attributes = Map();
 
   Context([this.request, this.response, this.app]) {
     this.status = HttpStatus.ok;
@@ -41,6 +43,18 @@ class Context {
     return this.cookies.where((cookie) {
       return cookie.domain == domain;
     });
+  }
+
+  Attribute getAttribute(String name) {
+    return this.attributes[name];
+  }
+
+  Iterable<String> getAttributeNames() {
+    return this.attributes.keys;
+  }
+
+  void setAttribute(String name, dynamic value) {
+    this.attributes[name] = Attribute(name, value);
   }
 
   void onerror(Error error) async {}
