@@ -83,20 +83,24 @@ class Application {
   // 请求处理
   Future<dynamic> handleRequest(HttpRequest req) async {
     HttpResponse res = req.response;
-    // 处理拦截
-    bool suspend = await this.applyPreHandler(req, res);
-    // 如果返回false，则表示拦截器已经处理了当前请求，不需要再匹配路由、处理请求、消费中间件
-    if (suspend) {
-      // 创建请求上下文
-      Context ctx = await this.createContext(req, res);
-      // 前置中间件处理
-      await this.handleWithMiddleware(ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
-      // 匹配路由并处理请求
-      await this.matchRouter(ctx, req);
-      // 后置中间件处理
-      await this.handleWithMiddleware(ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
-      // 执行后置拦截器方法
-      await this.applyPostHandler(req, res);
+    try {
+      // 处理拦截
+      bool suspend = await this.applyPreHandler(req, res);
+      // 如果返回false，则表示拦截器已经处理了当前请求，不需要再匹配路由、处理请求、消费中间件
+      if (suspend) {
+        // 创建请求上下文
+        Context ctx = await this.createContext(req, res);
+        // 前置中间件处理
+        await this.handleWithMiddleware(ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
+        // 匹配路由并处理请求
+        await this.matchRouter(ctx, req);
+        // 后置中间件处理
+        await this.handleWithMiddleware(ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
+        // 执行后置拦截器方法
+        await this.applyPostHandler(req, res);
+      }
+    } catch (exception) {
+      print(exception.toString());
     }
     await makeSureResponseRelease(res);
     return true;
@@ -244,7 +248,14 @@ class Application {
     List<Function> functions = List();
     for (int i = 0; i < this.interceptors.length; i++) {
       functions.add(() async {
-        return await this.interceptors[i].preHandle(req, res);
+        bool suspend;
+        try {
+          suspend = await this.interceptors[i].preHandle(req, res);
+        } catch (exception) {
+          suspend = true;
+          print(exception);
+        }
+        return suspend;
       });
     }
     bool suspend = await everySeries(functions);
