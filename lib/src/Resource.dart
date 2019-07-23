@@ -1,1 +1,1 @@
-class Resource {}
+abstract class Resource {}
