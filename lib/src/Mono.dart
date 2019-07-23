@@ -1,3 +1,3 @@
-class Mono<T> {
+abstract class Mono<T> {
 
 }

@@ -1,3 +1,3 @@
-class Flux<T> {
+abstract class Flux<T> {
 
 }
