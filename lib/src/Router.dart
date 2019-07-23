@@ -19,67 +19,128 @@ String OPTIONS = 'options';
 
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
 
-class Router {
-  Application app;
-  String path;
-  String requestPath;
-  RegExp pathRegex;
-  bool hasMatch;
+abstract class Router {
+  factory Router(String path, String method, RouterHandleFunction handle,
+          {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter}) =>
+      _Router(path, method, handle, params_: params, contentType_: contentType, converter_: converter, handlerAdapter_: handlerAdapter);
+
+  Map<String, List<String>> get query;
+
+  ContentType get contentType;
+
+  RouterHandleFunction get handle;
+
+  Application get app;
+
+  String get path;
+
+  Map get params;
+
+  String get method;
+
+  set app(Application app);
+
+  set handlerAdapter(HandlerAdapter handlerAdapter);
+
+  set converter(AbstractHttpMessageConverter converter);
+
+  Future<bool> match(HttpRequest request);
+
+  Future convert(ResponseEntry entry);
+
+  Future write(Context ctx);
+}
+
+class _Router implements Router {
+  Application app_;
+
+  final String path_;
 
   // 处理函数
-  RouterHandleFunction handle;
-  Map params;
-  String method = 'GET';
-  Map<String, List<String>> query;
+  final RouterHandleFunction handle_;
+
+  final Map params_;
+
+  String method_ = GET;
 
   // 默认返回的格式为json
-  ContentType contentType = ContentType.json;
+  ContentType contentType_ = ContentType.json;
 
   // 默认json数据转换
-  AbstractHttpMessageConverter converter;
+  AbstractHttpMessageConverter converter_;
 
   // response handler
-  HandlerAdapter handlerAdapter;
+  HandlerAdapter handlerAdapter_;
 
-  Router(this.path, this.method, this.handle, {this.params, this.contentType, this.converter, this.handlerAdapter}) {
-    if (this.handle == null) {
-      this.handle = (Context ctx, [HttpRequest req, HttpResponse res]) async => null;
-    }
-    if (this.contentType == null) {
-      this.contentType = ContentType.json;
+  Map<String, List<String>> query_;
+
+  _Router(this.path_, this.method_, this.handle_, {this.params_, this.contentType_, this.converter_, this.handlerAdapter_}) {
+    if (this.contentType_ == null) {
+      this.contentType_ = ContentType.json;
     }
   }
 
   // 请求路径匹配
   Future<bool> match(HttpRequest request) async {
-    this.requestPath = request.uri.path;
-    this.query = request.uri.queryParametersAll;
-    this.pathRegex = pathToRegExp(this.path);
-    this.hasMatch = this.pathRegex.hasMatch(this.requestPath) && request.method.toLowerCase() == this.method.toLowerCase();
-    return this.hasMatch;
+    this.query_ = request.uri.queryParametersAll;
+    return pathToRegExp(this.path).hasMatch(request.uri.path) && request.method.toLowerCase() == this.method.toLowerCase();
   }
 
   Future convert(ResponseEntry entry) async {
-    return this.converter.convert(entry.result);
+    return this.converter_.convert(entry.result);
   }
 
   Future write(Context ctx) {
-    return this.handlerAdapter.handle(ctx);
+    return this.handlerAdapter_.handle(ctx);
   }
 
-  static get(String path, RouterHandleFunction handle, {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter}) {
-    return Router(path, GET, handle, params: params, contentType: contentType, converter: converter, handlerAdapter: handlerAdapter);
+  @override
+  set app(Application app) {
+    this.app_ = app;
   }
 
-  static post(String path, RouterHandleFunction handle, {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter}) {
-    return Router(path, POST, handle, params: params, contentType: contentType, converter: converter, handlerAdapter: handlerAdapter);
+  @override
+  set handlerAdapter(HandlerAdapter handlerAdapter) {
+    this.handlerAdapter_ = handlerAdapter;
   }
 
-  static delete(String path, RouterHandleFunction handle, {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter}) {
-    return Router(path, DELETE, handle, params: params, contentType: contentType, converter: converter, handlerAdapter: handlerAdapter);
+  @override
+  String get method {
+    return this.method_;
   }
 
-  static put(String path, RouterHandleFunction handle, {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter}) {
-    return Router(path, PUT, handle, params: params, contentType: contentType, converter: converter, handlerAdapter: handlerAdapter);
+  @override
+  Map get params {
+    return this.params_;
+  }
+
+  @override
+  String get path {
+    return this.path_;
+  }
+
+  @override
+  Application get app {
+    return this.app_;
+  }
+
+  @override
+  RouterHandleFunction get handle {
+    return this.handle_;
+  }
+
+  @override
+  ContentType get contentType {
+    return this.contentType_;
+  }
+
+  @override
+  Map<String, List<String>> get query {
+    return this.query_;
+  }
+
+  @override
+  set converter(AbstractHttpMessageConverter converter) {
+    this.converter_ = converter;
   }
 }
