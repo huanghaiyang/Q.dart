@@ -1,16 +1,18 @@
 import 'dart:io';
 
-class Configuration {
-  Configuration._();
+abstract class Configuration {
+  List<ContentType> get unSupportedContentTypes;
 
-  static Configuration _instance;
+  factory Configuration() => _Configuration();
+}
 
-  static Configuration getInstance() {
-    if (_instance == null) {
-      _instance = Configuration._();
-    }
-    return _instance;
+class _Configuration implements Configuration {
+  _Configuration();
+
+  List<ContentType> unSupportedContentTypes_ = List();
+
+  @override
+  List<ContentType> get unSupportedContentTypes {
+    return this.unSupportedContentTypes_;
   }
-
-  List<ContentType> unSupportedContentTypes = List();
 }

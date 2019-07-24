@@ -1,16 +1,18 @@
 import 'package:Q/src/Configuration.dart';
 
-class ApplicationContext {
-  ApplicationContext._();
+abstract class ApplicationContext {
+  Configuration get configuration;
 
-  static ApplicationContext _instance;
+  factory ApplicationContext() => _ApplicationContext();
+}
 
-  static ApplicationContext getInstance() {
-    if (_instance == null) {
-      _instance = ApplicationContext._();
-    }
-    return _instance;
+class _ApplicationContext implements ApplicationContext {
+  Configuration configuration_ = Configuration();
+
+  _ApplicationContext();
+
+  @override
+  Configuration get configuration {
+    return this.configuration_;
   }
-
-  Configuration configuration = Configuration.getInstance();
 }

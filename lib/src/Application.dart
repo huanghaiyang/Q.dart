@@ -5,37 +5,97 @@ import 'package:Q/Q.dart';
 import 'package:Q/src/ApplicationContext.dart';
 import 'package:curie/curie.dart';
 
-class Application {
-  ApplicationContext applicationContext = ApplicationContext.getInstance();
+abstract class Application {
+  factory Application() => _Application.getInstance();
+
+  static ApplicationContext getApplicationContext() {
+    return Application().applicationContext;
+  }
+
+  String get env;
+
+  List<Middleware> get middleWares;
+
+  List<Router> get routers;
+
+  Map<int, HandlerAdapter> get handlers;
+
+  Map<ContentType, AbstractHttpMessageConverter> get converters;
+
+  List<AbstractInterceptor> get interceptors;
+
+  List<Resource> get resources;
+
+  Map<ResolverType, AbstractResolver> get resolvers;
+
+  ApplicationContext get applicationContext;
+
+  void route(Router router);
+
+  void listen(int port, {InternetAddress internetAddress});
+
+  void use(Middleware middleware);
+
+  void onFinished(Context ctx);
+
+  void onError(Context ctx);
+
+  void routes(List<Router> routers);
+
+  Future<Context> matchRouter(Context ctx, HttpRequest req);
+
+  void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter);
+
+  void replaceConverter(ContentType type, AbstractHttpMessageConverter converter);
+
+  void registryInterceptor(AbstractInterceptor interceptor);
+
+  void registryInterceptors(List<AbstractInterceptor> interceptors);
+}
+
+class _Application implements Application {
+  _Application._();
+
+  static _Application _instance;
+
+  static _Application getInstance() {
+    if (_instance == null) {
+      _instance = _Application._();
+      _instance.init();
+    }
+    return _instance;
+  }
+
+  ApplicationContext applicationContext_ = ApplicationContext();
 
   // 当前环境
-  String env = 'development';
+  String env_ = 'development';
 
   // 服务
-  HttpServer server;
+  HttpServer server_;
 
   // 中间件
-  List<Middleware> middleWares = List();
+  List<Middleware> middleWares_ = List();
 
   // 路由
-  List<Router> routers = List();
+  List<Router> routers_ = List();
 
   // default handlers
-  Map<int, HandlerAdapter> handlers = Map();
+  Map<int, HandlerAdapter> handlers_ = Map();
 
   // 转换器
-  Map<ContentType, AbstractHttpMessageConverter> converters = Map();
+  Map<ContentType, AbstractHttpMessageConverter> converters_ = Map();
 
   // 拦截器
-  List<AbstractInterceptor> interceptors = List();
+  List<AbstractInterceptor> interceptors_ = List();
 
   // 资源
-  List<Resource> resources = List();
+  List<Resource> resources_ = List();
 
   // 请求解析器
-  Map<ResolverType, AbstractResolver> resolvers = Map();
+  Map<ResolverType, AbstractResolver> resolvers_ = Map();
 
-  Application() {
+  init() {
     this.initHandlers();
     this.initConverters();
     this.initInterceptors();
@@ -44,38 +104,39 @@ class Application {
 
   // 初始化默认处理器
   initHandlers() {
-    this.handlers[HttpStatus.notFound] = NotFoundHandler.getInstance();
-    this.handlers[HttpStatus.ok] = OKHandler.getInstance();
+    this.handlers_[HttpStatus.notFound] = NotFoundHandler.getInstance();
+    this.handlers_[HttpStatus.ok] = OKHandler.getInstance();
   }
 
   // 初始化转换器
   initConverters() {
-    this.converters[ContentType.json] = JSONHttpMessageConverter.getInstance();
-    this.converters[ContentType.text] = StringHttpMessageConverter.getInstance();
-    this.converters[ContentType.html] = StringHttpMessageConverter.getInstance();
+    this.converters_[ContentType.json] = JSONHttpMessageConverter.getInstance();
+    this.converters_[ContentType.text] = StringHttpMessageConverter.getInstance();
+    this.converters_[ContentType.html] = StringHttpMessageConverter.getInstance();
   }
 
   // 内置拦截器初始化
   initInterceptors() {
-    this.interceptors.add(I18nInterceptor.getInstance());
-    this.interceptors.add(UnSupportedContentTypeInterceptor.getInstance());
+    this.interceptors_.add(I18nInterceptor.getInstance());
+    this.interceptors_.add(UnSupportedContentTypeInterceptor.getInstance());
   }
 
   // 初始化内置解析器
   initResolvers() {
-    this.resolvers[ResolverType.MULTIPART] = MultipartResolver.getInstance();
-    this.resolvers[ResolverType.JSON] = JsonResolver.getInstance();
+    this.resolvers_[ResolverType.MULTIPART] = MultipartResolver.getInstance();
+    this.resolvers_[ResolverType.JSON] = JsonResolver.getInstance();
   }
 
   // ip/端口监听
+  @override
   void listen(int port, {InternetAddress internetAddress}) async {
     // 默认ipv4
     internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;
     // 创建服务
-    this.server = await HttpServer.bind(internetAddress, port).catchError(this.onError);
+    this.server_ = await HttpServer.bind(internetAddress, port).catchError(this.onError);
 
     // 处理请求
-    await for (HttpRequest req in server) {
+    await for (HttpRequest req in this.server_) {
       await this.handleRequest(req);
     }
   }
@@ -110,22 +171,25 @@ class Application {
   }
 
   // 加入一个中间件
+  @override
   void use(Middleware middleware) {
-    this.middleWares.add(middleware);
+    this.middleWares_.add(middleware);
   }
 
   // response中间件
   Future<Context> handleWithMiddleware(Context ctx, MiddlewareType type, Function onFinished, Function onError) async {
-    await for (Middleware middleware in Stream.fromIterable(this.middleWares.where((Middleware middleware) => middleware.type == type))) {
+    await for (Middleware middleware in Stream.fromIterable(this.middleWares_.where((Middleware middleware) => middleware.type == type))) {
       await middleware.handle(ctx, onFinished, onError);
     }
     return ctx;
   }
 
   // 请求完成处理回调函数
+  @override
   void onFinished(Context ctx) async {}
 
   // 错误处理
+  @override
   void onError(Context ctx) async {}
 
   // 创建上下文
@@ -144,13 +208,13 @@ class Application {
 
   // 预处理请求
   Future<Request> resolveRequest(HttpRequest req) async {
-    if (this.resolvers.isEmpty) return Request();
+    if (this.resolvers_.isEmpty) return Request();
     List<Function> functions = List();
-    List<ResolverType> keys = List.from(this.resolvers.keys);
+    List<ResolverType> keys = List.from(this.resolvers_.keys);
     for (int i = 0; i < keys.length; i++) {
       ResolverType resolverType = keys[i];
       functions.add(() async {
-        return await this.resolvers[resolverType].match(req);
+        return await this.resolvers_[resolverType].match(req);
       });
     }
     Completer<Request> completer = Completer();
@@ -160,7 +224,7 @@ class Application {
       } else {
         for (MapEntry entry in result.entries) {
           if (entry.value) {
-            completer.complete(this.resolvers[keys[entry.key]].resolve(req));
+            completer.complete(this.resolvers_[keys[entry.key]].resolve(req));
             break;
           }
         }
@@ -170,23 +234,26 @@ class Application {
   }
 
   // 添加路由
+  @override
   void route(Router router) {
-    this.routers.add(router);
+    this.routers_.add(router);
     router.app = this;
-    router.converter = this.converters[router.contentType];
-    router.handlerAdapter = this.handlers[HttpStatus.ok];
+    router.converter = this.converters_[router.contentType];
+    router.handlerAdapter = this.handlers_[HttpStatus.ok];
   }
 
   // 同时添加多个路由
+  @override
   void routes(List<Router> routers) {
     routers.forEach((router) => this.route(router));
   }
 
   // 匹配路由，并处理请求
+  @override
   Future<Context> matchRouter(Context ctx, HttpRequest req) async {
     Router matchedRouter;
     // 匹配路由
-    await for (Router router in Stream.fromIterable(this.routers)) {
+    await for (Router router in Stream.fromIterable(this.routers_)) {
       bool hasMatch = await router.match(req);
       if (hasMatch) {
         matchedRouter = router;
@@ -210,31 +277,35 @@ class Application {
       await matchedRouter.write(ctx);
     } else {
       // TODO throw router not found exception
-      await this.handlers[HttpStatus.notFound].handle(ctx);
+      await this.handlers_[HttpStatus.notFound].handle(ctx);
     }
     return ctx;
   }
 
   // 替换内置默认的handler
+  @override
   void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter) {
-    if (this.handlers.containsKey(httpStatus)) {
-      this.handlers[httpStatus] = handlerAdapter;
+    if (this.handlers_.containsKey(httpStatus)) {
+      this.handlers_[httpStatus] = handlerAdapter;
     }
   }
 
   // 替换内置转换器
+  @override
   void replaceConverter(ContentType type, AbstractHttpMessageConverter converter) {
-    if (this.converters.containsKey(type)) {
-      this.converters[type] = converter;
+    if (this.converters_.containsKey(type)) {
+      this.converters_[type] = converter;
     }
   }
 
   // 拦截器注册
+  @override
   void registryInterceptor(AbstractInterceptor interceptor) {
-    this.interceptors.add(interceptor);
+    this.interceptors_.add(interceptor);
   }
 
   // 注册多个拦截器
+  @override
   void registryInterceptors(List<AbstractInterceptor> interceptors) {
     interceptors.forEach((interceptor) => this.registryInterceptor(interceptor));
   }
@@ -242,11 +313,11 @@ class Application {
   // 执行拦截器的preHandler
   Future<bool> applyPreHandler(HttpRequest req, HttpResponse res) async {
     List<Function> functions = List();
-    for (int i = 0; i < this.interceptors.length; i++) {
+    for (int i = 0; i < this.interceptors_.length; i++) {
       functions.add(() async {
         bool suspend;
         try {
-          suspend = await this.interceptors[i].preHandle(req, res);
+          suspend = await this.interceptors_[i].preHandle(req, res);
         } catch (exception) {
           suspend = true;
           print(exception);
@@ -261,9 +332,9 @@ class Application {
   // 执行拦截器的postHandler
   void applyPostHandler(HttpRequest req, HttpResponse res) async {
     List<Function> functions = List();
-    for (int i = this.interceptors.length - 1; i >= 0; i--) {
+    for (int i = this.interceptors_.length - 1; i >= 0; i--) {
       functions.add(() async {
-        return this.interceptors[i].postHandle(req, res);
+        return this.interceptors_[i].postHandle(req, res);
       });
     }
     await eachSeries(functions);
@@ -271,4 +342,49 @@ class Application {
 
   // 资源维护
   void resource(String pattern, Resource resource) {}
+
+  @override
+  Map<ResolverType, AbstractResolver> get resolvers {
+    return this.resolvers_;
+  }
+
+  @override
+  List<Resource> get resources {
+    return this.resources_;
+  }
+
+  @override
+  List<AbstractInterceptor> get interceptors {
+    return this.interceptors_;
+  }
+
+  @override
+  Map<ContentType, AbstractHttpMessageConverter> get converters {
+    return this.converters_;
+  }
+
+  @override
+  Map<int, HandlerAdapter> get handlers {
+    return this.handlers_;
+  }
+
+  @override
+  List<Router> get routers {
+    return this.routers_;
+  }
+
+  @override
+  List<Middleware> get middleWares {
+    return this.middleWares_;
+  }
+
+  @override
+  String get env {
+    return this.env_;
+  }
+
+  @override
+  ApplicationContext get applicationContext {
+    return this.applicationContext_;
+  }
 }
