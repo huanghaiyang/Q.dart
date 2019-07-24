@@ -2,20 +2,12 @@ import 'dart:io';
 
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/Context.dart';
+import 'package:Q/src/Method.dart';
+import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/ResponseEntry.dart';
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
-
-String GET = 'get';
-
-String POST = 'post';
-
-String PUT = 'put';
-
-String DELETE = 'delete';
-
-String OPTIONS = 'options';
 
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
 
@@ -45,6 +37,8 @@ abstract class Router {
   set converter(AbstractHttpMessageConverter converter);
 
   Future<bool> match(HttpRequest request);
+
+  Future<bool> matchRedirect(Redirect redirect);
 
   Future convert(ResponseEntry entry);
 
@@ -142,5 +136,10 @@ class _Router implements Router {
   @override
   set converter(AbstractHttpMessageConverter converter) {
     this.converter_ = converter;
+  }
+
+  @override
+  Future<bool> matchRedirect(Redirect redirect) async {
+    return pathToRegExp(this.path).hasMatch(redirect.path) && redirect.method.toLowerCase() == this.method.toLowerCase();
   }
 }

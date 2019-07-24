@@ -42,7 +42,7 @@ abstract class Application {
 
   void routes(List<Router> routers);
 
-  Future<Context> matchRouter(Context ctx, HttpRequest req);
+  Future<Context> applyRouter(Context ctx, HttpRequest req);
 
   void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter);
 
@@ -51,6 +51,8 @@ abstract class Application {
   void registryInterceptor(AbstractInterceptor interceptor);
 
   void registryInterceptors(List<AbstractInterceptor> interceptors);
+
+  Future<dynamic> handleRedirect(Context ctx, Redirect redirect, HttpRequest req);
 }
 
 class _Application implements Application {
@@ -153,7 +155,7 @@ class _Application implements Application {
       // 前置中间件处理
       await this.handleWithMiddleware(ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
       // 匹配路由并处理请求
-      await this.matchRouter(ctx, req);
+      await this.applyRouter(ctx, req);
       // 后置中间件处理
       await this.handleWithMiddleware(ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
       // 执行后置拦截器方法
@@ -250,19 +252,24 @@ class _Application implements Application {
 
   // 匹配路由，并处理请求
   @override
-  Future<Context> matchRouter(Context ctx, HttpRequest req) async {
-    Router matchedRouter;
-    // 匹配路由
-    await for (Router router in Stream.fromIterable(this.routers_)) {
-      bool hasMatch = await router.match(req);
-      if (hasMatch) {
-        matchedRouter = router;
-      }
-    }
+  Future<Context> applyRouter(Context ctx, HttpRequest req) async {
+    Router matchedRouter = await this.matchRouter(req);
     if (matchedRouter != null) {
-      ctx.router = matchedRouter;
-      // 等待结果处理完成
-      dynamic result = await matchedRouter.handle(ctx, ctx.request.req, ctx.response.res);
+      ctx.setRouter(matchedRouter);
+      await this.handleRouter(matchedRouter, ctx, req);
+    } else {
+      // TODO throw router not found exception
+      await this.handlers_[HttpStatus.notFound].handle(ctx);
+    }
+    return ctx;
+  }
+
+  Future<Context> handleRouter(Router matchedRouter, Context ctx, HttpRequest req) async {
+    // 等待结果处理完成
+    dynamic result = await matchedRouter.handle(ctx, ctx.request.req, ctx.response.res);
+    if (result is Redirect) {
+      await this.handleRedirect(ctx, result, req);
+    } else {
       ResponseEntry responseEntry;
       if (!(result is ResponseEntry)) {
         responseEntry = ResponseEntry(result);
@@ -275,9 +282,6 @@ class _Application implements Application {
       responseEntry.convertedResult = convertedResult;
       // 写response,完成请求
       await matchedRouter.write(ctx);
-    } else {
-      // TODO throw router not found exception
-      await this.handlers_[HttpStatus.notFound].handle(ctx);
     }
     return ctx;
   }
@@ -386,5 +390,39 @@ class _Application implements Application {
   @override
   ApplicationContext get applicationContext {
     return this.applicationContext_;
+  }
+
+  @override
+  Future<Context> handleRedirect(Context ctx, Redirect redirect, HttpRequest req) async {
+    Router matchedRouter = await this.matchRedirect(redirect);
+    if (matchedRouter != null) {
+      ctx.setRouter(matchedRouter);
+      ctx.mergeAttributes(redirect.attributes);
+      return this.handleRouter(matchedRouter, ctx, req);
+    }
+    return ctx;
+  }
+
+  // 匹配路由
+  Future<Router> matchRouter(HttpRequest req) async {
+    Router matchedRouter;
+    await for (Router router in Stream.fromIterable(this.routers_)) {
+      bool hasMatch = await router.match(req);
+      if (hasMatch) {
+        matchedRouter = router;
+      }
+    }
+    return matchedRouter;
+  }
+
+  Future<Router> matchRedirect(Redirect redirect) async {
+    Router matchedRouter;
+    await for (Router router in Stream.fromIterable(this.routers_)) {
+      bool hasMatch = await router.matchRedirect(redirect);
+      if (hasMatch) {
+        matchedRouter = router;
+      }
+    }
+    return matchedRouter;
   }
 }

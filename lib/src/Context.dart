@@ -30,9 +30,9 @@ abstract class Context {
 
   List<Cookie> get cookies;
 
-  set app(Application app);
+  int get routeCount;
 
-  set router(Router router);
+  set app(Application app);
 
   set status(int status);
 
@@ -45,6 +45,12 @@ abstract class Context {
   Iterable<String> getAttributeNames();
 
   void setAttribute(String name, dynamic value);
+
+  void mergeAttributes(Map<String, Attribute> attributes);
+
+  void incrementRouteCount();
+
+  void setRouter(Router router);
 }
 
 class _Context implements Context {
@@ -61,6 +67,8 @@ class _Context implements Context {
   Router router_;
 
   Map<String, Attribute> attributes_ = Map();
+
+  int routeCount_ = 0;
 
   _Context([this.request_, this.response_, this.app_]) {
     this.status_ = HttpStatus.ok;
@@ -107,7 +115,7 @@ class _Context implements Context {
 
   @override
   void setAttribute(String name, dynamic value) {
-    this.attributes_[name] = Attribute(name, value);
+    this.attributes_[name] = Attribute(name, value, this.router_);
   }
 
   @override
@@ -151,12 +159,34 @@ class _Context implements Context {
   }
 
   @override
-  set router(Router router) {
-    this.router_ = router;
+  set app(Application app) {
+    this.app_ = app;
   }
 
   @override
-  set app(Application app) {
-    this.app_ = app;
+  void mergeAttributes(Map<String, Attribute> attributes) {
+    if (attributes != null) {
+      Map<String, Attribute> newAttributes = Map();
+      attributes.entries.forEach((entry) {
+        newAttributes[entry.key] = Attribute(entry.value.name, entry.value.value, this.router_);
+      });
+      this.attributes_.addAll(newAttributes);
+    }
+  }
+
+  @override
+  void incrementRouteCount() {
+    this.routeCount_++;
+  }
+
+  @override
+  int get routeCount {
+    return this.routeCount_;
+  }
+
+  @override
+  void setRouter(Router router) {
+    this.router_ = router;
+    this.incrementRouteCount();
   }
 }

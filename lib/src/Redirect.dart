@@ -1,19 +1,24 @@
 import 'package:Q/src/Attribute.dart';
+import 'package:Q/src/Method.dart';
 
 abstract class Redirect {
   String get path;
 
+  String get method;
+
   Map<String, Attribute> get attributes;
 
-  factory Redirect(String path, [Map<String, Attribute> attributes]) => _Redirect(path, attributes);
+  factory Redirect(String path, String method, [List<Attribute> attributes]) => _Redirect(path, method, attributes);
 }
 
 class _Redirect implements Redirect {
   String path_;
 
-  Map<String, Attribute> attributes_ = Map();
+  List<Attribute> attributes_ = List();
 
-  _Redirect(this.path_, this.attributes_);
+  String method_ = GET;
+
+  _Redirect(this.path_, this.method_, this.attributes_);
 
   @override
   String get path {
@@ -21,7 +26,16 @@ class _Redirect implements Redirect {
   }
 
   @override
+  String get method {
+    return this.method_;
+  }
+
+  @override
   Map<String, Attribute> get attributes {
-    return this.attributes_;
+    Map<String, Attribute> attributes = Map();
+    this.attributes_.forEach((attribute) {
+      attributes[attribute.name] = attribute;
+    });
+    return attributes;
   }
 }

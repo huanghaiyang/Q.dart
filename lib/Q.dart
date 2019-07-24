@@ -6,6 +6,7 @@ export 'src/Attribute.dart';
 export 'src/Configuration.dart';
 export 'src/Context.dart';
 export 'src/Flux.dart';
+export 'src/Method.dart';
 export 'src/Middleware.dart';
 export 'src/Mono.dart';
 export 'src/Redirect.dart';
