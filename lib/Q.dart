@@ -8,6 +8,7 @@ export 'src/Context.dart';
 export 'src/Flux.dart';
 export 'src/Middleware.dart';
 export 'src/Mono.dart';
+export 'src/Redirect.dart';
 export 'src/Request.dart';
 export 'src/Resource.dart';
 export 'src/Response.dart';

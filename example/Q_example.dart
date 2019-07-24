@@ -14,5 +14,8 @@ main() {
   app.route(Router("/user", 'post', (Context ctx, [HttpRequest req, HttpResponse res]) async {
     return {'success': true};
   }));
+  app.route(Router("/redirect", 'post', (Context ctx, [HttpRequest req, HttpResponse res]) async {
+    return Redirect("/user_redirect");
+  }));
   app.listen(8081);
 }
