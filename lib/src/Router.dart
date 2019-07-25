@@ -13,14 +13,14 @@ typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, H
 
 abstract class Router {
   factory Router(String path, String method, RouterHandleFunction handle,
-          {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) =>
-      _Router(path, method, handle, params_: params, contentType_: contentType, converter_: converter, handlerAdapter_: handlerAdapter, name_: name);
+          {Map params, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) =>
+      _Router(path, method, handle, params_: params, produceType_: produceType, converter_: converter, handlerAdapter_: handlerAdapter, name_: name);
 
   String get name;
 
   Map<String, List<String>> get query;
 
-  ContentType get contentType;
+  ContentType get produceType;
 
   RouterHandleFunction get handle;
 
@@ -62,7 +62,7 @@ class _Router implements Router {
   String method_ = GET;
 
   // 默认返回的格式为json
-  ContentType contentType_ = ContentType.json;
+  ContentType produceType_ = ContentType.json;
 
   // 默认json数据转换
   AbstractHttpMessageConverter converter_;
@@ -72,9 +72,9 @@ class _Router implements Router {
 
   Map<String, List<String>> query_;
 
-  _Router(this.path_, this.method_, this.handle_, {this.params_, this.contentType_, this.converter_, this.handlerAdapter_, this.name_}) {
-    if (this.contentType_ == null) {
-      this.contentType_ = ContentType.json;
+  _Router(this.path_, this.method_, this.handle_, {this.params_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
+    if (this.produceType_ == null) {
+      this.produceType_ = ContentType.json;
     }
   }
 
@@ -128,8 +128,8 @@ class _Router implements Router {
   }
 
   @override
-  ContentType get contentType {
-    return this.contentType_;
+  ContentType get produceType {
+    return this.produceType_;
   }
 
   @override

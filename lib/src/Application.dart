@@ -244,7 +244,7 @@ class _Application implements Application {
   void route(Router router) {
     this.routers_.add(router);
     router.app = this;
-    router.converter = this.converters_[router.contentType];
+    router.converter = this.converters_[router.produceType];
     router.handlerAdapter = this.handlers_[HttpStatus.ok];
   }
 

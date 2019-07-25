@@ -19,7 +19,7 @@ class OKHandler implements HandlerAdapter {
   Future<Context> handle(Context ctx) async {
     HttpResponse httpResponse = ctx.response.res;
     httpResponse.statusCode = ctx.status;
-    httpResponse.headers.contentType = ctx.router.contentType;
+    httpResponse.headers.contentType = ctx.router.produceType;
     httpResponse.write(ctx.response.responseEntry.convertedResult);
     return ctx;
   }
