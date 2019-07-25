@@ -20,9 +20,12 @@ main() {
       map[key] = value.value;
     });
     return map;
-  }));
+  }, name: 'user_redirect'));
   app.route(Router("/redirect", 'post', (Context ctx, [HttpRequest req, HttpResponse res]) async {
     return Redirect("/user_redirect", 'post', [Attribute('hello', 'world')]);
+  }));
+  app.route(Router("/redirect_name", 'post', (Context ctx, [HttpRequest req, HttpResponse res]) async {
+    return Redirect("name:user_redirect", 'post', [Attribute('hello', 'world')]);
   }));
   app.listen(8081);
 }

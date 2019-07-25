@@ -12,6 +12,14 @@ abstract class Application {
     return Application().applicationContext;
   }
 
+  static List<Router> getRouters() {
+    return Application().routers;
+  }
+
+  static List<Middleware> getMiddleWares() {
+    return Application().middleWares;
+  }
+
   String get env;
 
   List<Middleware> get middleWares;
@@ -42,8 +50,6 @@ abstract class Application {
 
   void routes(List<Router> routers);
 
-  Future<Context> applyRouter(Context ctx, HttpRequest req);
-
   void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter);
 
   void replaceConverter(ContentType type, AbstractHttpMessageConverter converter);
@@ -51,8 +57,6 @@ abstract class Application {
   void registryInterceptor(AbstractInterceptor interceptor);
 
   void registryInterceptors(List<AbstractInterceptor> interceptors);
-
-  Future<dynamic> handleRedirect(Context ctx, Redirect redirect, HttpRequest req);
 }
 
 class _Application implements Application {
@@ -392,7 +396,6 @@ class _Application implements Application {
     return this.applicationContext_;
   }
 
-  @override
   Future<Context> handleRedirect(Context ctx, Redirect redirect, HttpRequest req) async {
     Router matchedRouter = await this.matchRedirect(redirect);
     if (matchedRouter != null) {
@@ -416,12 +419,16 @@ class _Application implements Application {
     return matchedRouter;
   }
 
+  // 匹配重定向
   Future<Router> matchRedirect(Redirect redirect) async {
-    Router matchedRouter;
-    await for (Router router in Stream.fromIterable(this.routers_)) {
-      bool hasMatch = await router.matchRedirect(redirect);
-      if (hasMatch) {
-        matchedRouter = router;
+    // 先路由名称匹配
+    Router matchedRouter = RedirectHelper.matchRouter(redirect);
+    if (matchedRouter == null) {
+      await for (Router router in Stream.fromIterable(this.routers_)) {
+        bool hasMatch = await router.matchRedirect(redirect);
+        if (hasMatch) {
+          matchedRouter = router;
+        }
       }
     }
     return matchedRouter;

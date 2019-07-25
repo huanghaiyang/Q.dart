@@ -13,8 +13,10 @@ typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, H
 
 abstract class Router {
   factory Router(String path, String method, RouterHandleFunction handle,
-          {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter}) =>
-      _Router(path, method, handle, params_: params, contentType_: contentType, converter_: converter, handlerAdapter_: handlerAdapter);
+          {Map params, ContentType contentType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) =>
+      _Router(path, method, handle, params_: params, contentType_: contentType, converter_: converter, handlerAdapter_: handlerAdapter, name_: name);
+
+  String get name;
 
   Map<String, List<String>> get query;
 
@@ -48,6 +50,8 @@ abstract class Router {
 class _Router implements Router {
   Application app_;
 
+  final String name_;
+
   final String path_;
 
   // 处理函数
@@ -68,7 +72,7 @@ class _Router implements Router {
 
   Map<String, List<String>> query_;
 
-  _Router(this.path_, this.method_, this.handle_, {this.params_, this.contentType_, this.converter_, this.handlerAdapter_}) {
+  _Router(this.path_, this.method_, this.handle_, {this.params_, this.contentType_, this.converter_, this.handlerAdapter_, this.name_}) {
     if (this.contentType_ == null) {
       this.contentType_ = ContentType.json;
     }
@@ -141,5 +145,10 @@ class _Router implements Router {
   @override
   Future<bool> matchRedirect(Redirect redirect) async {
     return pathToRegExp(this.path).hasMatch(redirect.path) && redirect.method.toLowerCase() == this.method.toLowerCase();
+  }
+
+  @override
+  String get name {
+    return this.name_;
   }
 }
