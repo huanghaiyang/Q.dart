@@ -399,8 +399,9 @@ class _Application implements Application {
       ctx.setRouter(matchedRouter);
       ctx.mergeAttributes(redirect.attributes);
       return this.handleRouter(matchedRouter, ctx, req);
+    } else {
+      throw Exception('redirect ${redirect.path} not found.');
     }
-    return ctx;
   }
 
   // 匹配路由
