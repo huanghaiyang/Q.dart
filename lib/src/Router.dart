@@ -40,6 +40,8 @@ abstract class Router {
 
   Future<bool> match(HttpRequest request);
 
+  void apply(HttpRequest request);
+
   Future<bool> matchRedirect(Redirect redirect);
 
   Future convert(ResponseEntry entry);
@@ -57,12 +59,12 @@ class _Router implements Router {
   // 处理函数
   final RouterHandleFunction handle_;
 
-  final Map params_;
+  Map params_;
 
   String method_ = GET;
 
   // 默认返回的格式为json
-  ContentType produceType_ = ContentType.json;
+  ContentType produceType_;
 
   // 默认json数据转换
   AbstractHttpMessageConverter converter_;
@@ -76,11 +78,13 @@ class _Router implements Router {
     if (this.produceType_ == null) {
       this.produceType_ = ContentType.json;
     }
+    if (this.params_ == null) {
+      this.params_ = Map();
+    }
   }
 
   // 请求路径匹配
   Future<bool> match(HttpRequest request) async {
-    this.query_ = request.uri.queryParametersAll;
     return pathToRegExp(this.path).hasMatch(request.uri.path) && request.method.toLowerCase() == this.method.toLowerCase();
   }
 
@@ -150,5 +154,15 @@ class _Router implements Router {
   @override
   String get name {
     return this.name_;
+  }
+
+  @override
+  void apply(HttpRequest request) {
+    this.query_ = request.uri.queryParametersAll;
+    String requestPath = request.uri.path;
+    final parameters = <String>[];
+    final regExp = pathToRegExp(this.path, parameters: parameters);
+    final match = regExp.matchAsPrefix(requestPath);
+    this.params_.addAll(extract(parameters, match));
   }
 }

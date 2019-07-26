@@ -19,7 +19,9 @@ class JsonResolver extends AbstractResolver {
 
   @override
   Future<bool> match(HttpRequest req) async {
-    return req.headers.contentType.mimeType.toLowerCase().startsWith(RegExp(ContentType.json.mimeType));
+    ContentType contentType = req.headers.contentType;
+    if (contentType == null) return false;
+    return contentType.mimeType.toLowerCase().startsWith(RegExp(ContentType.json.mimeType));
   }
 
   @override

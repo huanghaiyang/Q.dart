@@ -255,7 +255,6 @@ class _Application implements Application {
   }
 
   // 匹配路由，并处理请求
-  @override
   Future<Context> applyRouter(Context ctx, HttpRequest req) async {
     Router matchedRouter = await this.matchRouter(req);
     if (matchedRouter != null) {
@@ -268,9 +267,11 @@ class _Application implements Application {
     return ctx;
   }
 
+  // 路由处理，响应请求
   Future<Context> handleRouter(Router matchedRouter, Context ctx, HttpRequest req) async {
+    RouterHandleFunction routerHandleFunction = matchedRouter.handle;
     // 等待结果处理完成
-    dynamic result = await matchedRouter.handle(ctx, ctx.request.req, ctx.response.res);
+    dynamic result = await routerHandleFunction(ctx, ctx.request.req, ctx.response.res);
     if (result is Redirect) {
       await this.handleRedirect(ctx, result, req);
     } else {
@@ -414,6 +415,7 @@ class _Application implements Application {
       bool hasMatch = await router.match(req);
       if (hasMatch) {
         matchedRouter = router;
+        matchedRouter.apply(req);
       }
     }
     return matchedRouter;
