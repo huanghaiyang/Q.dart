@@ -77,7 +77,7 @@ class _Router implements Router {
 
   _Router(this.path_, this.method_, this.handle_, {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
     if (this.produceType_ == null) {
-      this.produceType_ = ContentType.json;
+      this.produceType_ = Application.getApplicationContext().configuration.defaultProducedType;
     }
     if (this.pathVariables_ == null) {
       this.pathVariables_ = Map();
