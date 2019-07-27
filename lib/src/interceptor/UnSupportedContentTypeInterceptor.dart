@@ -29,7 +29,4 @@ class UnSupportedContentTypeInterceptor implements AbstractInterceptor {
 
   @override
   void postHandle(HttpRequest req, HttpResponse res) {}
-
-  @override
-  void rejectHandle(HttpRequest req, HttpResponse res) {}
 }

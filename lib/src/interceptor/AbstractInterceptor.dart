@@ -6,6 +6,4 @@ abstract class AbstractInterceptor {
   Future<bool> preHandle(HttpRequest req, HttpResponse res);
 
   void postHandle(HttpRequest req, HttpResponse res);
-
-  void rejectHandle(HttpRequest req, HttpResponse res);
 }
