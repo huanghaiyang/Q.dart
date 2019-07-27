@@ -1,7 +1,9 @@
+String PATH_VARIABLE_NAME = "name";
+
 @pragma('vm:entry-point')
 class PathVariable {
-  const factory PathVariable() = PathVariable._;
+  final String name;
 
   @pragma('vm:entry-point')
-  const PathVariable._() : super();
+  const PathVariable(this.name);
 }

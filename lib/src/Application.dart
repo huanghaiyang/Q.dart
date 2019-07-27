@@ -269,9 +269,10 @@ class _Application implements Application {
 
   // 路由处理，响应请求
   Future<Context> handleRouter(Router matchedRouter, Context ctx, HttpRequest req) async {
-    RouterHandleFunction routerHandleFunction = matchedRouter.handle;
+    Map<String, dynamic> reflectedPathVariables = RouterHelper.reflectPathVariables(matchedRouter);
+    List positionArguments = List()..addAll([ctx, ctx.request.req, ctx.response.res])..addAll(reflectedPathVariables.values);
     // 等待结果处理完成
-    dynamic result = await routerHandleFunction(ctx, ctx.request.req, ctx.response.res);
+    dynamic result = await Function.apply(matchedRouter.handle, positionArguments);
     if (result is Redirect) {
       await this.handleRedirect(ctx, result, req);
     } else {

@@ -13,8 +13,9 @@ typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, H
 
 abstract class Router {
   factory Router(String path, String method, RouterHandleFunction handle,
-          {Map params, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) =>
-      _Router(path, method, handle, params_: params, produceType_: produceType, converter_: converter, handlerAdapter_: handlerAdapter, name_: name);
+          {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) =>
+      _Router(path, method, handle,
+          pathVariables_: pathVariables, produceType_: produceType, converter_: converter, handlerAdapter_: handlerAdapter, name_: name);
 
   String get name;
 
@@ -28,7 +29,7 @@ abstract class Router {
 
   String get path;
 
-  Map get params;
+  Map get pathVariables;
 
   String get method;
 
@@ -59,7 +60,7 @@ class _Router implements Router {
   // 处理函数
   final RouterHandleFunction handle_;
 
-  Map params_;
+  Map pathVariables_;
 
   String method_ = GET;
 
@@ -74,12 +75,12 @@ class _Router implements Router {
 
   Map<String, List<String>> query_;
 
-  _Router(this.path_, this.method_, this.handle_, {this.params_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
+  _Router(this.path_, this.method_, this.handle_, {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
     if (this.produceType_ == null) {
       this.produceType_ = ContentType.json;
     }
-    if (this.params_ == null) {
-      this.params_ = Map();
+    if (this.pathVariables_ == null) {
+      this.pathVariables_ = Map();
     }
   }
 
@@ -112,8 +113,8 @@ class _Router implements Router {
   }
 
   @override
-  Map get params {
-    return this.params_;
+  Map get pathVariables {
+    return this.pathVariables_;
   }
 
   @override
@@ -163,6 +164,6 @@ class _Router implements Router {
     final parameters = <String>[];
     final regExp = pathToRegExp(this.path, parameters: parameters);
     final match = regExp.matchAsPrefix(requestPath);
-    this.params_.addAll(extract(parameters, match));
+    this.pathVariables_.addAll(extract(parameters, match));
   }
 }

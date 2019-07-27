@@ -34,8 +34,9 @@ main() {
     return Redirect("name:user_redirect", 'post', [Attribute('hello', 'world')]);
   }));
 
-  app.route(Router("/user/:user_id", 'get', (Context ctx, [HttpRequest req, HttpResponse res, @PathVariable() int userId]) async {
-    return {'name': 'huang'};
+  app.route(Router("/user/:user_id/:name", 'get', (Context ctx,
+      [HttpRequest req, HttpResponse res, @PathVariable("user_id") int userId, @PathVariable("name") String name]) async {
+    return {'id': userId, 'name': name};
   }));
 
   app.listen(8081);
