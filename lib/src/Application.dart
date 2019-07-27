@@ -256,7 +256,7 @@ class _Application implements Application {
 
   // 匹配路由，并处理请求
   Future<Context> applyRouter(Context ctx, HttpRequest req) async {
-    Router matchedRouter = await this.matchRouter(req);
+    Router matchedRouter = await RouterHelper.matchRouter(req, this.routers_);
     if (matchedRouter != null) {
       ctx.setRouter(matchedRouter);
       await this.handleRouter(matchedRouter, ctx, req);
@@ -399,7 +399,7 @@ class _Application implements Application {
   }
 
   Future<Context> handleRedirect(Context ctx, Redirect redirect, HttpRequest req) async {
-    Router matchedRouter = await this.matchRedirect(redirect);
+    Router matchedRouter = await RouterHelper.matchRedirect(redirect, this.routers_);
     if (matchedRouter != null) {
       ctx.setRouter(matchedRouter);
       ctx.mergeAttributes(redirect.attributes);
@@ -407,33 +407,5 @@ class _Application implements Application {
     } else {
       throw Exception('redirect ${redirect.path} not found.');
     }
-  }
-
-  // 匹配路由
-  Future<Router> matchRouter(HttpRequest req) async {
-    Router matchedRouter;
-    await for (Router router in Stream.fromIterable(this.routers_)) {
-      bool hasMatch = await router.match(req);
-      if (hasMatch) {
-        matchedRouter = router;
-        matchedRouter.apply(req);
-      }
-    }
-    return matchedRouter;
-  }
-
-  // 匹配重定向
-  Future<Router> matchRedirect(Redirect redirect) async {
-    // 先路由名称匹配
-    Router matchedRouter = RedirectHelper.matchRouter(redirect);
-    if (matchedRouter == null) {
-      await for (Router router in Stream.fromIterable(this.routers_)) {
-        bool hasMatch = await router.matchRedirect(redirect);
-        if (hasMatch) {
-          matchedRouter = router;
-        }
-      }
-    }
-    return matchedRouter;
   }
 }
