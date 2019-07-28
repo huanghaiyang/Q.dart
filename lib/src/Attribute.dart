@@ -1,5 +1,6 @@
 import 'package:Q/src/Router.dart';
 
+// 用户当前请求上下文中的数据传递
 abstract class Attribute {
   factory Attribute(String name, dynamic value, [Router router]) => _Attribute(name, value, router);
 

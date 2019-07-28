@@ -42,6 +42,8 @@ abstract class Application {
 
   void listen(int port, {InternetAddress internetAddress});
 
+  void close();
+
   void use(Middleware middleware);
 
   void onFinished(Context ctx);
@@ -244,6 +246,7 @@ class _Application implements Application {
   void route(Router router) {
     this.routers_.add(router);
     router.app = this;
+    // 查找路由的响应结果转换器
     router.converter = this.converters_[router.produceType];
     router.handlerAdapter = this.handlers_[HttpStatus.ok];
   }
@@ -256,9 +259,12 @@ class _Application implements Application {
 
   // 匹配路由，并处理请求
   Future<Context> applyRouter(Context ctx, HttpRequest req) async {
+    // 匹配路由
     Router matchedRouter = await RouterHelper.matchRouter(req, this.routers_);
     if (matchedRouter != null) {
+      // 设置当前请求上下文的路由
       ctx.setRouter(matchedRouter);
+      // 处理路由请求
       await this.handleRouter(matchedRouter, ctx, req);
     } else {
       // TODO throw router not found exception
@@ -269,19 +275,25 @@ class _Application implements Application {
 
   // 路由处理，响应请求
   Future<Context> handleRouter(Router matchedRouter, Context ctx, HttpRequest req) async {
+    // 通过反射获取当前请求处理函数上定义的路径参数
     Map<String, dynamic> reflectedPathVariables = RouterHelper.reflectPathVariables(matchedRouter);
+    // 合并参数
     List positionArguments = List()..addAll([ctx, ctx.request.req, ctx.response.res])..addAll(reflectedPathVariables.values);
     // 等待结果处理完成
     dynamic result = await Function.apply(matchedRouter.handle, positionArguments);
+    // 如果执行的结果是一个重定向
     if (result is Redirect) {
+      // 根据重定向匹配路由并执行
       await this.handleRedirect(ctx, result, req);
     } else {
       ResponseEntry responseEntry;
+      // 如果执行的结果不是一个ResponseEntry,则将结果封装
       if (!(result is ResponseEntry)) {
         responseEntry = ResponseEntry(result);
       } else {
         responseEntry = result;
       }
+      // 将执行结果赋值给上线文的响应
       ctx.response.responseEntry = responseEntry;
       // 转换后的而结果，类型为String
       String convertedResult = await matchedRouter.convert(responseEntry);
@@ -329,6 +341,7 @@ class _Application implements Application {
         try {
           suspend = await this.interceptors_[i].preHandle(req, res);
         } catch (exception) {
+          // 如果拦截器执行preHandler时抛出异常，则终止请求
           suspend = true;
           print(exception);
         }
@@ -347,6 +360,7 @@ class _Application implements Application {
         return this.interceptors_[i].postHandle(req, res);
       });
     }
+    // 处理每一个拦截器的后置处理方法
     await eachSeries(functions);
   }
 
@@ -398,14 +412,24 @@ class _Application implements Application {
     return this.applicationContext_;
   }
 
+  // 处理重定向
   Future<Context> handleRedirect(Context ctx, Redirect redirect, HttpRequest req) async {
+    // 根据重定向的地址匹配路由
     Router matchedRouter = await RouterHelper.matchRedirect(redirect, this.routers_);
     if (matchedRouter != null) {
+      // 重新设置请求上下文的路由
       ctx.setRouter(matchedRouter);
+      // 合并当前请求上下文中的attributes数据
       ctx.mergeAttributes(redirect.attributes);
+      // 处理路由请求
       return this.handleRouter(matchedRouter, ctx, req);
     } else {
       throw Exception('redirect ${redirect.path} not found.');
     }
+  }
+
+  @override
+  void close() {
+    this.server_.close();
   }
 }

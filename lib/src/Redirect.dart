@@ -1,6 +1,7 @@
 import 'package:Q/src/Attribute.dart';
 import 'package:Q/src/Method.dart';
 
+// 重定向
 abstract class Redirect {
   String get path;
 

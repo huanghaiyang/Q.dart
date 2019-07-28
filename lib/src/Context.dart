@@ -72,7 +72,7 @@ class _Context implements Context {
 
   _Context([this.request_, this.response_, this.app_]) {
     this.status_ = HttpStatus.ok;
-    this.id_ = uuid;
+    this.id_ = uuid5;
   }
 
   @override

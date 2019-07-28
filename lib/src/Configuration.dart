@@ -1,8 +1,11 @@
 import 'dart:io';
 
+// 应用程序配置
 abstract class Configuration {
+  // 当前支持的请求类型
   List<ContentType> get unSupportedContentTypes;
 
+  // 默认返回结果的类型
   ContentType get defaultProducedType;
 
   factory Configuration() => _Configuration();
