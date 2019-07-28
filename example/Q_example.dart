@@ -14,6 +14,10 @@ main() {
     return {'name': 'huang'};
   }));
 
+//  app.route(Router("/upload", 'take', (Context ctx, [HttpRequest req, HttpResponse res]) async {
+//    return {'name': 'huang'};
+//  }));
+
   app.route(Router("/user", POST, (Context ctx, [HttpRequest req, HttpResponse res]) async {
     return {'success': true};
   }));

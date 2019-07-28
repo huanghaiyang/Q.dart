@@ -9,3 +9,5 @@ String DELETE = 'delete';
 String OPTIONS = 'options';
 
 String PATCH = 'patch';
+
+List<String> METHODS = [GET, POST, PUT, DELETE, OPTIONS, PATCH];

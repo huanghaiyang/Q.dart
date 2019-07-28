@@ -7,7 +7,9 @@ import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/ResponseEntry.dart';
 import 'package:Q/src/aware/BindApplicationAware.dart';
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
+import 'package:Q/src/exception/UnKnowMethodException.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
+import 'package:Q/src/helpers/HttpMethodHelper.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
@@ -73,6 +75,9 @@ class _Router implements Router {
   Map<String, List<String>> query_;
 
   _Router(this.path_, this.method_, this.handle_, {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
+    if (!HttpMethodHelper.checkValidMethod(this.method_)) {
+      throw UnKnowMethodException(method: this.method_);
+    }
     if (this.produceType_ == null) {
       this.produceType_ = Application.getApplicationContext().configuration.defaultProducedType;
     }

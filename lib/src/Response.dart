@@ -5,8 +5,11 @@ import 'package:Q/src/Context.dart';
 import 'package:Q/src/Request.dart';
 import 'package:Q/src/ResponseEntry.dart';
 import 'package:Q/src/aware/BindApplicationAware.dart';
+import 'package:Q/src/aware/StatusAware.dart';
 
-abstract class Response extends BindApplicationAware<Application> {
+String _FINE = 'fine';
+
+abstract class Response extends BindApplicationAware<Application> with StatusAware {
   set res(HttpResponse res);
 
   set request(Request request);
@@ -36,9 +39,16 @@ class _Response implements Response {
 
   Context ctx_;
 
+  int status_;
+
+  String _statusText;
+
   ResponseEntry responseEntry_;
 
-  _Response([this.app_, this.res_, this.request_, this.ctx_, this.responseEntry_]);
+  _Response([this.app_, this.res_, this.request_, this.ctx_, this.responseEntry_]) {
+    this.status_ = HttpStatus.ok;
+    this._statusText = _FINE;
+  }
 
   @override
   ResponseEntry get responseEntry {
@@ -88,5 +98,25 @@ class _Response implements Response {
   @override
   set app(Application app) {
     this.app_ = app;
+  }
+
+  @override
+  set status(int status) {
+    this.status_ = status;
+  }
+
+  @override
+  int get status {
+    return this.status_;
+  }
+
+  @override
+  set statusText(String statusText) {
+    this._statusText = statusText;
+  }
+
+  @override
+  String get statusText {
+    return this._statusText;
   }
 }

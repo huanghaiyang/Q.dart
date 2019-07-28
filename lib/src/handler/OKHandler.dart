@@ -18,7 +18,7 @@ class OKHandler implements HandlerAdapter {
   @override
   Future<Context> handle(Context ctx) async {
     HttpResponse httpResponse = ctx.response.res;
-    httpResponse.statusCode = ctx.status;
+    httpResponse.statusCode = ctx.response.status;
     httpResponse.headers.contentType = ctx.router.produceType;
     httpResponse.write(ctx.response.responseEntry.convertedResult);
     return ctx;

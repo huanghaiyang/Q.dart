@@ -1,11 +1,11 @@
 class RedirectNotFoundException extends Exception {
-  factory RedirectNotFoundException([var message]) => _RedirectNotFoundException(message);
+  factory RedirectNotFoundException({String message}) => _RedirectNotFoundException(message: message);
 }
 
 class _RedirectNotFoundException implements RedirectNotFoundException {
   final message;
 
-  _RedirectNotFoundException([this.message]);
+  _RedirectNotFoundException({this.message});
 
   String toString() {
     if (message == null) return "Exception";

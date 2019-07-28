@@ -17,8 +17,6 @@ abstract class Context extends AttributeAware<Attribute> with CookieAware<Cookie
 
   Response get response;
 
-  int get status;
-
   String get id;
 
   Router get router;
@@ -28,8 +26,6 @@ abstract class Context extends AttributeAware<Attribute> with CookieAware<Cookie
   Map<String, List<String>> get query;
 
   int get routeCount;
-
-  set status(int status);
 
   void incrementRouteCount();
 
@@ -43,8 +39,6 @@ class _Context implements Context {
 
   Application app_;
 
-  int status_;
-
   String id_;
 
   Router router_;
@@ -54,7 +48,6 @@ class _Context implements Context {
   int routeCount_ = 0;
 
   _Context([this.request_, this.response_, this.app_]) {
-    this.status_ = HttpStatus.ok;
     this.id_ = uuid5;
   }
 
@@ -130,11 +123,6 @@ class _Context implements Context {
   }
 
   @override
-  int get status {
-    return this.status_;
-  }
-
-  @override
   Application get app {
     return this.app_;
   }
@@ -147,11 +135,6 @@ class _Context implements Context {
   @override
   Request get request {
     return this.request_;
-  }
-
-  @override
-  set status(int status) {
-    this.status_ = status;
   }
 
   @override
