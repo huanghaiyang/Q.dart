@@ -17,6 +17,7 @@ export 'src/ResponseEntry.dart';
 export 'src/Router.dart';
 export 'src/Sign.dart';
 export 'src/annotation/Annotation.dart';
+export 'src/aware/Aware.dart';
 export 'src/converter/Converter.dart';
 export 'src/exception/Exception.dart';
 export 'src/handler/Handler.dart';

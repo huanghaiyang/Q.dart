@@ -5,7 +5,11 @@ import 'package:Q/Q.dart';
 import 'package:Q/src/ApplicationContext.dart';
 import 'package:curie/curie.dart';
 
-abstract class Application {
+typedef ApplicationStartUpCallback = Future<dynamic> Function(Application application);
+
+typedef ApplicationCloseCallback = void Function(Application application, [Future<dynamic> prevCloseableResult]);
+
+abstract class Application extends CloseableAware<Application, ApplicationCloseCallback> with RouteAware<Router> {
   factory Application() => _Application.getInstance();
 
   static ApplicationContext getApplicationContext() {
@@ -38,19 +42,15 @@ abstract class Application {
 
   ApplicationContext get applicationContext;
 
-  void route(Router router);
-
   void listen(int port, {InternetAddress internetAddress});
 
-  void close();
+  void onStartup(ApplicationStartUpCallback applicationStartUpCallback);
 
   void use(Middleware middleware);
 
   void onFinished(Context ctx);
 
   void onError(Context ctx);
-
-  void routes(List<Router> routers);
 
   void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter);
 
@@ -103,6 +103,10 @@ class _Application implements Application {
   // 请求解析器
   Map<ResolverType, AbstractResolver> resolvers_ = Map();
 
+  ApplicationCloseCallback applicationCloseCallback;
+
+  ApplicationStartUpCallback applicationStartUpCallback;
+
   init() {
     this.initHandlers();
     this.initConverters();
@@ -141,7 +145,11 @@ class _Application implements Application {
     // 默认ipv4
     internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;
     // 创建服务
-    this.server_ = await HttpServer.bind(internetAddress, port).catchError(this.onError);
+    this.server_ = await HttpServer.bind(internetAddress, port).catchError(this.onError).whenComplete(() {
+      if (this.applicationStartUpCallback != null) {
+        this.applicationStartUpCallback(this);
+      }
+    });
 
     // 处理请求
     await for (HttpRequest req in this.server_) {
@@ -253,7 +261,7 @@ class _Application implements Application {
 
   // 同时添加多个路由
   @override
-  void routes(List<Router> routers) {
+  void routes(Iterable<Router> routers) {
     routers.forEach((router) => this.route(router));
   }
 
@@ -429,7 +437,68 @@ class _Application implements Application {
   }
 
   @override
-  void close() {
-    this.server_.close();
+  Future<dynamic> close(Application application) async {
+    Future<dynamic> prevCloseableResult = await this.server_.close();
+    if (this.applicationCloseCallback != null) {
+      return await this.applicationCloseCallback(this, prevCloseableResult);
+    }
+    return prevCloseableResult;
+  }
+
+  @override
+  Future<dynamic> onClose(ApplicationCloseCallback applicationCloseCallback) async {
+    this.applicationCloseCallback = applicationCloseCallback;
+    return true;
+  }
+
+  @override
+  void onStartup(ApplicationStartUpCallback applicationStartUpCallback) {
+    this.applicationStartUpCallback = applicationStartUpCallback;
+  }
+
+  //-----------------------------------------------路由 简便使用方法-------------------------------------------//
+  @override
+  Router patch(String path, RouterHandleFunction handle,
+      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
+    Router router = Router(path, PATCH, handle,
+        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+    this.route(router);
+    return router;
+  }
+
+  @override
+  Router delete(String path, RouterHandleFunction handle,
+      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
+    Router router = Router(path, DELETE, handle,
+        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+    this.route(router);
+    return router;
+  }
+
+  @override
+  Router put(String path, RouterHandleFunction handle,
+      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
+    Router router = Router(path, PUT, handle,
+        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+    this.route(router);
+    return router;
+  }
+
+  @override
+  Router post(String path, RouterHandleFunction handle,
+      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
+    Router router = Router(path, POST, handle,
+        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+    this.route(router);
+    return router;
+  }
+
+  @override
+  Router get(String path, RouterHandleFunction handle,
+      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
+    Router router = Router(path, GET, handle,
+        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+    this.route(router);
+    return router;
   }
 }
