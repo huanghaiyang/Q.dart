@@ -5,9 +5,11 @@ import 'package:Q/src/Attribute.dart';
 import 'package:Q/src/Request.dart';
 import 'package:Q/src/Response.dart';
 import 'package:Q/src/Router.dart';
+import 'package:Q/src/aware/AttributeAware.dart';
+import 'package:Q/src/aware/CookieAware.dart';
 import 'package:Q/src/utils/UuidUtil.dart';
 
-abstract class Context {
+abstract class Context extends AttributeAware<Attribute> with CookieAware<Cookie> {
   factory Context([Request request, Response response, Application app]) => _Context(request, response, app);
 
   Request get request;
@@ -22,31 +24,15 @@ abstract class Context {
 
   Router get router;
 
-  Map<String, Attribute> get attributes;
-
   Map get body;
 
   Map<String, List<String>> get query;
-
-  List<Cookie> get cookies;
 
   int get routeCount;
 
   set app(Application app);
 
   set status(int status);
-
-  Cookie getBookie(String name);
-
-  Iterable<Cookie> getBookiesBy(String domain);
-
-  Attribute getAttribute(String name);
-
-  Iterable<String> getAttributeNames();
-
-  void setAttribute(String name, dynamic value);
-
-  void mergeAttributes(Map<String, Attribute> attributes);
 
   void incrementRouteCount();
 
@@ -101,6 +87,19 @@ class _Context implements Context {
     return this.cookies.where((cookie) {
       return cookie.domain == domain;
     });
+  }
+
+  @override
+  bool hasCookie(String name) {
+    int index = this.cookies.indexWhere((cookie) {
+      return cookie.name == name;
+    });
+    return index != -1;
+  }
+
+  @override
+  List<String> get cookieNames {
+    return this.cookies.map((cookie) => cookie.name);
   }
 
   @override
@@ -166,12 +165,32 @@ class _Context implements Context {
   @override
   void mergeAttributes(Map<String, Attribute> attributes) {
     if (attributes != null) {
-      Map<String, Attribute> newAttributes = Map();
-      attributes.entries.forEach((entry) {
-        newAttributes[entry.key] = Attribute(entry.value.name, entry.value.value, this.router_);
-      });
-      this.attributes_.addAll(newAttributes);
+      if (attributes is Map<String, Attribute>) {
+        Map<String, Attribute> newAttributes = Map();
+        attributes.entries.forEach((entry) {
+          newAttributes[entry.key] = Attribute(entry.value.name, entry.value.value, this.router_);
+        });
+        this.attributes_.addAll(newAttributes);
+      }
     }
+  }
+
+  @override
+  bool hasAttribute(String name) {
+    return this.getAttributeNames().contains(name);
+  }
+
+  @override
+  Iterable<String> get attributeNames {
+    return this.getAttributeNames();
+  }
+
+  @override
+  Attribute removeAttribute(String name) {
+    if (this.hasAttribute(name)) {
+      return this.attributes_.remove(name);
+    }
+    return null;
   }
 
   @override
