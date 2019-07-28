@@ -6,19 +6,19 @@ main() {
   Application app = Application();
 
   // app.applicationContext.configuration.unSupportedContentTypes.add(ContentType('multipart', 'form-data'));
-  app.route(Router("/users", 'get', (Context ctx, [HttpRequest req, HttpResponse res]) async {
+  app.route(Router("/users", GET, (Context ctx, [HttpRequest req, HttpResponse res]) async {
     return {'name': 'huang'};
   }));
 
-  app.route(Router("/upload", 'post', (Context ctx, [HttpRequest req, HttpResponse res]) async {
+  app.route(Router("/upload", POST, (Context ctx, [HttpRequest req, HttpResponse res]) async {
     return {'name': 'huang'};
   }));
 
-  app.route(Router("/user", 'post', (Context ctx, [HttpRequest req, HttpResponse res]) async {
+  app.route(Router("/user", POST, (Context ctx, [HttpRequest req, HttpResponse res]) async {
     return {'success': true};
   }));
 
-  app.route(Router("/user_redirect", 'post', (Context ctx, [HttpRequest req, HttpResponse res]) async {
+  app.route(Router("/user_redirect", POST, (Context ctx, [HttpRequest req, HttpResponse res]) async {
     Map<String, String> map = Map();
     ctx.attributes.forEach((String key, Attribute value) {
       map[key] = value.value;
@@ -26,15 +26,15 @@ main() {
     return map;
   }, name: 'user_redirect'));
 
-  app.route(Router("/redirect", 'post', (Context ctx, [HttpRequest req, HttpResponse res]) async {
-    return Redirect("/user_redirect", 'post', [Attribute('hello', 'world')]);
+  app.route(Router("/redirect", POST, (Context ctx, [HttpRequest req, HttpResponse res]) async {
+    return Redirect("/user_redirect", POST, [Attribute('hello', 'world')]);
   }));
 
-  app.route(Router("/redirect_name", 'post', (Context ctx, [HttpRequest req, HttpResponse res]) async {
-    return Redirect("name:user_redirect", 'post', [Attribute('hello', 'world')]);
+  app.route(Router("/redirect_name", POST, (Context ctx, [HttpRequest req, HttpResponse res]) async {
+    return Redirect("name:user_redirect", POST, [Attribute('hello', 'world')]);
   }));
 
-  app.route(Router("/user/:user_id/:name", 'get', (Context ctx,
+  app.route(Router("/user/:user_id/:name", GET, (Context ctx,
       [HttpRequest req, HttpResponse res, @PathVariable("user_id") int userId, @PathVariable("name") String name]) async {
     return {'id': userId, 'name': name};
   }));
