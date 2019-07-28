@@ -74,7 +74,7 @@ class _Application implements Application {
     return _instance;
   }
 
-  ApplicationContext applicationContext_ = ApplicationContext();
+  ApplicationContext applicationContext_ = ApplicationContext(_instance);
 
   // 当前环境
   String env_ = 'development';

@@ -5,13 +5,14 @@ import 'package:Q/src/Context.dart';
 import 'package:Q/src/Method.dart';
 import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/ResponseEntry.dart';
+import 'package:Q/src/aware/BindApplicationAware.dart';
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
 
-abstract class Router {
+abstract class Router extends BindApplicationAware<Application> {
   factory Router(String path, String method, RouterHandleFunction handle,
           {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) =>
       _Router(path, method, handle,
@@ -25,15 +26,11 @@ abstract class Router {
 
   RouterHandleFunction get handle;
 
-  Application get app;
-
   String get path;
 
   Map get pathVariables;
 
   String get method;
-
-  set app(Application app);
 
   set handlerAdapter(HandlerAdapter handlerAdapter);
 

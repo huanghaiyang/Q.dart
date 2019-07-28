@@ -6,17 +6,16 @@ import 'package:Q/src/Request.dart';
 import 'package:Q/src/Response.dart';
 import 'package:Q/src/Router.dart';
 import 'package:Q/src/aware/AttributeAware.dart';
+import 'package:Q/src/aware/BindApplicationAware.dart';
 import 'package:Q/src/aware/CookieAware.dart';
 import 'package:Q/src/utils/UuidUtil.dart';
 
-abstract class Context extends AttributeAware<Attribute> with CookieAware<Cookie> {
+abstract class Context extends AttributeAware<Attribute> with CookieAware<Cookie>, BindApplicationAware<Application> {
   factory Context([Request request, Response response, Application app]) => _Context(request, response, app);
 
   Request get request;
 
   Response get response;
-
-  Application get app;
 
   int get status;
 
@@ -29,8 +28,6 @@ abstract class Context extends AttributeAware<Attribute> with CookieAware<Cookie
   Map<String, List<String>> get query;
 
   int get routeCount;
-
-  set app(Application app);
 
   set status(int status);
 

@@ -1,6 +1,8 @@
+import 'package:Q/src/Application.dart';
 import 'package:Q/src/Configuration.dart';
+import 'package:Q/src/aware/BindApplicationAware.dart';
 
-abstract class ApplicationContext {
+abstract class ApplicationContext extends BindApplicationAware<Application> {
   Configuration get configuration;
 
   String get applicationName;
@@ -13,7 +15,7 @@ abstract class ApplicationContext {
 
   set displayName(String displayName);
 
-  factory ApplicationContext() => _ApplicationContext();
+  factory ApplicationContext(Application application) => _ApplicationContext(application);
 }
 
 class _ApplicationContext implements ApplicationContext {
@@ -25,7 +27,9 @@ class _ApplicationContext implements ApplicationContext {
 
   DateTime startTime_ = DateTime.now();
 
-  _ApplicationContext();
+  Application _application;
+
+  _ApplicationContext(this._application);
 
   @override
   Configuration get configuration {
@@ -55,5 +59,15 @@ class _ApplicationContext implements ApplicationContext {
   @override
   set applicationName(String applicationName) {
     this.applicationName_ = applicationName;
+  }
+
+  @override
+  set app(Application application) {
+    this._application = application;
+  }
+
+  @override
+  Application get app {
+    return this._application;
   }
 }

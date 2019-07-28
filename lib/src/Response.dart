@@ -4,10 +4,9 @@ import 'package:Q/src/Application.dart';
 import 'package:Q/src/Context.dart';
 import 'package:Q/src/Request.dart';
 import 'package:Q/src/ResponseEntry.dart';
+import 'package:Q/src/aware/BindApplicationAware.dart';
 
-abstract class Response {
-  set app(Application app);
-
+abstract class Response extends BindApplicationAware<Application> {
   set res(HttpResponse res);
 
   set request(Request request);
@@ -15,8 +14,6 @@ abstract class Response {
   set ctx(Context ctx);
 
   set responseEntry(ResponseEntry responseEntry);
-
-  Application get app;
 
   HttpResponse get res;
 

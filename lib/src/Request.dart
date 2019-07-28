@@ -3,10 +3,9 @@ import 'dart:io';
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/Context.dart';
 import 'package:Q/src/Response.dart';
+import 'package:Q/src/aware/BindApplicationAware.dart';
 
-abstract class Request {
-  Application get app;
-
+abstract class Request extends BindApplicationAware<Application> {
   HttpRequest get req;
 
   Context get ctx;
@@ -14,8 +13,6 @@ abstract class Request {
   Response get response;
 
   Map get data;
-
-  set app(Application app);
 
   set req(HttpRequest req);
 
