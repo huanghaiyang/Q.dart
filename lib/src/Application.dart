@@ -294,13 +294,7 @@ class _Application implements Application {
       // 根据重定向匹配路由并执行
       await this.handleRedirect(ctx, result, req);
     } else {
-      ResponseEntry responseEntry;
-      // 如果执行的结果不是一个ResponseEntry,则将结果封装
-      if (!(result is ResponseEntry)) {
-        responseEntry = ResponseEntry(result);
-      } else {
-        responseEntry = result;
-      }
+      ResponseEntry responseEntry = ResponseEntry.from(result);
       // 将执行结果赋值给上线文的响应
       ctx.response.responseEntry = responseEntry;
       // 转换后的而结果，类型为String
