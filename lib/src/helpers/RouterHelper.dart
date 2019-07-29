@@ -6,6 +6,7 @@ import 'package:Q/src/Router.dart';
 import 'package:Q/src/annotation/PathVariable.dart';
 import 'package:Q/src/helpers/RedirectHelper.dart';
 import 'package:Q/src/helpers/ReflectHelper.dart';
+import 'package:path_to_regexp/path_to_regexp.dart';
 
 class RouterHelper {
   // 反射获取路由地址参数
@@ -33,7 +34,7 @@ class RouterHelper {
   // 匹配重定向
   static Future<Router> matchRedirect(Redirect redirect, List<Router> routers) async {
     // 先路由名称匹配
-    Router matchedRouter = RedirectHelper.matchRouter(redirect);
+    Router matchedRouter = await RedirectHelper.matchRouter(redirect);
     if (matchedRouter == null) {
       await for (Router router in Stream.fromIterable(routers)) {
         bool hasMatch = await router.matchRedirect(redirect);
@@ -56,5 +57,12 @@ class RouterHelper {
       }
     }
     return matchedRouter;
+  }
+
+  static Map<String, String> applyPathVariables(String requestPath, String path) {
+    final parameters = <String>[];
+    final regExp = pathToRegExp(path, parameters: parameters);
+    final match = regExp.matchAsPrefix(requestPath);
+    return extract(parameters, match);
   }
 }

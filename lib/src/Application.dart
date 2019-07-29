@@ -419,6 +419,7 @@ class _Application implements Application {
     // 根据重定向的地址匹配路由
     Router matchedRouter = await RouterHelper.matchRedirect(redirect, this.routers_);
     if (matchedRouter != null) {
+      matchedRouter.mergePathVariables(RouterHelper.applyPathVariables(matchedRouter.path, redirect.address.replaceFirst(PATH_PATTERN, '')));
       // 重新设置请求上下文的路由
       ctx.setRouter(matchedRouter);
       // 合并当前请求上下文中的attributes数据
@@ -426,7 +427,7 @@ class _Application implements Application {
       // 处理路由请求
       return this.handleRouter(matchedRouter, ctx, req);
     } else {
-      throw Exception('redirect ${redirect.path} not found.');
+      throw Exception('redirect ${redirect.address} not found.');
     }
   }
 

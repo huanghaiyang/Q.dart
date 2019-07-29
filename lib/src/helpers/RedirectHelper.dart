@@ -4,18 +4,31 @@ import 'package:Q/src/Router.dart';
 
 Pattern NAME_PATTERN = RegExp("name:");
 
+Pattern PATH_PATTERN = RegExp("path:");
+
 class RedirectHelper {
-  static Router matchRouter(Redirect redirect) {
-    Router router;
-    if (redirect.path.startsWith(NAME_PATTERN)) {
-      List<Router> routers = Application.getRouters();
+  static Future<Router> matchRouter(Redirect redirect) async {
+    String address = redirect.address;
+    List<Router> routers = Application.getRouters();
+    Router matchedRouter;
+    if (address.startsWith(NAME_PATTERN)) {
       for (int i = 0; i < routers.length; i++) {
-        if (routers[i].name == redirect.path.replaceFirst(NAME_PATTERN, '')) {
-          router = routers[i];
+        if (routers[i].name == redirect.name) {
+          matchedRouter = routers[i];
           break;
         }
       }
+    } else if (address.startsWith(PATH_PATTERN)) {
+      await for (Router router in Stream.fromIterable(routers)) {
+        bool hasMatch = await router.matchPath(redirect.path);
+        if (hasMatch) {
+          matchedRouter = router;
+        }
+      }
     }
-    return router;
+    if (matchedRouter.method == redirect.method) {
+      return matchedRouter;
+    }
+    return null;
   }
 }

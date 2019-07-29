@@ -31,11 +31,11 @@ main() {
   }, name: 'user_redirect'));
 
   app.route(Router("/redirect", POST, (Context ctx, [HttpRequest req, HttpResponse res]) async {
-    return Redirect("/user_redirect", POST, [Attribute('hello', 'world')]);
+    return Redirect("/user_redirect", POST, attributes: [Attribute('hello', 'world')]);
   }));
 
   app.route(Router("/redirect_name", POST, (Context ctx, [HttpRequest req, HttpResponse res]) async {
-    return Redirect("name:user_redirect", POST, [Attribute('hello', 'world')]);
+    return Redirect("name:user_redirect", POST, attributes: [Attribute('hello', 'world')]);
   }));
 
   app.route(Router("/user/:user_id/:name", GET, (Context ctx,

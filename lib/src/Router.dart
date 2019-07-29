@@ -11,6 +11,7 @@ import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 import 'package:Q/src/exception/UnKnowMethodException.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:Q/src/helpers/HttpMethodHelper.dart';
+import 'package:Q/src/helpers/RouterHelper.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
@@ -38,6 +39,8 @@ abstract class Router extends BindApplicationAware<Application> with PathVariabl
   set converter(AbstractHttpMessageConverter converter);
 
   Future<bool> match(HttpRequest request);
+
+  Future<bool> matchPath(String path);
 
   void apply(HttpRequest request);
 
@@ -87,7 +90,12 @@ class _Router implements Router {
 
   // 请求路径匹配
   Future<bool> match(HttpRequest request) async {
-    return pathToRegExp(this.path).hasMatch(request.uri.path) && request.method.toLowerCase() == this.method.toLowerCase();
+    return await this.matchPath(request.uri.path) && request.method.toLowerCase() == this.method_.toLowerCase();
+  }
+
+  @override
+  Future<bool> matchPath(String path) async {
+    return pathToRegExp(this.path).hasMatch(path);
   }
 
   Future convert(ResponseEntry entry) async {
@@ -161,7 +169,7 @@ class _Router implements Router {
 
   @override
   Future<bool> matchRedirect(Redirect redirect) async {
-    return pathToRegExp(this.path).hasMatch(redirect.path) && redirect.method.toLowerCase() == this.method.toLowerCase();
+    return pathToRegExp(this.path).hasMatch(redirect.address) && redirect.method.toLowerCase() == this.method.toLowerCase();
   }
 
   @override
@@ -172,10 +180,16 @@ class _Router implements Router {
   @override
   void apply(HttpRequest request) {
     this.query_ = request.uri.queryParametersAll;
-    String requestPath = request.uri.path;
-    final parameters = <String>[];
-    final regExp = pathToRegExp(this.path, parameters: parameters);
-    final match = regExp.matchAsPrefix(requestPath);
-    this.pathVariables_.addAll(extract(parameters, match));
+    this.pathVariables = RouterHelper.applyPathVariables(request.uri.path, this.path_);
+  }
+
+  @override
+  set pathVariables(Map pathVariables) {
+    this.pathVariables_ = pathVariables;
+  }
+
+  @override
+  void mergePathVariables(Map pathVariables) {
+    this.pathVariables_.addAll(pathVariables);
   }
 }
