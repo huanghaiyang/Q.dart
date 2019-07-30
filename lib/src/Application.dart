@@ -131,6 +131,7 @@ class _Application implements Application {
   initInterceptors() {
     this.interceptors_.add(I18nInterceptor.getInstance());
     this.interceptors_.add(UnSupportedContentTypeInterceptor.getInstance());
+    this.interceptors_.add(UnSupportedMethodInterceptor.getInstance());
   }
 
   // 初始化内置解析器
