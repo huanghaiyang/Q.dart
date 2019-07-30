@@ -70,4 +70,12 @@ class RouterHelper {
     if (path == null || path.isEmpty) return false;
     return true;
   }
+
+  static String reBuildPathByVariables(Router router) {
+    String path = router.path;
+    router.pathVariables.forEach((dynamic key, dynamic val) {
+      path.replaceAll(RegExp(":${key.toString()}"), val.toString());
+    });
+    return path;
+  }
 }

@@ -54,8 +54,6 @@ abstract class Router extends BindApplicationAware<Application> with PathVariabl
   Future convert(ResponseEntry entry);
 
   Future write(Context ctx);
-
-  String reBuildPathByVariables();
 }
 
 class _Router implements Router {
@@ -206,16 +204,6 @@ class _Router implements Router {
     if (pathVariables != null) {
       this.pathVariables_.addAll(pathVariables);
     }
-  }
-
-  @override
-  String reBuildPathByVariables() {
-    String path = this.path;
-    this.pathVariables.forEach((dynamic key, dynamic val) {
-      path.replaceAll(RegExp(":${key.toString()}"), val.toString());
-    });
-    this.requestUri = path;
-    return this.requestUri;
   }
 
   @override

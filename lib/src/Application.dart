@@ -420,6 +420,8 @@ class _Application implements Application {
     Router matchedRouter = await RouterHelper.matchRedirect(redirect, this.routers_);
     if (matchedRouter != null) {
       matchedRouter.mergePathVariables(redirect.isName ? redirect.pathVariables : RouterHelper.applyPathVariables(matchedRouter.path, redirect.path));
+      // 根据参数构建请求地址，此地址不是从request.uri.path取到的
+      matchedRouter.requestUri = RouterHelper.reBuildPathByVariables(matchedRouter);
       // 重新设置请求上下文的路由
       ctx.setRouter(matchedRouter);
       // 合并当前请求上下文中的attributes数据
