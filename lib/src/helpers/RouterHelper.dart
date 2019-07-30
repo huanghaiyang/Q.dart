@@ -65,4 +65,9 @@ class RouterHelper {
     final match = regExp.matchAsPrefix(requestPath);
     return extract(parameters, match);
   }
+
+  static bool checkPathAvailable(String path) {
+    if (path == null || path.isEmpty) return false;
+    return true;
+  }
 }

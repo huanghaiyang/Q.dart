@@ -8,6 +8,7 @@ import 'package:Q/src/ResponseEntry.dart';
 import 'package:Q/src/aware/BindApplicationAware.dart';
 import 'package:Q/src/aware/PathVariablesAware.dart';
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
+import 'package:Q/src/exception/InvalidRouterPathException.dart';
 import 'package:Q/src/exception/UnKnowMethodException.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:Q/src/helpers/HttpMethodHelper.dart';
@@ -32,11 +33,15 @@ abstract class Router extends BindApplicationAware<Application> with PathVariabl
 
   String get path;
 
+  String get requestUri;
+
   String get method;
 
   set handlerAdapter(HandlerAdapter handlerAdapter);
 
   set converter(AbstractHttpMessageConverter converter);
+
+  set requestUri(String requestUri);
 
   Future<bool> match(HttpRequest request);
 
@@ -49,6 +54,8 @@ abstract class Router extends BindApplicationAware<Application> with PathVariabl
   Future convert(ResponseEntry entry);
 
   Future write(Context ctx);
+
+  String reBuildPathByVariables();
 }
 
 class _Router implements Router {
@@ -57,6 +64,8 @@ class _Router implements Router {
   final String name_;
 
   final String path_;
+
+  String requestUri_;
 
   // 处理函数
   final RouterHandleFunction handle_;
@@ -79,6 +88,9 @@ class _Router implements Router {
   _Router(this.path_, this.method_, this.handle_, {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
     if (!HttpMethodHelper.checkValidMethod(this.method_)) {
       throw UnKnowMethodException(method: this.method_);
+    }
+    if (!RouterHelper.checkPathAvailable(this.path_)) {
+      throw InvalidRouterPathException(path: this.path_);
     }
     if (this.produceType_ == null) {
       this.produceType_ = Application.getApplicationContext().configuration.defaultProducedType;
@@ -129,12 +141,12 @@ class _Router implements Router {
 
   @override
   dynamic getVariable(String name) {
-    return this.pathVariables_[name];
+    return this.pathVariables[name];
   }
 
   @override
   bool contains(String name) {
-    return this.pathVariables_.containsKey(name);
+    return this.pathVariables.containsKey(name);
   }
 
   @override
@@ -180,6 +192,7 @@ class _Router implements Router {
   @override
   void apply(HttpRequest request) {
     this.query_ = request.uri.queryParametersAll;
+    this.requestUri_ = request.uri.path;
     this.pathVariables = RouterHelper.applyPathVariables(request.uri.path, this.path_);
   }
 
@@ -190,6 +203,28 @@ class _Router implements Router {
 
   @override
   void mergePathVariables(Map pathVariables) {
-    this.pathVariables_.addAll(pathVariables);
+    if (pathVariables != null) {
+      this.pathVariables_.addAll(pathVariables);
+    }
+  }
+
+  @override
+  String reBuildPathByVariables() {
+    String path = this.path;
+    this.pathVariables.forEach((dynamic key, dynamic val) {
+      path.replaceAll(RegExp(":${key.toString()}"), val.toString());
+    });
+    this.requestUri = path;
+    return this.requestUri;
+  }
+
+  @override
+  set requestUri(String requestUri) {
+    this.requestUri_ = requestUri;
+  }
+
+  @override
+  String get requestUri {
+    return this.requestUri_;
   }
 }

@@ -39,16 +39,13 @@ class _Response implements Response {
 
   Context ctx_;
 
-  int status_;
+  int status_ = HttpStatus.ok;
 
-  String _statusText;
+  String _statusText = _FINE;
 
   ResponseEntry responseEntry_;
 
-  _Response([this.app_, this.res_, this.request_, this.ctx_, this.responseEntry_]) {
-    this.status_ = HttpStatus.ok;
-    this._statusText = _FINE;
-  }
+  _Response([this.app_, this.res_, this.request_, this.ctx_, this.responseEntry_]);
 
   @override
   ResponseEntry get responseEntry {
