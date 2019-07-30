@@ -138,16 +138,6 @@ class _Router implements Router {
   }
 
   @override
-  dynamic getVariable(String name) {
-    return this.pathVariables[name];
-  }
-
-  @override
-  bool contains(String name) {
-    return this.pathVariables.containsKey(name);
-  }
-
-  @override
   String get path {
     return this.path_;
   }
@@ -214,5 +204,20 @@ class _Router implements Router {
   @override
   String get requestUri {
     return this.requestUri_;
+  }
+
+  @override
+  List<String> pathVariableNames() {
+    return this.pathVariables.keys;
+  }
+
+  @override
+  bool containsPathVariable(String name) {
+    return this.pathVariables.containsKey(name);
+  }
+
+  @override
+  dynamic getPathVariable(String name) {
+    return this.pathVariables[name];
   }
 }

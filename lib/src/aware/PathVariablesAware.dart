@@ -3,9 +3,11 @@ abstract class PathVariablesAware<T> {
 
   set pathVariables(T pathVariables);
 
-  dynamic getVariable(String name);
+  dynamic getPathVariable(String name);
 
-  bool contains(String name);
+  bool containsPathVariable(String name);
 
   void mergePathVariables(T pathVariables);
+
+  List<String> pathVariableNames();
 }
