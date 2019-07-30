@@ -1,16 +1,16 @@
 import 'package:Q/src/Attribute.dart';
 import 'package:Q/src/Method.dart';
+import 'package:Q/src/aware/HttpMethodAware.dart';
+import 'package:Q/src/helpers/HttpMethodHelper.dart';
 import 'package:Q/src/helpers/RedirectHelper.dart';
 
 // 重定向
-abstract class Redirect {
+abstract class Redirect extends HttpMethodAware<HttpMethod> {
   String get address;
-
-  String get method;
 
   Map<String, Attribute> get attributes;
 
-  factory Redirect(String address, String method, {List<Attribute> attributes, Map pathVariables}) =>
+  factory Redirect(String address, HttpMethod method, {List<Attribute> attributes, Map pathVariables}) =>
       _Redirect(address, method, attributes_: attributes, pathVariables_: pathVariables);
 
   String get path;
@@ -29,7 +29,7 @@ class _Redirect implements Redirect {
 
   List<Attribute> attributes_;
 
-  String method_ = GET;
+  HttpMethod method_ = HttpMethod.GET;
 
   Map pathVariables_;
 
@@ -48,8 +48,13 @@ class _Redirect implements Redirect {
   }
 
   @override
-  String get method {
+  HttpMethod get method {
     return this.method_;
+  }
+
+  @override
+  String get methodName {
+    return HttpMethodHelper.getMethodName(this.method);
   }
 
   @override

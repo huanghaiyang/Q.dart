@@ -9,7 +9,8 @@ typedef ApplicationStartUpCallback = Future<dynamic> Function(Application applic
 
 typedef ApplicationCloseCallback = void Function(Application application, [Future<dynamic> prevCloseableResult]);
 
-abstract class Application extends CloseableAware<Application, ApplicationCloseCallback> with RouteAware<Router> {
+abstract class Application extends CloseableAware<Application, ApplicationCloseCallback>
+    with RouteAware<Router>, InterceptorRegistryAware<AbstractInterceptor> {
   factory Application() => _Application.getInstance();
 
   static ApplicationContext getApplicationContext() {
@@ -34,8 +35,6 @@ abstract class Application extends CloseableAware<Application, ApplicationCloseC
 
   Map<ContentType, AbstractHttpMessageConverter> get converters;
 
-  List<AbstractInterceptor> get interceptors;
-
   List<Resource> get resources;
 
   Map<ResolverType, AbstractResolver> get resolvers;
@@ -55,10 +54,6 @@ abstract class Application extends CloseableAware<Application, ApplicationCloseC
   void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter);
 
   void replaceConverter(ContentType type, AbstractHttpMessageConverter converter);
-
-  void registryInterceptor(AbstractInterceptor interceptor);
-
-  void registryInterceptors(List<AbstractInterceptor> interceptors);
 }
 
 class _Application implements Application {
@@ -326,13 +321,18 @@ class _Application implements Application {
   // 拦截器注册
   @override
   void registryInterceptor(AbstractInterceptor interceptor) {
+    if (interceptor == null) {
+      throw IllegalArgumentException(message: '(AbstractInterceptor interceptor) argument could not be null.');
+    }
     this.interceptors_.add(interceptor);
   }
 
   // 注册多个拦截器
   @override
-  void registryInterceptors(List<AbstractInterceptor> interceptors) {
-    interceptors.forEach((interceptor) => this.registryInterceptor(interceptor));
+  void registryInterceptors(Iterable<AbstractInterceptor> interceptors) {
+    if (InterceptorHelper.canRegistry(interceptors)) {
+      List.from(interceptors).forEach((interceptor) => this.registryInterceptor(interceptor));
+    }
   }
 
   // 执行拦截器的preHandler
@@ -458,7 +458,7 @@ class _Application implements Application {
   @override
   Router patch(String path, RouterHandleFunction handle,
       {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
-    Router router = Router(path, PATCH, handle,
+    Router router = Router(path, HttpMethod.PATCH, handle,
         pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
     this.route(router);
     return router;
@@ -467,7 +467,7 @@ class _Application implements Application {
   @override
   Router delete(String path, RouterHandleFunction handle,
       {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
-    Router router = Router(path, DELETE, handle,
+    Router router = Router(path, HttpMethod.DELETE, handle,
         pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
     this.route(router);
     return router;
@@ -476,7 +476,7 @@ class _Application implements Application {
   @override
   Router put(String path, RouterHandleFunction handle,
       {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
-    Router router = Router(path, PUT, handle,
+    Router router = Router(path, HttpMethod.PUT, handle,
         pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
     this.route(router);
     return router;
@@ -485,7 +485,7 @@ class _Application implements Application {
   @override
   Router post(String path, RouterHandleFunction handle,
       {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
-    Router router = Router(path, POST, handle,
+    Router router = Router(path, HttpMethod.POST, handle,
         pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
     this.route(router);
     return router;
@@ -494,7 +494,7 @@ class _Application implements Application {
   @override
   Router get(String path, RouterHandleFunction handle,
       {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
-    Router router = Router(path, GET, handle,
+    Router router = Router(path, HttpMethod.GET, handle,
         pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
     this.route(router);
     return router;

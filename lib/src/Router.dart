@@ -6,6 +6,7 @@ import 'package:Q/src/Method.dart';
 import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/ResponseEntry.dart';
 import 'package:Q/src/aware/BindApplicationAware.dart';
+import 'package:Q/src/aware/HttpMethodAware.dart';
 import 'package:Q/src/aware/PathVariablesAware.dart';
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 import 'package:Q/src/exception/InvalidRouterPathException.dart';
@@ -17,8 +18,8 @@ import 'package:path_to_regexp/path_to_regexp.dart';
 
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
 
-abstract class Router extends BindApplicationAware<Application> with PathVariablesAware<Map> {
-  factory Router(String path, String method, RouterHandleFunction handle,
+abstract class Router extends BindApplicationAware<Application> with PathVariablesAware<Map>, HttpMethodAware<HttpMethod> {
+  factory Router(String path, HttpMethod method, RouterHandleFunction handle,
           {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) =>
       _Router(path, method, handle,
           pathVariables_: pathVariables, produceType_: produceType, converter_: converter, handlerAdapter_: handlerAdapter, name_: name);
@@ -34,8 +35,6 @@ abstract class Router extends BindApplicationAware<Application> with PathVariabl
   String get path;
 
   String get requestUri;
-
-  String get method;
 
   set handlerAdapter(HandlerAdapter handlerAdapter);
 
@@ -70,7 +69,7 @@ class _Router implements Router {
 
   Map pathVariables_;
 
-  String method_ = GET;
+  HttpMethod method_ = HttpMethod.GET;
 
   // 默认返回的格式为json
   ContentType produceType_;
@@ -100,7 +99,7 @@ class _Router implements Router {
 
   // 请求路径匹配
   Future<bool> match(HttpRequest request) async {
-    return await this.matchPath(request.uri.path) && request.method.toLowerCase() == this.method_.toLowerCase();
+    return await this.matchPath(request.uri.path) && request.method.toUpperCase() == this.methodName;
   }
 
   @override
@@ -128,8 +127,13 @@ class _Router implements Router {
   }
 
   @override
-  String get method {
+  HttpMethod get method {
     return this.method_;
+  }
+
+  @override
+  String get methodName {
+    return HttpMethodHelper.getMethodName(this.method);
   }
 
   @override
@@ -169,7 +173,7 @@ class _Router implements Router {
 
   @override
   Future<bool> matchRedirect(Redirect redirect) async {
-    return pathToRegExp(this.path).hasMatch(redirect.address) && redirect.method.toLowerCase() == this.method.toLowerCase();
+    return pathToRegExp(this.path).hasMatch(redirect.address) && redirect.method.toString() == this.methodName;
   }
 
   @override
