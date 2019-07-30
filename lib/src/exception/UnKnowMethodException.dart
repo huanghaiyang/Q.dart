@@ -12,7 +12,7 @@ class _UnKnowMethodException implements UnKnowMethodException {
   _UnKnowMethodException({this.message, this.method});
 
   String toString() {
-    if (message == null) return "Exception: method '${this.method}' unknown";
+    if (message == null) return "Exception: method '${this.method.toString()}' unknown";
     return "Exception: $message";
   }
 }

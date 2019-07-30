@@ -16,7 +16,7 @@ main() {
   Application app = Application();
 
   // app.applicationContext.configuration.unSupportedContentTypes.add(ContentType('multipart', 'form-data'));
-  // app.applicationContext.configuration.unSupportedMethods.add(POST);
+  // app.applicationContext.configuration.unSupportedMethods.add(HttpMethod.POST);
   app.route(Router("/users", HttpMethod.GET, (Context ctx, [HttpRequest req, HttpResponse res]) async {
     return {'name': 'huang'};
   }));
@@ -56,6 +56,7 @@ main() {
 
   app.listen(8081);
 }
+
 ```
 
 ## 概念
