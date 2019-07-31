@@ -9,6 +9,7 @@ import 'package:Q/src/aware/BindApplicationAware.dart';
 import 'package:Q/src/aware/HttpMethodAware.dart';
 import 'package:Q/src/aware/PathVariablesAware.dart';
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
+import 'package:Q/src/exception/IllegalArgumentException.dart';
 import 'package:Q/src/exception/InvalidRouterPathException.dart';
 import 'package:Q/src/exception/UnKnowMethodException.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
@@ -83,6 +84,9 @@ class _Router implements Router {
   Map<String, List<String>> query_;
 
   _Router(this.path_, this.method_, this.handle_, {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
+    if (this.handle_ == null) {
+      throw IllegalArgumentException(message: 'The handler function of router:${this.path_} should not be null.');
+    }
     if (!HttpMethodHelper.checkValidMethod(this.method_)) {
       throw UnKnowMethodException(method: this.method_);
     }
