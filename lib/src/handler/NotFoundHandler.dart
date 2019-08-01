@@ -16,11 +16,11 @@ class NotFoundHandler implements HandlerAdapter {
   }
 
   @override
-  Future<Context> handle(Context ctx) async {
-    ctx.response.status = HttpStatus.notFound;
-    HttpResponse httpResponse = ctx.response.res;
-    httpResponse.statusCode = ctx.response.status;
+  Future<Context> handle(Context context) async {
+    context.response.status = HttpStatus.notFound;
+    HttpResponse httpResponse = context.response.res;
+    httpResponse.statusCode = context.response.status;
     await httpResponse.close();
-    return ctx;
+    return context;
   }
 }

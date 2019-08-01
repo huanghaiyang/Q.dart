@@ -47,9 +47,9 @@ abstract class Application extends CloseableAware<Application, ApplicationCloseC
 
   void use(Middleware middleware);
 
-  void onFinished(Context ctx);
+  void onFinished(Context context);
 
-  void onError(Context ctx);
+  void onError(Context context);
 
   void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter);
 
@@ -161,13 +161,13 @@ class _Application implements Application {
     // 如果返回false，则表示拦截器已经处理了当前请求，不需要再匹配路由、处理请求、消费中间件
     if (suspend) {
       // 创建请求上下文
-      Context ctx = await this.createContext(req, res);
+      Context context = await this.createContext(req, res);
       // 前置中间件处理
-      await this.handleWithMiddleware(ctx, MiddlewareType.BEFORE, this.onFinished, this.onError);
+      await this.handleWithMiddleware(context, MiddlewareType.BEFORE, this.onFinished, this.onError);
       // 匹配路由并处理请求
-      await this.applyRouter(ctx, req);
+      await this.applyRouter(context, req);
       // 后置中间件处理
-      await this.handleWithMiddleware(ctx, MiddlewareType.AFTER, this.onFinished, this.onError);
+      await this.handleWithMiddleware(context, MiddlewareType.AFTER, this.onFinished, this.onError);
       // 执行后置拦截器方法
       await this.applyPostHandler(req, res);
     }
@@ -189,20 +189,20 @@ class _Application implements Application {
   }
 
   // response中间件
-  Future<Context> handleWithMiddleware(Context ctx, MiddlewareType type, Function onFinished, Function onError) async {
+  Future<Context> handleWithMiddleware(Context context, MiddlewareType type, Function onFinished, Function onError) async {
     await for (Middleware middleware in Stream.fromIterable(this.middleWares_.where((Middleware middleware) => middleware.type == type))) {
-      await middleware.handle(ctx, onFinished, onError);
+      await middleware.handle(context, onFinished, onError);
     }
-    return ctx;
+    return context;
   }
 
   // 请求完成处理回调函数
   @override
-  void onFinished(Context ctx) async {}
+  void onFinished(Context context) async {}
 
   // 错误处理
   @override
-  void onError(Context ctx) async {}
+  void onError(Context context) async {}
 
   // 创建上下文
   Future<Context> createContext(HttpRequest req, HttpResponse res) async {
@@ -212,7 +212,7 @@ class _Application implements Application {
     response.res = res;
     Context context = Context(request, response);
     context.app = request.app = response.app = this;
-    request.ctx = response.ctx = context;
+    request.context = response.context = context;
     request.response = response;
     response.request = request;
     return context;
@@ -262,44 +262,45 @@ class _Application implements Application {
   }
 
   // 匹配路由，并处理请求
-  Future<Context> applyRouter(Context ctx, HttpRequest req) async {
+  Future<Context> applyRouter(Context context, HttpRequest req) async {
     // 匹配路由
     Router matchedRouter = await RouterHelper.matchRouter(req, this.routers_);
     if (matchedRouter != null) {
       // 设置当前请求上下文的路由
-      ctx.setRouter(matchedRouter);
+      context.setRouter(matchedRouter);
+      matchedRouter.context = context;
       // 处理路由请求
-      await this.handleRouter(matchedRouter, ctx, req);
+      await this.handleRouter(matchedRouter, context, req);
     } else {
       // TODO throw router not found exception
-      await this.handlers_[HttpStatus.notFound].handle(ctx);
+      await this.handlers_[HttpStatus.notFound].handle(context);
     }
-    return ctx;
+    return context;
   }
 
   // 路由处理，响应请求
-  Future<Context> handleRouter(Router matchedRouter, Context ctx, HttpRequest req) async {
+  Future<Context> handleRouter(Router matchedRouter, Context context, HttpRequest req) async {
     // 通过反射获取当前请求处理函数上定义的路径参数
-    Map<String, dynamic> reflectedPathVariables = RouterHelper.reflectPathVariables(matchedRouter);
+    List<dynamic> reflectedParameters = RouterHelper.listParameters(matchedRouter);
     // 合并参数
-    List positionArguments = List()..addAll([ctx, ctx.request.req, ctx.response.res])..addAll(reflectedPathVariables.values);
+    List positionArguments = List()..addAll([context, context.request.req, context.response.res])..addAll(reflectedParameters);
     // 等待结果处理完成
     dynamic result = await Function.apply(matchedRouter.handle, positionArguments);
     // 如果执行的结果是一个重定向
     if (result is Redirect) {
       // 根据重定向匹配路由并执行
-      await this.handleRedirect(ctx, result, req);
+      await this.handleRedirect(context, result, req);
     } else {
       ResponseEntry responseEntry = ResponseEntry.from(result);
       // 将执行结果赋值给上线文的响应
-      ctx.response.responseEntry = responseEntry;
+      context.response.responseEntry = responseEntry;
       // 转换后的而结果，类型为String
       String convertedResult = await matchedRouter.convert(responseEntry);
       responseEntry.convertedResult = convertedResult;
       // 写response,完成请求
-      await matchedRouter.write(ctx);
+      await matchedRouter.write(context);
     }
-    return ctx;
+    return context;
   }
 
   // 替换内置默认的handler
@@ -416,7 +417,7 @@ class _Application implements Application {
   }
 
   // 处理重定向
-  Future<Context> handleRedirect(Context ctx, Redirect redirect, HttpRequest req) async {
+  Future<Context> handleRedirect(Context context, Redirect redirect, HttpRequest req) async {
     // 根据重定向的地址匹配路由
     Router matchedRouter = await RouterHelper.matchRedirect(redirect, this.routers_);
     if (matchedRouter != null) {
@@ -424,11 +425,11 @@ class _Application implements Application {
       // 根据参数构建请求地址，此地址不是从request.uri.path取到的
       matchedRouter.requestUri = RouterHelper.reBuildPathByVariables(matchedRouter);
       // 重新设置请求上下文的路由
-      ctx.setRouter(matchedRouter);
+      context.setRouter(matchedRouter);
       // 合并当前请求上下文中的attributes数据
-      ctx.mergeAttributes(redirect.attributes);
+      context.mergeAttributes(redirect.attributes);
       // 处理路由请求
-      return this.handleRouter(matchedRouter, ctx, req);
+      return this.handleRouter(matchedRouter, context, req);
     } else {
       throw Exception('redirect ${redirect.address} not found.');
     }

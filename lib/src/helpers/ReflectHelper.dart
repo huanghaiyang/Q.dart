@@ -1,5 +1,7 @@
 import 'dart:mirrors';
 
+typedef ParameterAnnotationCallback = void Function(ParameterMirror parameterMirror, InstanceMirror instanceMirror);
+
 class ReflectHelper {
   static dynamic reflectParameterValue(ParameterMirror parameterMirror, String value) {
     dynamic result;
@@ -32,5 +34,22 @@ class ReflectHelper {
         break;
     }
     return result;
+  }
+
+  static void reflectParamAnnotation(Function function, Type annotationClass, ParameterAnnotationCallback parameterAnnotationCallback) {
+    assert(function != null);
+    assert(annotationClass != null);
+    FunctionTypeMirror functionTypeMirror = reflect(function).type;
+    functionTypeMirror.parameters.forEach((ParameterMirror parameterMirror) {
+      List<InstanceMirror> instanceMirrors = parameterMirror.metadata;
+      if (instanceMirrors.isNotEmpty) {
+        InstanceMirror annotationMirror = instanceMirrors.lastWhere((InstanceMirror instanceMirror) {
+          return instanceMirror.type == reflectClass(annotationClass);
+        });
+        if (annotationMirror != null && parameterAnnotationCallback != null) {
+          parameterAnnotationCallback(parameterMirror, annotationMirror);
+        }
+      }
+    });
   }
 }

@@ -58,7 +58,7 @@ class _Context implements Context {
 
   @override
   Map<String, List<String>> get query {
-    return this.router_.query;
+    return this.router.query;
   }
 
   @override
@@ -104,7 +104,7 @@ class _Context implements Context {
 
   @override
   void setAttribute(String name, dynamic value) {
-    this.attributes_[name] = Attribute(name, value, this.router_);
+    this.attributes_[name] = Attribute(name, value, this.router);
   }
 
   @override
@@ -148,7 +148,7 @@ class _Context implements Context {
       if (attributes is Map<String, Attribute>) {
         Map<String, Attribute> newAttributes = Map();
         attributes.entries.forEach((entry) {
-          newAttributes[entry.key] = Attribute(entry.value.name, entry.value.value, this.router_);
+          newAttributes[entry.key] = Attribute(entry.value.name, entry.value.value, this.router);
         });
         this.attributes_.addAll(newAttributes);
       }

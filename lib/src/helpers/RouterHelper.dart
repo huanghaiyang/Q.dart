@@ -3,34 +3,13 @@ import 'dart:mirrors';
 
 import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/Router.dart';
+import 'package:Q/src/annotation/CookieValue.dart';
 import 'package:Q/src/annotation/PathVariable.dart';
 import 'package:Q/src/helpers/RedirectHelper.dart';
 import 'package:Q/src/helpers/ReflectHelper.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 class RouterHelper {
-  // 反射获取路由地址参数
-  static Map<String, dynamic> reflectPathVariables(Router router) {
-    Map<String, dynamic> reflectedPathVariables = Map();
-    FunctionTypeMirror functionTypeMirror = reflect(router.handle).type;
-    functionTypeMirror.parameters.forEach((ParameterMirror parameterMirror) {
-      List<InstanceMirror> instanceMirrors = parameterMirror.metadata;
-      if (instanceMirrors.isNotEmpty) {
-        InstanceMirror pathVariableMirror = instanceMirrors.lastWhere((InstanceMirror instanceMirror) {
-          return instanceMirror.type == reflectClass(PathVariable);
-        });
-        if (pathVariableMirror != null) {
-          String nameValue = pathVariableMirror.getField(Symbol(PATH_VARIABLE_NAME)).reflectee;
-          if (router.pathVariables.containsKey(nameValue)) {
-            reflectedPathVariables[nameValue] = ReflectHelper.reflectParameterValue(parameterMirror, router.pathVariables[nameValue]);
-          }
-        }
-      }
-    });
-
-    return reflectedPathVariables;
-  }
-
   // 匹配重定向
   static Future<Router> matchRedirect(Redirect redirect, List<Router> routers) async {
     // 先路由名称匹配
@@ -77,5 +56,48 @@ class RouterHelper {
       path.replaceAll(RegExp(":${key.toString()}"), val.toString());
     });
     return path;
+  }
+
+  static dynamic reflectPathVariable(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
+    if (annotationMirror != null) {
+      String nameValue = annotationMirror.getField(Symbol(PATH_VARIABLE_NAME)).reflectee;
+      if (router.pathVariables.containsKey(nameValue)) {
+        return ReflectHelper.reflectParameterValue(parameterMirror, router.pathVariables[nameValue]);
+      }
+    }
+  }
+
+  static dynamic reflectCookieValue(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
+    if (annotationMirror != null) {
+      String nameValue = annotationMirror.getField(Symbol(COOKIE_NAME)).reflectee;
+      if (router.pathVariables.containsKey(nameValue)) {
+        return ReflectHelper.reflectParameterValue(parameterMirror, router.pathVariables[nameValue]);
+      }
+    }
+  }
+
+  static List<dynamic> listParameters(Router router) {
+    List<dynamic> parameters = List();
+    FunctionTypeMirror functionTypeMirror = reflect(router.handle).type;
+    functionTypeMirror.parameters.forEach((ParameterMirror parameterMirror) {
+      List<InstanceMirror> instanceMirrors = parameterMirror.metadata;
+      if (instanceMirrors.isNotEmpty) {
+        for (InstanceMirror instanceMirror in instanceMirrors) {
+          ClassMirror type = instanceMirror.type;
+          if (type == reflectClass(PathVariable)) {
+            parameters.add(reflectPathVariable(router, parameterMirror, instanceMirror));
+            break;
+          }
+          if (type == reflectClass(PathVariable)) {
+            parameters.add(reflectCookieValue(router, parameterMirror, instanceMirror));
+            break;
+          }
+          if (parameterMirror.hasDefaultValue) {
+            parameters.add(parameterMirror.defaultValue);
+          }
+        }
+      }
+    });
+    return parameters;
   }
 }

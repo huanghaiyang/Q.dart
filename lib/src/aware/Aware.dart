@@ -3,6 +3,7 @@ library q_aware;
 export 'package:Q/src/aware/AttributeAware.dart';
 export 'package:Q/src/aware/BindApplicationAware.dart';
 export 'package:Q/src/aware/CloseableAware.dart';
+export 'package:Q/src/aware/ContextAware.dart';
 export 'package:Q/src/aware/CookieAware.dart';
 export 'package:Q/src/aware/HttpMethodAware.dart';
 export 'package:Q/src/aware/InterceptorRegistryAware.dart';

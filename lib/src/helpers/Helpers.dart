@@ -1,5 +1,6 @@
 library Q_helpers;
 
+export 'package:Q/src/helpers/AnnotationHelpers.dart';
 export 'package:Q/src/helpers/HttpMethodHelper.dart';
 export 'package:Q/src/helpers/InterceptorHelper.dart';
 export 'package:Q/src/helpers/RedirectHelper.dart';

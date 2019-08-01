@@ -5,16 +5,15 @@ import 'package:Q/src/Context.dart';
 import 'package:Q/src/Request.dart';
 import 'package:Q/src/ResponseEntry.dart';
 import 'package:Q/src/aware/BindApplicationAware.dart';
+import 'package:Q/src/aware/ContextAware.dart';
 import 'package:Q/src/aware/StatusAware.dart';
 
 String _FINE = 'fine';
 
-abstract class Response extends BindApplicationAware<Application> with StatusAware {
+abstract class Response extends BindApplicationAware<Application> with StatusAware, ContextAware<Context> {
   set res(HttpResponse res);
 
   set request(Request request);
-
-  set ctx(Context ctx);
 
   set responseEntry(ResponseEntry responseEntry);
 
@@ -22,12 +21,10 @@ abstract class Response extends BindApplicationAware<Application> with StatusAwa
 
   Request get request;
 
-  Context get ctx;
-
   ResponseEntry get responseEntry;
 
-  factory Response([Application app, HttpResponse res, Request request, Context ctx, ResponseEntry responseEntry]) =>
-      _Response(app, res, request, ctx, responseEntry);
+  factory Response([Application app, HttpResponse res, Request request, Context context, ResponseEntry responseEntry]) =>
+      _Response(app, res, request, context, responseEntry);
 }
 
 class _Response implements Response {
@@ -37,7 +34,7 @@ class _Response implements Response {
 
   Request request_;
 
-  Context ctx_;
+  Context context_;
 
   int status_ = HttpStatus.ok;
 
@@ -45,7 +42,7 @@ class _Response implements Response {
 
   ResponseEntry responseEntry_;
 
-  _Response([this.app_, this.res_, this.request_, this.ctx_, this.responseEntry_]);
+  _Response([this.app_, this.res_, this.request_, this.context_, this.responseEntry_]);
 
   @override
   ResponseEntry get responseEntry {
@@ -53,8 +50,8 @@ class _Response implements Response {
   }
 
   @override
-  Context get ctx {
-    return this.ctx_;
+  Context get context {
+    return this.context_;
   }
 
   @override
@@ -78,8 +75,8 @@ class _Response implements Response {
   }
 
   @override
-  set ctx(Context ctx) {
-    this.ctx_ = ctx;
+  set context(Context context) {
+    this.context_ = context;
   }
 
   @override
