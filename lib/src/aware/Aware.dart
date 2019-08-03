@@ -1,5 +1,6 @@
 library q_aware;
 
+export 'package:Q/src/aware/ApplicationStageAware.dart';
 export 'package:Q/src/aware/AttributeAware.dart';
 export 'package:Q/src/aware/BindApplicationAware.dart';
 export 'package:Q/src/aware/CloseableAware.dart';

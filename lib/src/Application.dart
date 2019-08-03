@@ -138,6 +138,7 @@ class _Application implements Application {
   // ip/端口监听
   @override
   void listen(int port, {InternetAddress internetAddress}) async {
+    this.applicationContext.currentStage = ApplicationStage.STARTING;
     // 默认ipv4
     internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;
     // 创建服务
@@ -151,6 +152,8 @@ class _Application implements Application {
     await for (HttpRequest req in this.server_) {
       await this.handleRequest(req);
     }
+
+    this.applicationContext.currentStage = ApplicationStage.RUNNING;
   }
 
   // 请求处理
@@ -202,7 +205,7 @@ class _Application implements Application {
 
   // 错误处理
   @override
-  void onError(Context context) async {}
+  void onError(dynamic error, {StackTrace stackTrace}) async {}
 
   // 创建上下文
   Future<Context> createContext(HttpRequest req, HttpResponse res) async {
@@ -436,11 +439,13 @@ class _Application implements Application {
   }
 
   @override
-  Future<dynamic> close(Application application) async {
-    Future<dynamic> prevCloseableResult = await this.server_.close();
+  Future<dynamic> close() async {
+    this.applicationContext.currentStage = ApplicationStage.STOPPING;
+    dynamic prevCloseableResult = await this.server_.close();
     if (this.applicationCloseCallback != null) {
       return await this.applicationCloseCallback(this, prevCloseableResult);
     }
+    this.applicationContext.currentStage = ApplicationStage.STOPPED;
     return prevCloseableResult;
   }
 
@@ -453,6 +458,9 @@ class _Application implements Application {
   @override
   void onStartup(ApplicationStartUpCallback applicationStartUpCallback) {
     this.applicationStartUpCallback = applicationStartUpCallback;
+    if (this.applicationContext.currentStage == ApplicationStage.RUNNING) {
+      this.applicationStartUpCallback(this);
+    }
   }
 
   //-----------------------------------------------路由 简便使用方法-------------------------------------------//

@@ -1,4 +1,3 @@
-import 'package:Q/src/Application.dart';
 import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/Router.dart';
 
@@ -7,9 +6,8 @@ Pattern NAME_PATTERN = RegExp("name:");
 Pattern PATH_PATTERN = RegExp("path:");
 
 class RedirectHelper {
-  static Future<Router> matchRouter(Redirect redirect) async {
+  static Future<Router> matchRouter(Redirect redirect, List<Router> routers) async {
     String address = redirect.address;
-    List<Router> routers = Application.getRouters();
     Router matchedRouter;
     if (address.startsWith(NAME_PATTERN)) {
       for (int i = 0; i < routers.length; i++) {
@@ -26,8 +24,10 @@ class RedirectHelper {
         }
       }
     }
-    if (matchedRouter.method == redirect.method) {
-      return matchedRouter;
+    if (matchedRouter != null) {
+      if (matchedRouter.method == redirect.method) {
+        return matchedRouter;
+      }
     }
     return null;
   }

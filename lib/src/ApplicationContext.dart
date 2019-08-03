@@ -1,8 +1,10 @@
 import 'package:Q/src/Application.dart';
+import 'package:Q/src/ApplicationStage.dart';
 import 'package:Q/src/Configuration.dart';
+import 'package:Q/src/aware/ApplicationStageAware.dart';
 import 'package:Q/src/aware/BindApplicationAware.dart';
 
-abstract class ApplicationContext extends BindApplicationAware<Application> {
+abstract class ApplicationContext extends BindApplicationAware<Application> with ApplicationStageAware<ApplicationStage> {
   Configuration get configuration;
 
   String get applicationName;
@@ -28,6 +30,8 @@ class _ApplicationContext implements ApplicationContext {
   DateTime startTime_ = DateTime.now();
 
   Application _application;
+
+  ApplicationStage _applicationStage = ApplicationStage.STOPPED;
 
   _ApplicationContext(this._application);
 
@@ -69,5 +73,15 @@ class _ApplicationContext implements ApplicationContext {
   @override
   Application get app {
     return this._application;
+  }
+
+  @override
+  set currentStage(ApplicationStage applicationStage) {
+    this._applicationStage = applicationStage;
+  }
+
+  @override
+  ApplicationStage get currentStage {
+    return this._applicationStage;
   }
 }

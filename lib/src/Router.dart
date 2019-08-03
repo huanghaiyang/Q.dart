@@ -103,6 +103,11 @@ class _Router implements Router {
     }
     if (this.pathVariables_ == null) {
       this.pathVariables_ = Map();
+    } else {
+      this.pathVariables_.forEach((key, value) {
+        assert(key != null, "'key' must not be null");
+        assert(value != null, "'value' must not be null");
+      });
     }
   }
 

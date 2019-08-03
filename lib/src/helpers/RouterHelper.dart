@@ -13,7 +13,7 @@ class RouterHelper {
   // 匹配重定向
   static Future<Router> matchRedirect(Redirect redirect, List<Router> routers) async {
     // 先路由名称匹配
-    Router matchedRouter = await RedirectHelper.matchRouter(redirect);
+    Router matchedRouter = await RedirectHelper.matchRouter(redirect, routers);
     if (matchedRouter == null) {
       await for (Router router in Stream.fromIterable(routers)) {
         bool hasMatch = await router.matchRedirect(redirect);
@@ -38,6 +38,7 @@ class RouterHelper {
     return matchedRouter;
   }
 
+  // 通过理由地址获取路由地址参数
   static Map<String, String> applyPathVariables(String requestPath, String path) {
     final parameters = <String>[];
     final regExp = pathToRegExp(path, parameters: parameters);
@@ -45,19 +46,22 @@ class RouterHelper {
     return extract(parameters, match);
   }
 
+  // 检查路由路径是否有效
   static bool checkPathAvailable(String path) {
     if (path == null || path.isEmpty) return false;
     return true;
   }
 
+  // 通过路由地址参数重建地址
   static String reBuildPathByVariables(Router router) {
     String path = router.path;
     router.pathVariables.forEach((dynamic key, dynamic val) {
-      path.replaceAll(RegExp(":${key.toString()}"), val.toString());
+      path = path.replaceAll(RegExp(":${key.toString()}"), val.toString());
     });
     return path;
   }
 
+  // 通过反射获取使用PathVariable注解的参数
   static dynamic reflectPathVariable(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(PATH_VARIABLE_NAME)).reflectee;
@@ -67,6 +71,7 @@ class RouterHelper {
     }
   }
 
+  // 通过反射获取使用CookieValue注解的参数
   static dynamic reflectCookieValue(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(COOKIE_NAME)).reflectee;
@@ -76,6 +81,7 @@ class RouterHelper {
     }
   }
 
+  // 反射获取路由处理器方法的参数列表
   static List<dynamic> listParameters(Router router) {
     List<dynamic> parameters = List();
     FunctionTypeMirror functionTypeMirror = reflect(router.handle).type;

@@ -1,5 +1,5 @@
 abstract class CloseableAware<T, F> {
-  Future<dynamic> close(T t);
+  Future<dynamic> close();
 
   Future<dynamic> onClose(F f);
 }

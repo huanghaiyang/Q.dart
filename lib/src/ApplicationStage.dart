@@ -1,0 +1,1 @@
+enum ApplicationStage { STOPPED, STARTING, STARTED, RUNNING, STOPPING }

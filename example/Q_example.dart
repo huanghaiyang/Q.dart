@@ -2,21 +2,29 @@ import 'dart:io';
 
 import 'package:Q/Q.dart';
 
-main() {
-  Application app = Application();
+Application app;
+
+void main() {
+  start();
+}
+
+void start() {
+  app = Application();
 
   // app.applicationContext.configuration.unSupportedContentTypes.add(ContentType('multipart', 'form-data'));
   // app.applicationContext.configuration.unSupportedMethods.add(HttpMethod.POST);
-  app.route(Router("/users", HttpMethod.GET, (Context context, [HttpRequest req, HttpResponse res]) async {
-    return {'name': 'huang'};
+  app.route(Router("/users", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
+    return [
+      {'name': 'peter'}
+    ];
   }));
 
   app.route(Router("/upload", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
-    return {'name': 'huang'};
+    return {'name': 'peter'};
   }));
 
-  app.route(Router("/user", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
-    return {'success': true};
+  app.route(Router("/user", HttpMethod.GET, (Context context, [HttpRequest req, HttpResponse res]) async {
+    return {'name': "peter"};
   }));
 
   app.route(Router("/user_redirect", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
@@ -36,7 +44,7 @@ main() {
   }));
 
   app.route(Router("/redirect_user", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
-    return Redirect("name:user", HttpMethod.GET, pathVariables: {"user_id": "1", "name": "huang"});
+    return Redirect("name:user", HttpMethod.GET, pathVariables: {"user_id": "1", "name": "peter"});
   }));
 
   app.route(Router("/user/:user_id/:name", HttpMethod.GET, (Context context,
