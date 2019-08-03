@@ -18,5 +18,9 @@ void main() {
       expect(await JSONHttpMessageConverter.getInstance().convert({'name': 'Q'}), '{"name":"Q"}');
       expect(await JSONHttpMessageConverter.getInstance().convert(["name", "age"]), '["name","age"]');
     });
+
+    tearDown(() {
+      jsonHttpMessageConverter = null;
+    });
   });
 }

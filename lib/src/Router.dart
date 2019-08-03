@@ -7,7 +7,6 @@ import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/ResponseEntry.dart';
 import 'package:Q/src/aware/BindApplicationAware.dart';
 import 'package:Q/src/aware/ContextAware.dart';
-import 'package:Q/src/aware/CookieAware.dart';
 import 'package:Q/src/aware/HttpMethodAware.dart';
 import 'package:Q/src/aware/PathVariablesAware.dart';
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
@@ -21,8 +20,7 @@ import 'package:path_to_regexp/path_to_regexp.dart';
 
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
 
-abstract class Router extends BindApplicationAware<Application>
-    with PathVariablesAware<Map>, HttpMethodAware<HttpMethod>, CookieAware<Cookie>, ContextAware<Context> {
+abstract class Router extends BindApplicationAware<Application> with PathVariablesAware<Map>, HttpMethodAware<HttpMethod>, ContextAware<Context> {
   factory Router(String path, HttpMethod method, RouterHandleFunction handle,
           {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) =>
       _Router(path, method, handle,
@@ -237,16 +235,6 @@ class _Router implements Router {
   @override
   dynamic getPathVariable(String name) {
     return this.pathVariables[name];
-  }
-
-  @override
-  List<String> get cookieNames {
-    return this.context.cookieNames;
-  }
-
-  @override
-  List<Cookie> get cookies {
-    return this.context.cookies;
   }
 
   @override

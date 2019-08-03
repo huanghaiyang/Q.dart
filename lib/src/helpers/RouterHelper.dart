@@ -5,8 +5,11 @@ import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/Router.dart';
 import 'package:Q/src/annotation/CookieValue.dart';
 import 'package:Q/src/annotation/PathVariable.dart';
+import 'package:Q/src/annotation/RequestHeader.dart';
+import 'package:Q/src/helpers/CookieValueHelper.dart';
+import 'package:Q/src/helpers/PathVariableHelper.dart';
 import 'package:Q/src/helpers/RedirectHelper.dart';
-import 'package:Q/src/helpers/ReflectHelper.dart';
+import 'package:Q/src/helpers/RequestHeaderHelper.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 class RouterHelper {
@@ -61,26 +64,6 @@ class RouterHelper {
     return path;
   }
 
-  // 通过反射获取使用PathVariable注解的参数
-  static dynamic reflectPathVariable(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
-    if (annotationMirror != null) {
-      String nameValue = annotationMirror.getField(Symbol(PATH_VARIABLE_NAME)).reflectee;
-      if (router.pathVariables.containsKey(nameValue)) {
-        return ReflectHelper.reflectParameterValue(parameterMirror, router.pathVariables[nameValue]);
-      }
-    }
-  }
-
-  // 通过反射获取使用CookieValue注解的参数
-  static dynamic reflectCookieValue(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
-    if (annotationMirror != null) {
-      String nameValue = annotationMirror.getField(Symbol(COOKIE_NAME)).reflectee;
-      if (router.pathVariables.containsKey(nameValue)) {
-        return ReflectHelper.reflectParameterValue(parameterMirror, router.pathVariables[nameValue]);
-      }
-    }
-  }
-
   // 反射获取路由处理器方法的参数列表
   static List<dynamic> listParameters(Router router) {
     List<dynamic> parameters = List();
@@ -90,12 +73,17 @@ class RouterHelper {
       if (instanceMirrors.isNotEmpty) {
         for (InstanceMirror instanceMirror in instanceMirrors) {
           ClassMirror type = instanceMirror.type;
+          List params = [router, parameterMirror, instanceMirror];
           if (type == reflectClass(PathVariable)) {
-            parameters.add(reflectPathVariable(router, parameterMirror, instanceMirror));
+            parameters.add(Function.apply(PathVariableHelper.reflectPathVariable, params));
             break;
           }
-          if (type == reflectClass(PathVariable)) {
-            parameters.add(reflectCookieValue(router, parameterMirror, instanceMirror));
+          if (type == reflectClass(CookieValue)) {
+            parameters.add(Function.apply(CookieValueHelper.reflectCookieValue, params));
+            break;
+          }
+          if (type == reflectClass(RequestHeader)) {
+            parameters.add(Function.apply(RequestHeaderHelper.reflectRequestHeader, params));
             break;
           }
           if (parameterMirror.hasDefaultValue) {

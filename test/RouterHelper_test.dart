@@ -35,5 +35,10 @@ void main() {
       expect(await RouterHelper.matchRedirect(Redirect("path:/user/1/peter", HttpMethod.GET), routers), null);
       expect(await RouterHelper.matchRedirect(Redirect("name:request_user_named_peter_1", HttpMethod.POST), routers), null);
     });
+
+    tearDown(() {
+      routers = null;
+      requestUserByIdAndNameRouter = null;
+    });
   });
 }

@@ -52,5 +52,16 @@ void start() {
     return {'id': userId, 'name': name};
   }, name: 'user'));
 
+  app.route(Router("/cookie", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res, @CookieValue("name") String name]) async {
+    return [
+      {'name': name}
+    ];
+  }));
+
+  app.route(Router("/header", HttpMethod.POST, (Context context,
+      [HttpRequest req, HttpResponse res, @RequestHeader("Content-Type") String contentType]) async {
+    return {'Content-Type': contentType};
+  }));
+
   app.listen(8081);
 }
