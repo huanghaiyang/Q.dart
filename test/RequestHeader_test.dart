@@ -12,7 +12,8 @@ void main() {
     });
 
     test('users', () async {
-      Response response = await dio.post("http://localhost:8081/header", data: {}, options: Options(contentType: ContentType.json));
+      Response response =
+          await dio.post("http://localhost:8081/header", data: {}, options: Options(contentType: ContentType.json));
       expect(response.data, {"Content-Type": "application/json; charset=utf-8"});
     });
 

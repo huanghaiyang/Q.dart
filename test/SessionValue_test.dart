@@ -18,8 +18,8 @@ void main() {
       expect(setSessionRes.data["jsessionid"] != null, true);
       expect(setSessionRes.data["name"], "peter");
 
-      Response getSessionRes =
-          await dio.post("http://localhost:8081/setSession", options: Options(cookies: [Cookie("set-cookie", setSessionRes.data["jsessionid"])]));
+      Response getSessionRes = await dio.post("http://localhost:8081/setSession",
+          options: Options(cookies: [Cookie("set-cookie", setSessionRes.data["jsessionid"])]));
       expect(getSessionRes.data["name"], "peter");
     });
 

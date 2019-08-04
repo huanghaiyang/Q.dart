@@ -20,11 +20,20 @@ import 'package:path_to_regexp/path_to_regexp.dart';
 
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
 
-abstract class Router extends BindApplicationAware<Application> with PathVariablesAware<Map>, HttpMethodAware<HttpMethod>, ContextAware<Context> {
+abstract class Router extends BindApplicationAware<Application>
+    with PathVariablesAware<Map>, HttpMethodAware<HttpMethod>, ContextAware<Context> {
   factory Router(String path, HttpMethod method, RouterHandleFunction handle,
-          {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) =>
+          {Map pathVariables,
+          ContentType produceType,
+          AbstractHttpMessageConverter converter,
+          HandlerAdapter handlerAdapter,
+          String name}) =>
       _Router(path, method, handle,
-          pathVariables_: pathVariables, produceType_: produceType, converter_: converter, handlerAdapter_: handlerAdapter, name_: name);
+          pathVariables_: pathVariables,
+          produceType_: produceType,
+          converter_: converter,
+          handlerAdapter_: handlerAdapter,
+          name_: name);
 
   String get name;
 
@@ -86,7 +95,8 @@ class _Router implements Router {
 
   Context context_;
 
-  _Router(this.path_, this.method_, this.handle_, {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
+  _Router(this.path_, this.method_, this.handle_,
+      {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
     if (this.handle_ == null) {
       throw IllegalArgumentException(message: 'The handler function of router:${this.path_} should not be null.');
     }

@@ -6,19 +6,39 @@ import 'package:Q/src/handler/HandlerAdapter.dart';
 
 abstract class RouteAware<T> {
   T get(String path, RouterHandleFunction handle,
-      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name});
+      {Map pathVariables,
+      ContentType produceType,
+      AbstractHttpMessageConverter converter,
+      HandlerAdapter handlerAdapter,
+      String name});
 
   T post(String path, RouterHandleFunction handle,
-      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name});
+      {Map pathVariables,
+      ContentType produceType,
+      AbstractHttpMessageConverter converter,
+      HandlerAdapter handlerAdapter,
+      String name});
 
   T put(String path, RouterHandleFunction handle,
-      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name});
+      {Map pathVariables,
+      ContentType produceType,
+      AbstractHttpMessageConverter converter,
+      HandlerAdapter handlerAdapter,
+      String name});
 
   T delete(String path, RouterHandleFunction handle,
-      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name});
+      {Map pathVariables,
+      ContentType produceType,
+      AbstractHttpMessageConverter converter,
+      HandlerAdapter handlerAdapter,
+      String name});
 
   T patch(String path, RouterHandleFunction handle,
-      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name});
+      {Map pathVariables,
+      ContentType produceType,
+      AbstractHttpMessageConverter converter,
+      HandlerAdapter handlerAdapter,
+      String name});
 
   void route(T t);
 

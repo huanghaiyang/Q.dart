@@ -102,7 +102,8 @@ MultiValueMap mapResult(List<List<int>> partitions) {
   partitions.forEach((List<int> partition) {
     Value value;
     int splitIndex = knuthMorrisPrattMatcher.match(partition);
-    String info = String.fromCharCodes(partition.getRange(0, splitIndex - knuthMorrisPrattMatcher.delimiter.length + 1));
+    String info =
+        String.fromCharCodes(partition.getRange(0, splitIndex - knuthMorrisPrattMatcher.delimiter.length + 1));
     int contentTypeIndex = info.indexOf(RegExp(CONTENT_TYPE));
     List<int> contentBytes = partition.sublist(splitIndex + 1, partition.length - 1);
     if (contentTypeIndex != -1) {

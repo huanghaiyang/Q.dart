@@ -48,11 +48,15 @@ void start() {
   }));
 
   app.route(Router("/user/:user_id/:name", HttpMethod.GET, (Context context,
-      [HttpRequest req, HttpResponse res, @PathVariable("user_id") int userId, @PathVariable("name") String name]) async {
+      [HttpRequest req,
+      HttpResponse res,
+      @PathVariable("user_id") int userId,
+      @PathVariable("name") String name]) async {
     return {'id': userId, 'name': name};
   }, name: 'user'));
 
-  app.route(Router("/cookie", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res, @CookieValue("name") String name]) async {
+  app.route(Router("/cookie", HttpMethod.POST, (Context context,
+      [HttpRequest req, HttpResponse res, @CookieValue("name") String name]) async {
     return [
       {'name': name}
     ];
@@ -70,7 +74,8 @@ void start() {
     return {"name": req.session["name"], "jsessionid": req.session.id};
   }));
 
-  app.route(Router("/getSession", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res, @SessionValue("name") String name]) async {
+  app.route(Router("/getSession", HttpMethod.POST, (Context context,
+      [HttpRequest req, HttpResponse res, @SessionValue("name") String name]) async {
     return {"name": name};
   }));
 

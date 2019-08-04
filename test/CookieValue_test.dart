@@ -14,7 +14,8 @@ void main() {
     });
 
     test('cookie', () async {
-      Response response = await dio.post("http://localhost:8081/cookie", options: Options(cookies: [Cookie("name", "peter")]));
+      Response response =
+          await dio.post("http://localhost:8081/cookie", options: Options(cookies: [Cookie("name", "peter")]));
       expect(response.data, [
         {"name": "peter"}
       ]);

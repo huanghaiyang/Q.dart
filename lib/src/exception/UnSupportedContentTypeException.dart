@@ -1,7 +1,8 @@
 import 'dart:io';
 
 class UnSupportedContentTypeException extends Exception {
-  factory UnSupportedContentTypeException({String message, ContentType contentType}) => _UnSupportedContentTypeException(message: message, contentType: contentType);
+  factory UnSupportedContentTypeException({String message, ContentType contentType}) =>
+      _UnSupportedContentTypeException(message: message, contentType: contentType);
 }
 
 class _UnSupportedContentTypeException implements UnSupportedContentTypeException {

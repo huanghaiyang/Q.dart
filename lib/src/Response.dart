@@ -23,7 +23,8 @@ abstract class Response extends BindApplicationAware<Application> with StatusAwa
 
   ResponseEntry get responseEntry;
 
-  factory Response([Application app, HttpResponse res, Request request, Context context, ResponseEntry responseEntry]) =>
+  factory Response(
+          [Application app, HttpResponse res, Request request, Context context, ResponseEntry responseEntry]) =>
       _Response(app, res, request, context, responseEntry);
 }
 

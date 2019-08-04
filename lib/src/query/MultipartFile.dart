@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:Q/src/query/Value.dart';
 
 class MultipartFile extends Value {
-
   String originName;
 
   ContentType contentType;

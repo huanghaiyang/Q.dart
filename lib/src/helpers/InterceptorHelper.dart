@@ -8,7 +8,8 @@ class InterceptorHelper {
     }
     if (!(interceptors is List || interceptors is Set)) {
       throw IllegalArgumentException(
-          message: '(Iterable<AbstractInterceptor> interceptors) type should be List<AbstractInterceptor> or Set<AbstractInterceptor>');
+          message:
+              '(Iterable<AbstractInterceptor> interceptors) type should be List<AbstractInterceptor> or Set<AbstractInterceptor>');
     }
     return true;
   }

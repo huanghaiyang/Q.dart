@@ -1,5 +1,6 @@
 class InvalidRouterPathException extends Exception {
-  factory InvalidRouterPathException({String message, String path}) => _InvalidRouterPathException(message: message, path: path);
+  factory InvalidRouterPathException({String message, String path}) =>
+      _InvalidRouterPathException(message: message, path: path);
 }
 
 class _InvalidRouterPathException implements InvalidRouterPathException {

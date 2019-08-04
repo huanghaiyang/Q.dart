@@ -9,7 +9,8 @@ class RequestHeaderHelper {
   static dynamic reflectRequestHeader(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(HEADER_NAME)).reflectee;
-      return ReflectHelper.reflectParameterValue(parameterMirror, router.context.request.req.headers.value(nameValue.toLowerCase()));
+      return ReflectHelper.reflectParameterValue(
+          parameterMirror, router.context.request.req.headers.value(nameValue.toLowerCase()));
     }
   }
 }

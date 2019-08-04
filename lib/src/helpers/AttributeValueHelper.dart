@@ -6,7 +6,8 @@ import 'package:Q/src/helpers/ReflectHelper.dart';
 
 class AttributeValueHelper {
   // 通过反射获取使用AttributeValue注解的参数
-  static dynamic reflectAttributeValue(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
+  static dynamic reflectAttributeValue(
+      Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(ATTRIBUTE_NAME)).reflectee;
       if (router.context.hasAttribute(nameValue)) {

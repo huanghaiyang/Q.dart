@@ -36,7 +36,8 @@ class ReflectHelper {
     return result;
   }
 
-  static void reflectParamAnnotation(Function function, Type annotationClass, ParameterAnnotationCallback parameterAnnotationCallback) {
+  static void reflectParamAnnotation(
+      Function function, Type annotationClass, ParameterAnnotationCallback parameterAnnotationCallback) {
     assert(function != null);
     assert(annotationClass != null);
     FunctionTypeMirror functionTypeMirror = reflect(function).type;

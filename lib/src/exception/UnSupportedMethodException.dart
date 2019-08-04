@@ -2,7 +2,8 @@ import 'package:Q/src/Method.dart';
 import 'package:Q/src/helpers/HttpMethodHelper.dart';
 
 class UnSupportedMethodException extends Exception {
-  factory UnSupportedMethodException({String message, HttpMethod method}) => _UnSupportedMethodException(message: message, method: method);
+  factory UnSupportedMethodException({String message, HttpMethod method}) =>
+      _UnSupportedMethodException(message: message, method: method);
 }
 
 class _UnSupportedMethodException implements UnSupportedMethodException {
