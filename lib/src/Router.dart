@@ -111,15 +111,18 @@ class _Router implements Router {
 
   // 请求路径匹配
   Future<bool> match(HttpRequest request) async {
+    assert(request != null, "'request' must not be null.");
     return await this.matchPath(request.uri.path) && request.method.toUpperCase() == this.methodName;
   }
 
   @override
   Future<bool> matchPath(String path) async {
+    assert(path != null && path.isNotEmpty, "'path' can not be null or empry string.");
     return pathToRegExp(this.path).hasMatch(path);
   }
 
   Future convert(ResponseEntry entry) async {
+    assert(entry != null, "'ResponseEntry entry' can not be null.");
     entry.lastConvertedTime = DateTime.now();
     return this.converter_.convert(entry.result);
   }
@@ -185,6 +188,7 @@ class _Router implements Router {
 
   @override
   Future<bool> matchRedirect(Redirect redirect) async {
+    assert(redirect != null, "'redirect' can not be null");
     return pathToRegExp(this.path).hasMatch(redirect.address) && redirect.method.toString() == this.methodName;
   }
 
@@ -195,6 +199,7 @@ class _Router implements Router {
 
   @override
   void apply(HttpRequest request) {
+    assert(request != null, "'request' can not be null.");
     this.query_ = request.uri.queryParametersAll;
     this.requestUri_ = request.uri.path;
     this.pathVariables = RouterHelper.applyPathVariables(request.uri.path, this.path_);
@@ -214,6 +219,7 @@ class _Router implements Router {
 
   @override
   set requestUri(String requestUri) {
+    assert(requestUri.isNotEmpty && requestUri != null, "'requestUri' can not be null.");
     this.requestUri_ = requestUri;
   }
 
@@ -238,22 +244,8 @@ class _Router implements Router {
   }
 
   @override
-  bool hasCookie(String name) {
-    return this.context.hasCookie(name);
-  }
-
-  @override
-  Iterable<Cookie> getBookiesBy(String domain) {
-    return this.context.getBookiesBy(domain);
-  }
-
-  @override
-  Cookie getBookie(String name) {
-    return this.context.getBookie(name);
-  }
-
-  @override
   set context(Context context) {
+    assert(context != null, "'context' can not be null.");
     this.context_ = context;
   }
 

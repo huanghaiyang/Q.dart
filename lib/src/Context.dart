@@ -66,14 +66,14 @@ class _Context implements Context {
     return this.request_.req.cookies;
   }
 
-  Cookie getBookie(String name) {
+  Cookie getCookie(String name) {
     return this.cookies.singleWhere((cookie) {
       return cookie.name == name;
     });
   }
 
   @override
-  Iterable<Cookie> getBookiesBy(String domain) {
+  Iterable<Cookie> getCookiesBy(String domain) {
     return this.cookies.where((cookie) {
       return cookie.domain == domain;
     });
@@ -104,6 +104,8 @@ class _Context implements Context {
 
   @override
   void setAttribute(String name, dynamic value) {
+    assert(name != null);
+    assert(value != null);
     this.attributes_[name] = Attribute(name, value, this.router);
   }
 
@@ -139,6 +141,7 @@ class _Context implements Context {
 
   @override
   set app(Application app) {
+    assert(app != null);
     this.app_ = app;
   }
 
@@ -185,6 +188,7 @@ class _Context implements Context {
 
   @override
   void setRouter(Router router) {
+    assert(router != null);
     this.router_ = router;
     this.incrementRouteCount();
   }

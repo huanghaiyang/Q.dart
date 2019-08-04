@@ -1,7 +1,7 @@
 abstract class CookieAware<T> {
-  T getBookie(String name);
+  T getCookie(String name);
 
-  Iterable<T> getBookiesBy(String domain);
+  Iterable<T> getCookiesBy(String domain);
 
   bool hasCookie(String name);
 
