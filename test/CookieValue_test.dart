@@ -5,7 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:test/test.dart';
 
 void main() {
-  group("users", () {
+  group("CookieValue", () {
     Dio dio;
 
     setUp(() {
@@ -13,7 +13,7 @@ void main() {
       dio.interceptors.add(CookieManager(CookieJar()));
     });
 
-    test('users', () async {
+    test('cookie', () async {
       Response response = await dio.post("http://localhost:8081/cookie", options: Options(cookies: [Cookie("name", "peter")]));
       expect(response.data, [
         {"name": "peter"}

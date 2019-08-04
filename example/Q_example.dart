@@ -63,5 +63,16 @@ void start() {
     return {'Content-Type': contentType};
   }));
 
+  app.route(Router("/setSession", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
+    req.session.putIfAbsent("name", () {
+      return "peter";
+    });
+    return {"name": req.session["name"], "jsessionid": req.session.id};
+  }));
+
+  app.route(Router("/getSession", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res, @SessionValue("name") String name]) async {
+    return {"name": name};
+  }));
+
   app.listen(8081);
 }

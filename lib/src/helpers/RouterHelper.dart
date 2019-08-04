@@ -3,13 +3,17 @@ import 'dart:mirrors';
 
 import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/Router.dart';
+import 'package:Q/src/annotation/AttributeValue.dart';
 import 'package:Q/src/annotation/CookieValue.dart';
 import 'package:Q/src/annotation/PathVariable.dart';
 import 'package:Q/src/annotation/RequestHeader.dart';
+import 'package:Q/src/annotation/SessionValue.dart';
+import 'package:Q/src/helpers/AttributeValueHelper.dart';
 import 'package:Q/src/helpers/CookieValueHelper.dart';
 import 'package:Q/src/helpers/PathVariableHelper.dart';
 import 'package:Q/src/helpers/RedirectHelper.dart';
 import 'package:Q/src/helpers/RequestHeaderHelper.dart';
+import 'package:Q/src/helpers/SessionValueHelper.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 class RouterHelper {
@@ -84,6 +88,14 @@ class RouterHelper {
           }
           if (type == reflectClass(RequestHeader)) {
             parameters.add(Function.apply(RequestHeaderHelper.reflectRequestHeader, params));
+            break;
+          }
+          if (type == reflectClass(SessionValue)) {
+            parameters.add(Function.apply(SessionValueHelper.reflectSessionValue, params));
+            break;
+          }
+          if (type == reflectClass(AttributeValue)) {
+            parameters.add(Function.apply(AttributeValueHelper.reflectAttributeValue, params));
             break;
           }
           if (parameterMirror.hasDefaultValue) {
