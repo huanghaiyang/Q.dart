@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Q/src/Request.dart';
+import 'package:Q/src/exception/UnExpectedRequestJsonException.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
+import 'package:Q/src/utils/ListUtil.dart';
 
 class JsonResolver extends AbstractResolver {
   JsonResolver._();
@@ -21,14 +23,21 @@ class JsonResolver extends AbstractResolver {
   Future<bool> match(HttpRequest req) async {
     ContentType contentType = req.headers.contentType;
     if (contentType == null) return false;
-    return contentType.mimeType.toLowerCase().startsWith(RegExp(ContentType.json.mimeType));
+    return contentType.mimeType
+        .toLowerCase()
+        .startsWith(RegExp(ContentType.json.mimeType));
   }
 
   @override
   Future<Request> resolve(HttpRequest req) async {
-    Converter<List<int>, Object> decoder = json.fuse(utf8).decoder;
-    Map data = await decoder.bind(req).single;
-    Request request = Request(data: data);
-    return request;
+    String json_text = String.fromCharCodes(concat(await req.toList()));
+    try {
+      Map data = await jsonDecode(json_text);
+      Request request = Request(data: data);
+      return request;
+    } catch (error) {
+      throw UnExpectedRequestJsonException(
+          json: json_text, originalException: error);
+    }
   }
 }

@@ -6,6 +6,7 @@ import 'package:Q/src/multipart/MultiValueMap.dart';
 import 'package:Q/src/query/CommonValue.dart';
 import 'package:Q/src/query/MultipartFile.dart';
 import 'package:Q/src/query/Value.dart';
+import 'package:Q/src/utils/ListUtil.dart';
 
 List<int> CR = '\r'.codeUnits;
 
@@ -37,21 +38,6 @@ List<int> boundary(HttpRequest req) {
   return null;
 }
 
-// 数据组合
-List<int> concat(List<List<int>> byteArrays) {
-  int length = 0;
-  for (List<int> byteArray in byteArrays) {
-    length += byteArray.length;
-  }
-  List<int> result = List(length);
-  length = 0;
-  for (List<int> byteArray in byteArrays) {
-    result.setRange(length, length + byteArray.length, byteArray);
-    length += byteArray.length;
-  }
-  return result;
-}
-
 Future<MultiValueMap> transform(HttpRequest req, List<int> data) async {
   List<int> boundaryUnits = boundary(req);
   List<int> needle = concat([FIRST_BOUNDARY_PREFIX, boundaryUnits, CR, LF]);
@@ -63,7 +49,8 @@ Future<MultiValueMap> transform(HttpRequest req, List<int> data) async {
 }
 
 // 跳过第一个boundary,使用KMP算法进行匹配
-List<int> skipUntilFirstBoundary(List<int> data, KnuthMorrisPrattMatcher matcher) {
+List<int> skipUntilFirstBoundary(
+    List<int> data, KnuthMorrisPrattMatcher matcher) {
   int endIndex = matcher.match(data);
   if (endIndex != -1) {
     List<int> slice = List.from(data.getRange(endIndex + 1, data.length));
@@ -72,7 +59,8 @@ List<int> skipUntilFirstBoundary(List<int> data, KnuthMorrisPrattMatcher matcher
   return [];
 }
 
-List<List<int>> split(List<int> data, List<int> needle, KnuthMorrisPrattMatcher matcher) {
+List<List<int>> split(
+    List<int> data, List<int> needle, KnuthMorrisPrattMatcher matcher) {
   List<List<int>> partitions = List();
 
   while (true) {
@@ -98,18 +86,23 @@ Map getProps(String info) {
 MultiValueMap mapResult(List<List<int>> partitions) {
   Map<String, List<Value>> result = Map();
 
-  KnuthMorrisPrattMatcher knuthMorrisPrattMatcher = KnuthMorrisPrattMatcher(concat(DELIMITER));
+  KnuthMorrisPrattMatcher knuthMorrisPrattMatcher =
+      KnuthMorrisPrattMatcher(concat(DELIMITER));
   partitions.forEach((List<int> partition) {
     Value value;
     int splitIndex = knuthMorrisPrattMatcher.match(partition);
-    String info =
-        String.fromCharCodes(partition.getRange(0, splitIndex - knuthMorrisPrattMatcher.delimiter.length + 1));
+    String info = String.fromCharCodes(partition.getRange(
+        0, splitIndex - knuthMorrisPrattMatcher.delimiter.length + 1));
     int contentTypeIndex = info.indexOf(RegExp(CONTENT_TYPE));
-    List<int> contentBytes = partition.sublist(splitIndex + 1, partition.length - 1);
+    List<int> contentBytes =
+        partition.sublist(splitIndex + 1, partition.length - 1);
     if (contentTypeIndex != -1) {
       MultipartFile namedValue = MultipartFile();
-      namedValue.contentType = ContentType.parse(info.substring(contentTypeIndex + CONTENT_TYPE.length));
-      info = info.substring(CONTENT_DISPOSITION.length, contentTypeIndex).replaceAll(RegExp(HEADER_SEPARATOR), '');
+      namedValue.contentType = ContentType.parse(
+          info.substring(contentTypeIndex + CONTENT_TYPE.length));
+      info = info
+          .substring(CONTENT_DISPOSITION.length, contentTypeIndex)
+          .replaceAll(RegExp(HEADER_SEPARATOR), '');
       namedValue.bytes = contentBytes;
       namedValue.size = contentBytes.length;
       Map props = getProps(info);

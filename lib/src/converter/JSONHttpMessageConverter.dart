@@ -17,6 +17,6 @@ class JSONHttpMessageConverter implements AbstractHttpMessageConverter {
 
   @override
   Future convert([dynamic entry]) async {
-    return json.encode(entry);
+    return jsonEncode(entry);
   }
 }
