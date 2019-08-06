@@ -11,7 +11,7 @@ class AttributeValueHelper {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(ATTRIBUTE_NAME)).reflectee;
       if (router.context.hasAttribute(nameValue)) {
-        return ReflectHelper.reflectParameterValue(parameterMirror, router.context.getAttribute(nameValue).value);
+        return ReflectHelper.reflectParameterValue(parameterMirror.type.reflectedType, router.context.getAttribute(nameValue).value);
       }
     }
   }

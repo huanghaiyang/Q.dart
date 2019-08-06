@@ -10,7 +10,7 @@ class RequestParamHelper {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(PARAM_NAME)).reflectee;
       if (router.context.request.data.containsKey(nameValue)) {
-        return ReflectHelper.reflectParameterValue(parameterMirror, router.context.request.data[nameValue]);
+        return ReflectHelper.reflectParameterValue(parameterMirror.type.reflectedType, router.context.request.data[nameValue]);
       }
     }
   }

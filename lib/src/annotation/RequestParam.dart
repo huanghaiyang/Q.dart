@@ -1,9 +1,9 @@
 String PARAM_NAME = "name";
 
 @pragma('vm:entry-point')
-class ReqeustParam {
+class RequestParam {
   final String name;
 
   @pragma('vm:entry-point')
-  const ReqeustParam(this.name);
+  const RequestParam(this.name);
 }

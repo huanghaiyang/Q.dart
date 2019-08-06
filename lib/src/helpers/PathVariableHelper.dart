@@ -10,7 +10,7 @@ class PathVariableHelper {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(PATH_VARIABLE_NAME)).reflectee;
       if (router.pathVariables.containsKey(nameValue)) {
-        return ReflectHelper.reflectParameterValue(parameterMirror, router.pathVariables[nameValue]);
+        return ReflectHelper.reflectParameterValue(parameterMirror.type.reflectedType, router.pathVariables[nameValue]);
       }
     }
   }

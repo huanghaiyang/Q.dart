@@ -10,7 +10,7 @@ class SessionValueHelper {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(SESSION_NAME)).reflectee;
       if (router.context.request.req.session.containsKey(nameValue)) {
-        return ReflectHelper.reflectParameterValue(parameterMirror, router.context.request.req.session[nameValue]);
+        return ReflectHelper.reflectParameterValue(parameterMirror.type.reflectedType, router.context.request.req.session[nameValue]);
       }
     }
   }

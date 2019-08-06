@@ -5,14 +5,11 @@ import 'package:Q/Q.dart';
 import 'package:Q/src/ApplicationContext.dart';
 import 'package:curie/curie.dart';
 
-typedef ApplicationStartUpCallback = Future<dynamic> Function(
-    Application application);
+typedef ApplicationStartUpCallback = Future<dynamic> Function(Application application);
 
-typedef ApplicationCloseCallback = void Function(Application application,
-    [Future<dynamic> prevCloseableResult]);
+typedef ApplicationCloseCallback = void Function(Application application, [Future<dynamic> prevCloseableResult]);
 
-abstract class Application
-    extends CloseableAware<Application, ApplicationCloseCallback>
+abstract class Application extends CloseableAware<Application, ApplicationCloseCallback>
     with RouteAware<Router>, InterceptorRegistryAware<AbstractInterceptor> {
   factory Application() => _Application.getInstance();
 
@@ -56,8 +53,7 @@ abstract class Application
 
   void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter);
 
-  void replaceConverter(
-      ContentType type, AbstractHttpMessageConverter converter);
+  void replaceConverter(ContentType type, AbstractHttpMessageConverter converter);
 }
 
 class _Application implements Application {
@@ -122,10 +118,8 @@ class _Application implements Application {
   // 初始化转换器
   initConverters() {
     this.converters_[ContentType.json] = JSONHttpMessageConverter.getInstance();
-    this.converters_[ContentType.text] =
-        StringHttpMessageConverter.getInstance();
-    this.converters_[ContentType.html] =
-        StringHttpMessageConverter.getInstance();
+    this.converters_[ContentType.text] = StringHttpMessageConverter.getInstance();
+    this.converters_[ContentType.html] = StringHttpMessageConverter.getInstance();
   }
 
   // 内置拦截器初始化
@@ -146,13 +140,9 @@ class _Application implements Application {
   void listen(int port, {InternetAddress internetAddress}) async {
     this.applicationContext.currentStage = ApplicationStage.STARTING;
     // 默认ipv4
-    internetAddress = internetAddress != null
-        ? internetAddress
-        : InternetAddress.loopbackIPv4;
+    internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;
     // 创建服务
-    this.server_ = await HttpServer.bind(internetAddress, port)
-        .catchError(this.onError)
-        .whenComplete(() {
+    this.server_ = await HttpServer.bind(internetAddress, port).catchError(this.onError).whenComplete(() {
       if (this.applicationStartUpCallback != null) {
         this.applicationStartUpCallback(this);
       }
@@ -162,7 +152,11 @@ class _Application implements Application {
 
     // 处理请求
     await for (HttpRequest req in this.server_) {
-      await this.handleRequest(req);
+      try {
+        await this.handleRequest(req);
+      } catch (error) {
+        print(error.toString());
+      }
     }
   }
 
@@ -177,13 +171,11 @@ class _Application implements Application {
         // 创建请求上下文
         Context context = await this.createContext(req, res);
         // 前置中间件处理
-        await this.handleWithMiddleware(
-            context, MiddlewareType.BEFORE, this.onFinished, this.onError);
+        await this.handleWithMiddleware(context, MiddlewareType.BEFORE, this.onFinished, this.onError);
         // 匹配路由并处理请求
         await this.applyRouter(context, req);
         // 后置中间件处理
-        await this.handleWithMiddleware(
-            context, MiddlewareType.AFTER, this.onFinished, this.onError);
+        await this.handleWithMiddleware(context, MiddlewareType.AFTER, this.onFinished, this.onError);
         // 执行后置拦截器方法
         await this.applyPostHandler(req, res);
       }
@@ -207,11 +199,10 @@ class _Application implements Application {
   }
 
   // response中间件
-  Future<Context> handleWithMiddleware(Context context, MiddlewareType type,
-      Function onFinished, Function onError) async {
-    await for (Middleware middleware in Stream.fromIterable(this
-        .middleWares_
-        .where((Middleware middleware) => middleware.type == type))) {
+  Future<Context> handleWithMiddleware(
+      Context context, MiddlewareType type, Function onFinished, Function onError) async {
+    await for (Middleware middleware
+        in Stream.fromIterable(this.middleWares_.where((Middleware middleware) => middleware.type == type))) {
       await middleware.handle(context, onFinished, onError);
     }
     return context;
@@ -300,18 +291,15 @@ class _Application implements Application {
   }
 
   // 路由处理，响应请求
-  Future<Context> handleRouter(
-      Router matchedRouter, Context context, HttpRequest req) async {
+  Future<Context> handleRouter(Router matchedRouter, Context context, HttpRequest req) async {
     // 通过反射获取当前请求处理函数上定义的路径参数
-    List<dynamic> reflectedParameters =
-        RouterHelper.listParameters(matchedRouter);
+    List<dynamic> reflectedParameters = RouterHelper.listParameters(matchedRouter);
     // 合并参数
     List positionArguments = List()
       ..addAll([context, context.request.req, context.response.res])
       ..addAll(reflectedParameters);
     // 等待结果处理完成
-    dynamic result =
-        await Function.apply(matchedRouter.handle, positionArguments);
+    dynamic result = await Function.apply(matchedRouter.handle, positionArguments);
     // 如果执行的结果是一个重定向
     if (result is Redirect) {
       // 根据重定向匹配路由并执行
@@ -339,8 +327,7 @@ class _Application implements Application {
 
   // 替换内置转换器
   @override
-  void replaceConverter(
-      ContentType type, AbstractHttpMessageConverter converter) {
+  void replaceConverter(ContentType type, AbstractHttpMessageConverter converter) {
     if (this.converters_.containsKey(type)) {
       this.converters_[type] = converter;
     }
@@ -350,9 +337,7 @@ class _Application implements Application {
   @override
   void registryInterceptor(AbstractInterceptor interceptor) {
     if (interceptor == null) {
-      throw IllegalArgumentException(
-          message:
-              '(AbstractInterceptor interceptor) argument could not be null.');
+      throw IllegalArgumentException(message: '(AbstractInterceptor interceptor) argument could not be null.');
     }
     this.interceptors_.add(interceptor);
   }
@@ -361,8 +346,7 @@ class _Application implements Application {
   @override
   void registryInterceptors(Iterable<AbstractInterceptor> interceptors) {
     if (InterceptorHelper.canRegistry(interceptors)) {
-      List.from(interceptors)
-          .forEach((interceptor) => this.registryInterceptor(interceptor));
+      List.from(interceptors).forEach((interceptor) => this.registryInterceptor(interceptor));
     }
   }
 
@@ -447,18 +431,15 @@ class _Application implements Application {
   }
 
   // 处理重定向
-  Future<Context> handleRedirect(
-      Context context, Redirect redirect, HttpRequest req) async {
+  Future<Context> handleRedirect(Context context, Redirect redirect, HttpRequest req) async {
     // 根据重定向的地址匹配路由
-    Router matchedRouter =
-        await RouterHelper.matchRedirect(redirect, this.routers_);
+    Router matchedRouter = await RouterHelper.matchRedirect(redirect, this.routers_);
     if (matchedRouter != null) {
       matchedRouter.mergePathVariables(redirect.isName
           ? redirect.pathVariables
           : RouterHelper.applyPathVariables(matchedRouter.path, redirect.path));
       // 根据参数构建请求地址，此地址不是从request.uri.path取到的
-      matchedRouter.requestUri =
-          RouterHelper.reBuildPathByVariables(matchedRouter);
+      matchedRouter.requestUri = RouterHelper.reBuildPathByVariables(matchedRouter);
       // 重新设置请求上下文的路由
       context.setRouter(matchedRouter);
       // 合并当前请求上下文中的attributes数据
@@ -482,8 +463,7 @@ class _Application implements Application {
   }
 
   @override
-  Future<dynamic> onClose(
-      ApplicationCloseCallback applicationCloseCallback) async {
+  Future<dynamic> onClose(ApplicationCloseCallback applicationCloseCallback) async {
     this.applicationCloseCallback = applicationCloseCallback;
     return true;
   }

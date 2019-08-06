@@ -13,25 +13,21 @@ void start() {
 
   // app.applicationContext.configuration.unSupportedContentTypes.add(ContentType('multipart', 'form-data'));
   // app.applicationContext.configuration.unSupportedMethods.add(HttpMethod.POST);
-  app.route(Router("/users", HttpMethod.POST, (Context context,
-      [HttpRequest req, HttpResponse res]) async {
+  app.route(Router("/users", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
     return [
       {'name': 'peter'}
     ];
   }));
 
-  app.route(Router("/upload", HttpMethod.POST, (Context context,
-      [HttpRequest req, HttpResponse res]) async {
+  app.route(Router("/upload", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
     return {'name': 'peter'};
   }));
 
-  app.route(Router("/user", HttpMethod.GET, (Context context,
-      [HttpRequest req, HttpResponse res]) async {
+  app.route(Router("/user", HttpMethod.GET, (Context context, [HttpRequest req, HttpResponse res]) async {
     return {'name': "peter"};
   }));
 
-  app.route(Router("/user_redirect", HttpMethod.POST, (Context context,
-      [HttpRequest req, HttpResponse res]) async {
+  app.route(Router("/user_redirect", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
     Map<String, String> map = Map();
     context.attributes.forEach((String key, Attribute value) {
       map[key] = value.value;
@@ -39,22 +35,16 @@ void start() {
     return map;
   }, name: 'user_redirect'));
 
-  app.route(Router("/redirect", HttpMethod.POST, (Context context,
-      [HttpRequest req, HttpResponse res]) async {
-    return Redirect("/user_redirect", HttpMethod.POST,
-        attributes: [Attribute('hello', 'world')]);
+  app.route(Router("/redirect", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
+    return Redirect("/user_redirect", HttpMethod.POST, attributes: [Attribute('hello', 'world')]);
   }));
 
-  app.route(Router("/redirect_name", HttpMethod.POST, (Context context,
-      [HttpRequest req, HttpResponse res]) async {
-    return Redirect("name:user_redirect", HttpMethod.POST,
-        attributes: [Attribute('hello', 'world')]);
+  app.route(Router("/redirect_name", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
+    return Redirect("name:user_redirect", HttpMethod.POST, attributes: [Attribute('hello', 'world')]);
   }));
 
-  app.route(Router("/redirect_user", HttpMethod.POST, (Context context,
-      [HttpRequest req, HttpResponse res]) async {
-    return Redirect("name:user", HttpMethod.GET,
-        pathVariables: {"user_id": "1", "name": "peter"});
+  app.route(Router("/redirect_user", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
+    return Redirect("name:user", HttpMethod.GET, pathVariables: {"user_id": "1", "name": "peter"});
   }));
 
   app.route(Router("/user/:user_id/:name", HttpMethod.GET, (Context context,
@@ -66,23 +56,18 @@ void start() {
   }, name: 'user'));
 
   app.route(Router("/cookie", HttpMethod.POST, (Context context,
-      [HttpRequest req,
-      HttpResponse res,
-      @CookieValue("name") String name]) async {
+      [HttpRequest req, HttpResponse res, @CookieValue("name") String name]) async {
     return [
       {'name': name}
     ];
   }));
 
   app.route(Router("/header", HttpMethod.POST, (Context context,
-      [HttpRequest req,
-      HttpResponse res,
-      @RequestHeader("Content-Type") String contentType]) async {
+      [HttpRequest req, HttpResponse res, @RequestHeader("Content-Type") String contentType]) async {
     return {'Content-Type': contentType};
   }));
 
-  app.route(Router("/setSession", HttpMethod.POST, (Context context,
-      [HttpRequest req, HttpResponse res]) async {
+  app.route(Router("/setSession", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
     req.session.putIfAbsent("name", () {
       return "peter";
     });
@@ -90,21 +75,27 @@ void start() {
   }));
 
   app.route(Router("/getSession", HttpMethod.POST, (Context context,
-      [HttpRequest req,
-      HttpResponse res,
-      @SessionValue("name") String name]) async {
+      [HttpRequest req, HttpResponse res, @SessionValue("name") String name]) async {
     return {"name": name};
   }));
 
   // 请求头不含contentType
-  app.route(Router("/request_no_content_type", HttpMethod.POST,
-      (Context context, [HttpRequest req, HttpResponse res]) async {
+  app.route(
+      Router("/request_no_content_type", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
     return {'contentType': req.headers.contentType?.toString()};
   }));
 
-  app.route(Router("/application_json", HttpMethod.POST,
-      (Context context, [HttpRequest req, HttpResponse res]) async {
+  app.route(Router("/application_json", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
     return context.request.data;
+  }));
+
+  app.route(Router("/path_params", HttpMethod.GET, (Context context,
+      [HttpRequest req,
+      HttpResponse res,
+      @QueryParam('age') int age,
+      @QueryParam('isHero') bool isHero,
+      @QueryParam('friends') List<String> friends]) async {
+    return {'age': age, 'isHero': isHero, 'friends': friends};
   }));
 
   app.listen(8081);

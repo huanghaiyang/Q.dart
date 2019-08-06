@@ -10,7 +10,7 @@ class CookieValueHelper {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(COOKIE_NAME)).reflectee;
       if (router.context.hasCookie(nameValue)) {
-        return ReflectHelper.reflectParameterValue(parameterMirror, router.context.getCookie(nameValue).value);
+        return ReflectHelper.reflectParameterValue(parameterMirror.type.reflectedType, router.context.getCookie(nameValue).value);
       }
     }
   }

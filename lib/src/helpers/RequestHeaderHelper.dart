@@ -10,7 +10,7 @@ class RequestHeaderHelper {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(HEADER_NAME)).reflectee;
       return ReflectHelper.reflectParameterValue(
-          parameterMirror, router.context.request.req.headers.value(nameValue.toLowerCase()));
+          parameterMirror.type.reflectedType, router.context.request.req.headers.value(nameValue.toLowerCase()));
     }
   }
 }
