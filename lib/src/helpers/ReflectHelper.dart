@@ -4,6 +4,7 @@ typedef ParameterAnnotationCallback = void Function(ParameterMirror parameterMir
 
 class ReflectHelper {
   static dynamic reflectParameterValue(Type type, String value) {
+    if (value == null) return value;
     dynamic result;
     switch (type) {
       case int:

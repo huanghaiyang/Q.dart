@@ -6,7 +6,7 @@ export 'package:Q/src/helpers/CookieValueHelper.dart';
 export 'package:Q/src/helpers/HttpMethodHelper.dart';
 export 'package:Q/src/helpers/InterceptorHelper.dart';
 export 'package:Q/src/helpers/PathVariableHelper.dart';
-export 'package:Q/src/helpers/QueryParamHelper.dart';
+export 'package:Q/src/helpers/UrlParamHelper.dart';
 export 'package:Q/src/helpers/RedirectHelper.dart';
 export 'package:Q/src/helpers/ReflectHelper.dart';
 export 'package:Q/src/helpers/RequestParamHelper.dart';

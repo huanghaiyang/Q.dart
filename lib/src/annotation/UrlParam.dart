@@ -1,9 +1,9 @@
 String QUERY_PARAM_NAME = "name";
 
 @pragma('vm:entry-point')
-class QueryParam {
+class UrlParam {
   final String name;
 
   @pragma('vm:entry-point')
-  const QueryParam(this.name);
+  const UrlParam(this.name);
 }

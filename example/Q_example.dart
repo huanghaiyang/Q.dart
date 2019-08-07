@@ -92,10 +92,11 @@ void start() {
   app.route(Router("/path_params", HttpMethod.GET, (Context context,
       [HttpRequest req,
       HttpResponse res,
-      @QueryParam('age') int age,
-      @QueryParam('isHero') bool isHero,
-      @QueryParam('friends') List<String> friends]) async {
-    return {'age': age, 'isHero': isHero, 'friends': friends};
+      @UrlParam('age') int age,
+      @UrlParam('isHero') bool isHero,
+      @UrlParam('friends') List<String> friends,
+      @UrlParam('grandpa') String grandpa]) async {
+    return {'age': age, 'isHero': isHero, 'friends': friends, 'grandpa': grandpa, 'money': null};
   }));
 
   app.listen(8081);

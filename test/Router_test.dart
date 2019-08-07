@@ -29,12 +29,14 @@ void main() {
 //    });
 
     test('path_params', () async {
-      dio.Response response =
-          await dio.Dio().get("http://localhost:8081/path_params?age=16&isHero=true&friends=thor&friends=iron man");
+      dio.Response response = await dio.Dio()
+          .get("http://localhost:8081/path_params?age=16&isHero=true&friends=thor&friends=iron man&grandpa");
       expect(response.data, {
         "age": 16,
         "isHero": true,
-        "friends": ["thor", 'iron man']
+        "friends": ["thor", 'iron man'],
+        "grandpa": '',
+        "money": null
       });
     });
   });
