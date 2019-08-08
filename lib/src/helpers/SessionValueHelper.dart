@@ -9,6 +9,7 @@ class SessionValueHelper {
   static dynamic reflectSessionValue(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
     if (annotationMirror != null) {
       String nameValue = annotationMirror.getField(Symbol(SESSION_NAME)).reflectee;
+      if (nameValue == null) return null;
       if (router.context.request.req.session.containsKey(nameValue)) {
         return ReflectHelper.reflectParameterValue(parameterMirror.type.reflectedType, router.context.request.req.session[nameValue]);
       }

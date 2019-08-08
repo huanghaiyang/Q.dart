@@ -133,6 +133,7 @@ class _Application implements Application {
   initResolvers() {
     this.resolvers_[ResolverType.MULTIPART] = MultipartResolver.getInstance();
     this.resolvers_[ResolverType.JSON] = JsonResolver.getInstance();
+    this.resolvers_[ResolverType.FORM_URLENCODED] = X3WFormUrlEncodedResolver.getInstance();
   }
 
   // ip/端口监听
@@ -154,8 +155,9 @@ class _Application implements Application {
     await for (HttpRequest req in this.server_) {
       try {
         await this.handleRequest(req);
-      } catch (error) {
-        print(error.toString());
+      } catch (e, s) {
+        print('Exception details:\n $e');
+        print('Stack trace:\n $s');
       }
     }
   }
@@ -358,10 +360,11 @@ class _Application implements Application {
         bool suspend;
         try {
           suspend = await this.interceptors_[i].preHandle(req, res);
-        } catch (exception) {
+        } catch (e, s) {
           // 如果拦截器执行preHandler时抛出异常，则终止请求
           suspend = true;
-          print(exception);
+          print('Exception details:\n $e');
+          print('Stack trace:\n $s');
         }
         return suspend;
       });

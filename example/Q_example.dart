@@ -95,8 +95,20 @@ void start() {
       @UrlParam('age') int age,
       @UrlParam('isHero') bool isHero,
       @UrlParam('friends') List<String> friends,
-      @UrlParam('grandpa') String grandpa]) async {
-    return {'age': age, 'isHero': isHero, 'friends': friends, 'grandpa': grandpa, 'money': null};
+      @UrlParam('grandpa') String grandpa,
+      @RequestParam('actors') List<String> actors]) async {
+    return {'age': age, 'isHero': isHero, 'friends': friends, 'grandpa': grandpa, 'money': null, 'actors': actors};
+  }));
+
+  app.route(Router("/x-www-form-urlencoded", HttpMethod.POST, (Context context,
+      [HttpRequest req,
+      HttpResponse res,
+      @UrlParam('age') int age,
+      @UrlParam('isHero') bool isHero,
+      @UrlParam('friends') List<String> friends,
+      @UrlParam('grandpa') String grandpa,
+      @RequestParam('actors') List<String> actors]) async {
+    return {'age': age, 'isHero': isHero, 'friends': friends, 'grandpa': grandpa, 'money': null, 'actors': actors};
   }));
 
   app.listen(8081);

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart' as dio;
 import 'package:test/test.dart';
 
@@ -36,7 +38,25 @@ void main() {
         "isHero": true,
         "friends": ["thor", 'iron man'],
         "grandpa": '',
-        "money": null
+        "money": null,
+        "actors": null
+      });
+    });
+
+    test('x-www-form-urlencoded', () async {
+      dio.Response response = await dio.Dio()
+          .post("http://localhost:8081/x-www-form-urlencoded?age=16&isHero=true&friends=thor&friends=iron man&grandpa",
+              data: {
+                'actors': ["Tobey Maguire", "I dont care"]
+              },
+              options: dio.Options(contentType: ContentType.parse('application/x-www-form-urlencoded')));
+      expect(response.data, {
+        "age": 16,
+        "isHero": true,
+        "friends": ["thor", 'iron man'],
+        "grandpa": '',
+        "money": null,
+        "actors": ["Tobey Maguire", "I dont care"]
       });
     });
   });

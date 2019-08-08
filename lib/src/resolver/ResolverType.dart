@@ -1,1 +1,1 @@
-enum ResolverType { MULTIPART, JSON }
+enum ResolverType { MULTIPART, JSON, FORM_URLENCODED }
