@@ -12,7 +12,7 @@ import 'package:Q/src/aware/PathVariablesAware.dart';
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 import 'package:Q/src/exception/IllegalArgumentException.dart';
 import 'package:Q/src/exception/InvalidRouterPathException.dart';
-import 'package:Q/src/exception/UnKnowMethodException.dart';
+import 'package:Q/src/exception/UnKnowRouterMethodException.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:Q/src/helpers/HttpMethodHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
@@ -98,10 +98,12 @@ class _Router implements Router {
   _Router(this.path_, this.method_, this.handle_,
       {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
     if (this.handle_ == null) {
-      throw IllegalArgumentException(message: 'The handler function of router:${this.path_} should not be null.');
+      throw IllegalArgumentException(
+          message: 'The handler function of router:${this.path_} should not be null.');
     }
+    RouterHelper.checkoutRouterHandlerParameterAnnotations(this);
     if (!HttpMethodHelper.checkValidMethod(this.method_)) {
-      throw UnKnowMethodException(method: this.method_);
+      throw UnKnowRouterMethodException(method: this.method_);
     }
     if (!RouterHelper.checkPathAvailable(this.path_)) {
       throw InvalidRouterPathException(path: this.path_);
@@ -122,7 +124,8 @@ class _Router implements Router {
   // 请求路径匹配
   Future<bool> match(HttpRequest request) async {
     assert(request != null, "'request' must not be null.");
-    return await this.matchPath(request.uri.path) && request.method.toUpperCase() == this.methodName;
+    return await this.matchPath(request.uri.path) &&
+        request.method.toUpperCase() == this.methodName;
   }
 
   @override
@@ -199,7 +202,8 @@ class _Router implements Router {
   @override
   Future<bool> matchRedirect(Redirect redirect) async {
     assert(redirect != null, "'redirect' can not be null");
-    return pathToRegExp(this.path).hasMatch(redirect.address) && redirect.method.toString() == this.methodName;
+    return pathToRegExp(this.path).hasMatch(redirect.address) &&
+        redirect.method.toString() == this.methodName;
   }
 
   @override

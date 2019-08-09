@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:Q/src/exception/UnSupportedMethodException.dart';
+import 'package:Q/src/exception/UnSupportedRequestMethodException.dart';
 import 'package:Q/src/helpers/HttpMethodHelper.dart';
 import 'package:Q/src/helpers/UnSupportedMethodHelper.dart';
 import 'package:Q/src/interceptor/AbstractInterceptor.dart';
@@ -23,7 +23,7 @@ class UnSupportedMethodInterceptor implements AbstractInterceptor {
     bool passed = await UnSupportedMethodHelper.checkSupported(req);
     if (!passed) {
       res.write(UnSupportedMethodView().toRaw(req, res, extra: {'unSupported': req.method}));
-      throw UnSupportedMethodException(method: HttpMethodHelper.fromMethod(req.method));
+      throw UnSupportedRequestMethodException(method: HttpMethodHelper.fromMethod(req.method));
     }
     return passed;
   }

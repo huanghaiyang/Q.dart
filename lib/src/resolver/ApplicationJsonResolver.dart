@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:Q/src/Request.dart';
-import 'package:Q/src/exception/UnExpectedRequestJsonException.dart';
+import 'package:Q/src/exception/UnExpectedRequestApplicationJsonException.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 import 'package:Q/src/utils/ListUtil.dart';
 
@@ -36,7 +36,7 @@ class JsonResolver extends AbstractResolver {
       Request request = Request(data: data);
       return request;
     } catch (error) {
-      throw UnExpectedRequestJsonException(
+      throw UnExpectedRequestApplicationJsonException(
           json: json_text, originalException: error);
     }
   }

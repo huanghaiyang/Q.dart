@@ -10,6 +10,8 @@ import 'package:Q/src/annotation/RequestHeader.dart';
 import 'package:Q/src/annotation/RequestParam.dart';
 import 'package:Q/src/annotation/SessionValue.dart';
 import 'package:Q/src/annotation/UrlParam.dart';
+import 'package:Q/src/exception/UnSupportRouterHandlerParameterAnnotationException.dart';
+import 'package:Q/src/helpers/AnnotationHelpers.dart';
 import 'package:Q/src/helpers/AttributeValueHelper.dart';
 import 'package:Q/src/helpers/CookieValueHelper.dart';
 import 'package:Q/src/helpers/PathVariableHelper.dart';
@@ -117,5 +119,24 @@ class RouterHelper {
       }
     });
     return parameters;
+  }
+
+  // 检查路由处理器上的注解参数是否合法
+  static void checkoutRouterHandlerParameterAnnotations(Router router) {
+    FunctionTypeMirror functionTypeMirror = reflect(router.handle).type;
+    for (ParameterMirror parameterMirror in functionTypeMirror.parameters) {
+      List<InstanceMirror> instanceMirrors = parameterMirror.metadata;
+      if (instanceMirrors.isNotEmpty) {
+        for (InstanceMirror instanceMirror in instanceMirrors) {
+          ClassMirror type = instanceMirror.type;
+          if (SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATION_CLASSES
+                  .indexWhere((classMirror) => classMirror == type) ==
+              -1) {
+            throw UnSupportRouterHandlerParameterAnnotationException(
+                router: router, annotation: type.reflectedType);
+          }
+        }
+      }
+    }
   }
 }
