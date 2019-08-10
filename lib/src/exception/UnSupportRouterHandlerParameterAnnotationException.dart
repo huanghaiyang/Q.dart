@@ -3,14 +3,11 @@ import 'dart:mirrors';
 import 'package:Q/src/Router.dart';
 
 class UnSupportRouterHandlerParameterAnnotationException extends Exception {
-  factory UnSupportRouterHandlerParameterAnnotationException(
-          {String message, Router router, Type annotation}) =>
-      _UnSupportRouterHandlerParameterAnnotationException(
-          message: message, router: router, annotation: annotation);
+  factory UnSupportRouterHandlerParameterAnnotationException({String message, Router router, Type annotation}) =>
+      _UnSupportRouterHandlerParameterAnnotationException(message: message, router: router, annotation: annotation);
 }
 
-class _UnSupportRouterHandlerParameterAnnotationException
-    implements UnSupportRouterHandlerParameterAnnotationException {
+class _UnSupportRouterHandlerParameterAnnotationException implements UnSupportRouterHandlerParameterAnnotationException {
   final String message;
 
   final Router router;

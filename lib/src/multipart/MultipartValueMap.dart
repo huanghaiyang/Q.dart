@@ -6,13 +6,13 @@ import 'package:Q/src/query/MultipartFile.dart';
 import 'package:Q/src/query/Value.dart';
 import 'package:Q/src/utils/FileUtil.dart';
 
-class MultiValueMap<K, V> implements LinkedHashMap<K, V> {
+class MultipartValueMap<K, V> implements LinkedHashMap<K, V> {
   Map<K, V> store = Map();
 
-  MultiValueMap(this.store);
+  MultipartValueMap(this.store);
 
-  factory MultiValueMap.from(Map other) {
-    MultiValueMap<K, V> result = MultiValueMap<K, V>(other);
+  factory MultipartValueMap.from(Map other) {
+    MultipartValueMap<K, V> result = MultipartValueMap<K, V>(other);
     other.forEach((k, v) {
       result[k] = v;
     });
@@ -66,6 +66,23 @@ class MultiValueMap<K, V> implements LinkedHashMap<K, V> {
         return List<File>.from(list);
       }
       return [];
+    }
+    return null;
+  }
+
+  List get(K name) {
+    V values = this.store[name];
+    if (values is List) {
+      try {
+        return List<CommonValue>.from(values);
+      } catch (err) {
+        print('Trying convert List to List<CommonValue> failed.');
+      }
+      try {
+        return List<MultipartFile>.from(values);
+      } catch (err) {
+        print('Trying convert List to List<MultipartFile> failed.');
+      }
     }
     return null;
   }

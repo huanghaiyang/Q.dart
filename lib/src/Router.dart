@@ -29,11 +29,7 @@ abstract class Router extends BindApplicationAware<Application>
           HandlerAdapter handlerAdapter,
           String name}) =>
       _Router(path, method, handle,
-          pathVariables_: pathVariables,
-          produceType_: produceType,
-          converter_: converter,
-          handlerAdapter_: handlerAdapter,
-          name_: name);
+          pathVariables_: pathVariables, produceType_: produceType, converter_: converter, handlerAdapter_: handlerAdapter, name_: name);
 
   String get name;
 
@@ -98,8 +94,7 @@ class _Router implements Router {
   _Router(this.path_, this.method_, this.handle_,
       {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
     if (this.handle_ == null) {
-      throw IllegalArgumentException(
-          message: 'The handler function of router:${this.path_} should not be null.');
+      throw IllegalArgumentException(message: 'The handler function of router:${this.path_} should not be null.');
     }
     RouterHelper.checkoutRouterHandlerParameterAnnotations(this);
     if (!HttpMethodHelper.checkValidMethod(this.method_)) {
@@ -124,8 +119,7 @@ class _Router implements Router {
   // 请求路径匹配
   Future<bool> match(HttpRequest request) async {
     assert(request != null, "'request' must not be null.");
-    return await this.matchPath(request.uri.path) &&
-        request.method.toUpperCase() == this.methodName;
+    return await this.matchPath(request.uri.path) && request.method.toUpperCase() == this.methodName;
   }
 
   @override
@@ -202,8 +196,7 @@ class _Router implements Router {
   @override
   Future<bool> matchRedirect(Redirect redirect) async {
     assert(redirect != null, "'redirect' can not be null");
-    return pathToRegExp(this.path).hasMatch(redirect.address) &&
-        redirect.method.toString() == this.methodName;
+    return pathToRegExp(this.path).hasMatch(redirect.address) && redirect.method.toString() == this.methodName;
   }
 
   @override

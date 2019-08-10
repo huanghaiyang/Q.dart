@@ -12,6 +12,5 @@ List<Type> SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATIONS = [
   SessionValue
 ];
 
-List<ClassMirror> SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATION_CLASSES = List.from(
-    SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATIONS
-        .map((Type annotation) => reflectClass(annotation)));
+List<ClassMirror> SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATION_CLASSES =
+    List.from(SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATIONS.map((Type annotation) => reflectClass(annotation)));

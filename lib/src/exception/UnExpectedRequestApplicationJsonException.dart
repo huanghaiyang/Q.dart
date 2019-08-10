@@ -1,12 +1,9 @@
 class UnExpectedRequestApplicationJsonException extends Exception {
-  factory UnExpectedRequestApplicationJsonException(
-          {String message, String json, Exception originalException}) =>
-      _UnExpectedRequestApplicationJsonException(
-          message: message, json: json, originalException: originalException);
+  factory UnExpectedRequestApplicationJsonException({String message, String json, Exception originalException}) =>
+      _UnExpectedRequestApplicationJsonException(message: message, json: json, originalException: originalException);
 }
 
-class _UnExpectedRequestApplicationJsonException
-    implements UnExpectedRequestApplicationJsonException {
+class _UnExpectedRequestApplicationJsonException implements UnExpectedRequestApplicationJsonException {
   final message;
 
   final String json;

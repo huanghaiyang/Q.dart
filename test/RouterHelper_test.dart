@@ -15,8 +15,8 @@ void main() {
 
     setUp(() {
       routers = List();
-      requestUserByIdAndNameRouter = Router("/user/:id/:name", HttpMethod.POST, (Context context,
-          [HttpRequest request, HttpResponse response]) async {
+      requestUserByIdAndNameRouter =
+          Router("/user/:id/:name", HttpMethod.POST, (Context context, [HttpRequest request, HttpResponse response]) async {
         return {};
       }, pathVariables: {"id": 1, "name": "peter"}, name: 'request_user_named_peter');
 
@@ -24,8 +24,7 @@ void main() {
     });
 
     test('RouterHelper::applyPathVariables', () {
-      Map<String, String> variables =
-          RouterHelper.applyPathVariables('/user/1/peter', '/user/:id/:name');
+      Map<String, String> variables = RouterHelper.applyPathVariables('/user/1/peter', '/user/:id/:name');
       expect(variables, {"id": '1', "name": "peter"});
     });
 
@@ -35,22 +34,12 @@ void main() {
     });
 
     test('RouterHelper::matchRedirect', () async {
-      expect(
-          await RouterHelper.matchRedirect(
-              Redirect("path:/user/1/peter", HttpMethod.POST), routers),
-          requestUserByIdAndNameRouter);
-      expect(
-          await RouterHelper.matchRedirect(
-              Redirect("name:request_user_named_peter", HttpMethod.POST), routers),
+      expect(await RouterHelper.matchRedirect(Redirect("path:/user/1/peter", HttpMethod.POST), routers), requestUserByIdAndNameRouter);
+      expect(await RouterHelper.matchRedirect(Redirect("name:request_user_named_peter", HttpMethod.POST), routers),
           requestUserByIdAndNameRouter);
 
-      expect(
-          await RouterHelper.matchRedirect(Redirect("path:/user/1/peter", HttpMethod.GET), routers),
-          null);
-      expect(
-          await RouterHelper.matchRedirect(
-              Redirect("name:request_user_named_peter_1", HttpMethod.POST), routers),
-          null);
+      expect(await RouterHelper.matchRedirect(Redirect("path:/user/1/peter", HttpMethod.GET), routers), null);
+      expect(await RouterHelper.matchRedirect(Redirect("name:request_user_named_peter_1", HttpMethod.POST), routers), null);
     });
 
     tearDown(() {

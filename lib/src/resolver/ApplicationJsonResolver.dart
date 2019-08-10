@@ -23,9 +23,7 @@ class JsonResolver extends AbstractResolver {
   Future<bool> match(HttpRequest req) async {
     ContentType contentType = req.headers.contentType;
     if (contentType == null) return false;
-    return contentType.mimeType
-        .toLowerCase()
-        .startsWith(RegExp(ContentType.json.mimeType));
+    return contentType.mimeType.toLowerCase().startsWith(RegExp(ContentType.json.mimeType));
   }
 
   @override
@@ -36,8 +34,7 @@ class JsonResolver extends AbstractResolver {
       Request request = Request(data: data);
       return request;
     } catch (error) {
-      throw UnExpectedRequestApplicationJsonException(
-          json: json_text, originalException: error);
+      throw UnExpectedRequestApplicationJsonException(json: json_text, originalException: error);
     }
   }
 }

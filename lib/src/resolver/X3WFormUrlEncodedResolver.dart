@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Q/src/Request.dart';
+import 'package:Q/src/helpers/QueryHelper.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 import 'package:Q/src/utils/ListUtil.dart';
 
@@ -30,7 +31,8 @@ class X3WFormUrlEncodedResolver extends AbstractResolver {
     String query = String.fromCharCodes(concat(await req.toList()));
     if (query.isNotEmpty) {
       Uri uri = Uri(query: query);
-      data = uri.queryParametersAll;
+      data = Map.from(uri.queryParametersAll);
+      data = QueryHelper.fixData(data);
     }
     Request request = Request(data: data);
     return request;

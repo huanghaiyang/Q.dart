@@ -1,6 +1,5 @@
 class IllegalArgumentException extends Exception {
-  factory IllegalArgumentException({String message, dynamic argument}) =>
-      _IllegalArgumentException(message: message, argument: argument);
+  factory IllegalArgumentException({String message, dynamic argument}) => _IllegalArgumentException(message: message, argument: argument);
 }
 
 class _IllegalArgumentException implements IllegalArgumentException {

@@ -25,6 +25,7 @@ export 'src/handler/Handler.dart';
 export 'src/helpers/Helpers.dart';
 export 'src/interceptor/Interceptor.dart';
 export 'src/multipart/Multipart.dart';
+export 'src/query/Query.dart';
 export 'src/query/Value.dart';
 export 'src/resolver/Resolver.dart';
 export 'src/utils/Utils.dart';

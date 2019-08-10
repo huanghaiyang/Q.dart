@@ -42,17 +42,24 @@ class ReflectHelper {
     return result;
   }
 
-  static dynamic reflectParameterValues(Type type, List<String> values) {
+  // 获取list或者set的子元素类型
+  static Type reflectSubType(Type type) {
     Type subType;
-    bool isCollection = false;
-    List result = List();
     ClassMirror classMirror = reflectClass(type);
-    if (classMirror == reflectClass(List) || classMirror == reflectClass(Set)) {
-      isCollection = true;
-      classMirror.declarations;
+    if (classMirror == reflectClass(List) || reflectType(type).isSubtypeOf(reflectType(List))) {
       reflectType(type).typeArguments.forEach((TypeMirror typeMirror) {
         subType = typeMirror.reflectedType;
       });
+    }
+    return subType;
+  }
+
+  static dynamic reflectParameterValues(Type type, List<dynamic> values) {
+    List result = List();
+    bool isCollection = false;
+    Type subType = reflectSubType(type);
+    if (subType != null) {
+      isCollection = true;
     } else {
       subType = type;
     }
@@ -62,7 +69,7 @@ class ReflectHelper {
     if (isCollection) {
       return reflectCollection(type, subType, values);
     } else {
-      return result[0];
+      return result.first;
     }
   }
 
@@ -89,32 +96,10 @@ class ReflectHelper {
         default:
           return values;
       }
-    } else if (classMirror == reflectClass(Set)) {
-      switch (argType) {
-        case int:
-          return Set<int>.from(values);
-        case String:
-          return Set<String>.from(values);
-        case bool:
-          return Set<bool>.from(values);
-        case BigInt:
-          return Set<BigInt>.from(values);
-        case DateTime:
-          return Set<DateTime>.from(values);
-        case double:
-          return Set<double>.from(values);
-        case num:
-          return Set<num>.from(values);
-        case Symbol:
-          return Set<Symbol>.from(values);
-        default:
-          return values;
-      }
     }
   }
 
-  static void reflectParamAnnotation(
-      Function function, Type annotationClass, ParameterAnnotationCallback parameterAnnotationCallback) {
+  static void reflectParamAnnotation(Function function, Type annotationClass, ParameterAnnotationCallback parameterAnnotationCallback) {
     assert(function != null);
     assert(annotationClass != null);
     FunctionTypeMirror functionTypeMirror = reflect(function).type;

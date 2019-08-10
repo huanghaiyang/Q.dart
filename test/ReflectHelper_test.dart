@@ -10,8 +10,7 @@ void main() {
     setUp(() {});
 
     test('reflect function annatation parameter', () {
-      ReflectHelper.reflectParamAnnotation(handler, PathVariable,
-          (ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
+      ReflectHelper.reflectParamAnnotation(handler, PathVariable, (ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
         expect(parameterMirror.simpleName, 'ID');
         expect(annotationMirror.getField(Symbol(PATH_VARIABLE_NAME)).reflectee, 'id');
       });

@@ -201,10 +201,8 @@ class _Application implements Application {
   }
 
   // response中间件
-  Future<Context> handleWithMiddleware(
-      Context context, MiddlewareType type, Function onFinished, Function onError) async {
-    await for (Middleware middleware
-        in Stream.fromIterable(this.middleWares_.where((Middleware middleware) => middleware.type == type))) {
+  Future<Context> handleWithMiddleware(Context context, MiddlewareType type, Function onFinished, Function onError) async {
+    await for (Middleware middleware in Stream.fromIterable(this.middleWares_.where((Middleware middleware) => middleware.type == type))) {
       await middleware.handle(context, onFinished, onError);
     }
     return context;
@@ -297,9 +295,7 @@ class _Application implements Application {
     // 通过反射获取当前请求处理函数上定义的路径参数
     List<dynamic> reflectedParameters = RouterHelper.listParameters(matchedRouter);
     // 合并参数
-    List positionArguments = List()
-      ..addAll([context, context.request.req, context.response.res])
-      ..addAll(reflectedParameters);
+    List positionArguments = List()..addAll([context, context.request.req, context.response.res])..addAll(reflectedParameters);
     // 等待结果处理完成
     dynamic result = await Function.apply(matchedRouter.handle, positionArguments);
     // 如果执行的结果是一个重定向
@@ -438,9 +434,8 @@ class _Application implements Application {
     // 根据重定向的地址匹配路由
     Router matchedRouter = await RouterHelper.matchRedirect(redirect, this.routers_);
     if (matchedRouter != null) {
-      matchedRouter.mergePathVariables(redirect.isName
-          ? redirect.pathVariables
-          : RouterHelper.applyPathVariables(matchedRouter.path, redirect.path));
+      matchedRouter.mergePathVariables(
+          redirect.isName ? redirect.pathVariables : RouterHelper.applyPathVariables(matchedRouter.path, redirect.path));
       // 根据参数构建请求地址，此地址不是从request.uri.path取到的
       matchedRouter.requestUri = RouterHelper.reBuildPathByVariables(matchedRouter);
       // 重新设置请求上下文的路由
@@ -482,85 +477,45 @@ class _Application implements Application {
   //-----------------------------------------------路由 简便使用方法-------------------------------------------//
   @override
   Router patch(String path, RouterHandleFunction handle,
-      {Map pathVariables,
-      ContentType produceType,
-      AbstractHttpMessageConverter converter,
-      HandlerAdapter handlerAdapter,
-      String name}) {
+      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
     Router router = Router(path, HttpMethod.PATCH, handle,
-        pathVariables: pathVariables,
-        produceType: produceType,
-        converter: converter,
-        handlerAdapter: handlerAdapter,
-        name: name);
+        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
     this.route(router);
     return router;
   }
 
   @override
   Router delete(String path, RouterHandleFunction handle,
-      {Map pathVariables,
-      ContentType produceType,
-      AbstractHttpMessageConverter converter,
-      HandlerAdapter handlerAdapter,
-      String name}) {
+      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
     Router router = Router(path, HttpMethod.DELETE, handle,
-        pathVariables: pathVariables,
-        produceType: produceType,
-        converter: converter,
-        handlerAdapter: handlerAdapter,
-        name: name);
+        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
     this.route(router);
     return router;
   }
 
   @override
   Router put(String path, RouterHandleFunction handle,
-      {Map pathVariables,
-      ContentType produceType,
-      AbstractHttpMessageConverter converter,
-      HandlerAdapter handlerAdapter,
-      String name}) {
+      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
     Router router = Router(path, HttpMethod.PUT, handle,
-        pathVariables: pathVariables,
-        produceType: produceType,
-        converter: converter,
-        handlerAdapter: handlerAdapter,
-        name: name);
+        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
     this.route(router);
     return router;
   }
 
   @override
   Router post(String path, RouterHandleFunction handle,
-      {Map pathVariables,
-      ContentType produceType,
-      AbstractHttpMessageConverter converter,
-      HandlerAdapter handlerAdapter,
-      String name}) {
+      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
     Router router = Router(path, HttpMethod.POST, handle,
-        pathVariables: pathVariables,
-        produceType: produceType,
-        converter: converter,
-        handlerAdapter: handlerAdapter,
-        name: name);
+        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
     this.route(router);
     return router;
   }
 
   @override
   Router get(String path, RouterHandleFunction handle,
-      {Map pathVariables,
-      ContentType produceType,
-      AbstractHttpMessageConverter converter,
-      HandlerAdapter handlerAdapter,
-      String name}) {
+      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
     Router router = Router(path, HttpMethod.GET, handle,
-        pathVariables: pathVariables,
-        produceType: produceType,
-        converter: converter,
-        handlerAdapter: handlerAdapter,
-        name: name);
+        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
     this.route(router);
     return router;
   }

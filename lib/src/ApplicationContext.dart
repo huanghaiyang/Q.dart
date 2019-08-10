@@ -4,8 +4,7 @@ import 'package:Q/src/Configuration.dart';
 import 'package:Q/src/aware/ApplicationStageAware.dart';
 import 'package:Q/src/aware/BindApplicationAware.dart';
 
-abstract class ApplicationContext extends BindApplicationAware<Application>
-    with ApplicationStageAware<ApplicationStage> {
+abstract class ApplicationContext extends BindApplicationAware<Application> with ApplicationStageAware<ApplicationStage> {
   Configuration get configuration;
 
   String get applicationName;

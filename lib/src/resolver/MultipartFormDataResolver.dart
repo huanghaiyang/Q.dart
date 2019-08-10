@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Q/src/Request.dart';
-import 'package:Q/src/multipart/MultiValueMap.dart';
 import 'package:Q/src/multipart/MultipartTransformer.dart';
+import 'package:Q/src/multipart/MultipartValueMap.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 import 'package:Q/src/utils/ListUtil.dart';
 
@@ -23,16 +23,14 @@ class MultipartResolver extends AbstractResolver {
   Future<bool> match(HttpRequest req) async {
     ContentType contentType = req.headers.contentType;
     if (contentType == null) return false;
-    return contentType.mimeType
-        .toLowerCase()
-        .startsWith(RegExp('multipart/form-data'));
+    return contentType.mimeType.toLowerCase().startsWith(RegExp('multipart/form-data'));
   }
 
   // int i0, 13表示换行
   @override
   Future<Request> resolve(HttpRequest req) async {
     List<int> requestData = concat(await req.toList());
-    MultiValueMap data = await transform(req, requestData);
+    MultipartValueMap data = await transform(req, requestData);
     Request request = Request(data: data);
     return request;
   }
