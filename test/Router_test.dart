@@ -131,12 +131,15 @@ void main() {
           data: FormData.from({
             "name": "peter",
             "friends": ["thor", 'iron man'],
-            "file": UploadFileInfo(file, "20180902193200.jpg")
+            "file": UploadFileInfo(file, "20180902193200.jpg"),
+            "age": 17,
           }));
       expect(response.data, {
         "name": "peter",
         "friends": ["thor", 'iron man'],
-        "file_length": 1
+        "file_length": 1,
+        "file_bytes_length": await file.length(),
+        "age": 17
       });
     });
   });

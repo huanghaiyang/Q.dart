@@ -3,14 +3,15 @@ import 'dart:mirrors';
 
 import 'package:Q/src/Router.dart';
 import 'package:Q/src/annotation/RequestParam.dart';
-import 'package:Q/src/helpers/ReflectHelper.dart';
+import 'package:Q/src/exception/RequestParamRequiredException.dart';
+import 'package:Q/src/helpers/reflect/ReflectHelper.dart';
 import 'package:Q/src/multipart/MultipartValueMap.dart';
 import 'package:Q/src/query/CommonValue.dart';
 import 'package:Q/src/query/MultipartFile.dart';
 
 class RequestParamHelper {
   // 通过反射获取使用RequestParam注解的参数
-  static dynamic reflectRequestParam(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) {
+  static Future<dynamic> reflectRequestParam(Router router, ParameterMirror parameterMirror, InstanceMirror annotationMirror) async {
     if (annotationMirror != null) {
       String name = annotationMirror.getField(Symbol(PARAM_NAME)).reflectee;
       if (name == null) return null;
@@ -20,6 +21,9 @@ class RequestParamHelper {
       Type parameterType = parameterMirror.type.reflectedType;
       // multipart/form-data类型
       if (data is MultipartValueMap) {
+        if (!data.containsKey(name)) {
+          throw RequestParamRequiredException(name: name);
+        }
         List values = data.get(name);
         // 值类型
         Type valueType = ReflectHelper.reflectSubType(reflect(values).type.reflectedType);

@@ -41,7 +41,7 @@ List<int> boundary(HttpRequest req) {
 
 Future<MultipartValueMap> transform(HttpRequest req, List<int> data) async {
   List<int> boundaryUnits = boundary(req);
-  List<int> needle = concat([FIRST_BOUNDARY_PREFIX, boundaryUnits, CR, LF]);
+  List<int> needle = concat([FIRST_BOUNDARY_PREFIX, boundaryUnits]);
   KnuthMorrisPrattMatcher matcher = KnuthMorrisPrattMatcher(needle);
   List<int> body = skipUntilFirstBoundary(data, matcher);
   List<List<int>> partitions = split(body, needle, matcher);
@@ -61,17 +61,13 @@ List<int> skipUntilFirstBoundary(List<int> data, KnuthMorrisPrattMatcher matcher
 
 List<List<int>> split(List<int> data, List<int> needle, KnuthMorrisPrattMatcher matcher) {
   List<List<int>> partitions = List();
-
   while (true) {
     int endIndex = matcher.match(data);
     if (endIndex == -1) {
-      KnuthMorrisPrattMatcher endMatcher = KnuthMorrisPrattMatcher(matcher.delimiter.sublist(0, matcher.delimiter.length - 2));
-      endIndex = endMatcher.match(data);
-      if (endIndex == -1) {
-        break;
-      }
+      break;
     }
-    partitions.add(List.from(data.getRange(0, endIndex - needle.length)));
+    List<int> bytes = List.from(data.getRange(0, endIndex - needle.length));
+    partitions.add(bytes.sublist(2, bytes.length - 1));
     data = List.from(data.getRange(endIndex + 1, data.length));
   }
   return partitions;
@@ -96,7 +92,7 @@ MultipartValueMap mapResult(List<List<int>> partitions) {
     int splitIndex = knuthMorrisPrattMatcher.match(partition);
     String info = String.fromCharCodes(partition.getRange(0, splitIndex - knuthMorrisPrattMatcher.delimiter.length + 1));
     int contentTypeIndex = info.indexOf(RegExp(CONTENT_TYPE));
-    List<int> contentBytes = partition.sublist(splitIndex + 1, partition.length - 1);
+    List<int> contentBytes = partition.sublist(splitIndex + 1, partition.length);
     if (contentTypeIndex != -1) {
       MultipartFile namedValue = MultipartFile();
       namedValue.contentType = ContentType.parse(info.substring(contentTypeIndex + CONTENT_TYPE.length));

@@ -12,14 +12,14 @@ import 'package:Q/src/annotation/SessionValue.dart';
 import 'package:Q/src/annotation/UrlParam.dart';
 import 'package:Q/src/exception/UnSupportRouterHandlerParameterAnnotationException.dart';
 import 'package:Q/src/helpers/AnnotationHelpers.dart';
-import 'package:Q/src/helpers/AttributeValueHelper.dart';
-import 'package:Q/src/helpers/CookieValueHelper.dart';
-import 'package:Q/src/helpers/PathVariableHelper.dart';
 import 'package:Q/src/helpers/RedirectHelper.dart';
-import 'package:Q/src/helpers/RequestHeaderHelper.dart';
-import 'package:Q/src/helpers/RequestParamHelper.dart';
-import 'package:Q/src/helpers/SessionValueHelper.dart';
-import 'package:Q/src/helpers/UrlParamHelper.dart';
+import 'package:Q/src/helpers/reflect/AttributeValueHelper.dart';
+import 'package:Q/src/helpers/reflect/CookieValueHelper.dart';
+import 'package:Q/src/helpers/reflect/PathVariableHelper.dart';
+import 'package:Q/src/helpers/reflect/RequestHeaderHelper.dart';
+import 'package:Q/src/helpers/reflect/RequestParamHelper.dart';
+import 'package:Q/src/helpers/reflect/SessionValueHelper.dart';
+import 'package:Q/src/helpers/reflect/UrlParamHelper.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 class RouterHelper {
@@ -75,8 +75,8 @@ class RouterHelper {
   }
 
   // 反射获取路由处理器方法的参数列表
-  static List<dynamic> listParameters(Router router) {
-    List<dynamic> parameters = List();
+  static Future<List<dynamic>> listParameters(Router router) async {
+    List<Future> futures = List();
     FunctionTypeMirror functionTypeMirror = reflect(router.handle).type;
     functionTypeMirror.parameters.forEach((ParameterMirror parameterMirror) {
       List<InstanceMirror> instanceMirrors = parameterMirror.metadata;
@@ -85,40 +85,37 @@ class RouterHelper {
           ClassMirror type = instanceMirror.type;
           List params = [router, parameterMirror, instanceMirror];
           if (type == reflectClass(PathVariable)) {
-            parameters.add(Function.apply(PathVariableHelper.reflectPathVariable, params));
+            futures.add(Function.apply(PathVariableHelper.reflectPathVariable, params));
             break;
           }
           if (type == reflectClass(CookieValue)) {
-            parameters.add(Function.apply(CookieValueHelper.reflectCookieValue, params));
+            futures.add(Function.apply(CookieValueHelper.reflectCookieValue, params));
             break;
           }
           if (type == reflectClass(RequestHeader)) {
-            parameters.add(Function.apply(RequestHeaderHelper.reflectRequestHeader, params));
+            futures.add(Function.apply(RequestHeaderHelper.reflectRequestHeader, params));
             break;
           }
           if (type == reflectClass(SessionValue)) {
-            parameters.add(Function.apply(SessionValueHelper.reflectSessionValue, params));
+            futures.add(Function.apply(SessionValueHelper.reflectSessionValue, params));
             break;
           }
           if (type == reflectClass(AttributeValue)) {
-            parameters.add(Function.apply(AttributeValueHelper.reflectAttributeValue, params));
+            futures.add(Function.apply(AttributeValueHelper.reflectAttributeValue, params));
             break;
           }
           if (type == reflectClass(UrlParam)) {
-            parameters.add(Function.apply(UrlParamHelper.reflectUrlParams, params));
+            futures.add(Function.apply(UrlParamHelper.reflectUrlParams, params));
             break;
           }
           if (type == reflectClass(RequestParam)) {
-            parameters.add(Function.apply(RequestParamHelper.reflectRequestParam, params));
+            futures.add(Function.apply(RequestParamHelper.reflectRequestParam, params));
             break;
-          }
-          if (parameterMirror.hasDefaultValue) {
-            parameters.add(parameterMirror.defaultValue);
           }
         }
       }
     });
-    return parameters;
+    return await Future.wait(futures);
   }
 
   // 检查路由处理器上的注解参数是否合法

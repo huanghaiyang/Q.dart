@@ -25,8 +25,10 @@ void start() {
       HttpResponse res,
       @RequestParam("name") String name,
       @RequestParam("friends") List<String> friends,
-      @RequestParam("file") List<MultipartFile> files]) async {
-    return {'name': name, "friends": friends, "file_length": files.length};
+      @RequestParam("file") List<MultipartFile> files,
+      @RequestParam("file") File file,
+      @RequestParam("age") int age]) async {
+    return {'name': name, "friends": friends, "file_length": files.length, "file_bytes_length": await file.length(), "age": age};
   }));
 
   app.route(Router("/user", HttpMethod.GET, (Context context, [HttpRequest req, HttpResponse res]) async {

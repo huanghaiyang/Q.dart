@@ -293,7 +293,7 @@ class _Application implements Application {
   // 路由处理，响应请求
   Future<Context> handleRouter(Router matchedRouter, Context context, HttpRequest req) async {
     // 通过反射获取当前请求处理函数上定义的路径参数
-    List<dynamic> reflectedParameters = RouterHelper.listParameters(matchedRouter);
+    List<dynamic> reflectedParameters = await RouterHelper.listParameters(matchedRouter);
     // 合并参数
     List positionArguments = List()..addAll([context, context.request.req, context.response.res])..addAll(reflectedParameters);
     // 等待结果处理完成
