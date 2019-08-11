@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Q/src/Method.dart';
+import 'package:Q/src/configure/MultipartConfigure.dart';
 
 // 应用程序配置
 abstract class Configuration {
@@ -13,6 +14,8 @@ abstract class Configuration {
   // 默认返回结果的类型
   ContentType get defaultProducedType;
 
+  MultipartConfigure get multipartConfigure;
+
   factory Configuration() => _Configuration();
 }
 
@@ -24,6 +27,8 @@ class _Configuration implements Configuration {
   List<HttpMethod> unSupportedMethods_ = List();
 
   ContentType defaultProducedType_ = ContentType.json;
+
+  MultipartConfigure _multipartConfigure = MultipartConfigure();
 
   @override
   List<ContentType> get unSupportedContentTypes {
@@ -38,5 +43,10 @@ class _Configuration implements Configuration {
   @override
   List<HttpMethod> get unSupportedMethods {
     return this.unSupportedMethods_;
+  }
+
+  @override
+  MultipartConfigure get multipartConfigure {
+    return this._multipartConfigure;
   }
 }

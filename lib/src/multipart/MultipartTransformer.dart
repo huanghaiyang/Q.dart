@@ -39,13 +39,13 @@ List<int> boundary(HttpRequest req) {
   return null;
 }
 
-Future<MultipartValueMap> transform(HttpRequest req, List<int> data) async {
+Future<MultipartValueMap> transform(HttpRequest req, List<int> data, bool fixNameSuffixIfArray) async {
   List<int> boundaryUnits = boundary(req);
   List<int> needle = concat([FIRST_BOUNDARY_PREFIX, boundaryUnits]);
   KnuthMorrisPrattMatcher matcher = KnuthMorrisPrattMatcher(needle);
   List<int> body = skipUntilFirstBoundary(data, matcher);
   List<List<int>> partitions = split(body, needle, matcher);
-  MultipartValueMap result = mapResult(partitions);
+  MultipartValueMap result = mapResult(partitions, fixNameSuffixIfArray);
   return result;
 }
 
@@ -73,17 +73,24 @@ List<List<int>> split(List<int> data, List<int> needle, KnuthMorrisPrattMatcher 
   return partitions;
 }
 
-Map getProps(String info) {
+Map getProps(String info, bool fixNameSuffixIfArray) {
   Map namedMap = Map();
   info.split(RegExp("; ")).forEach((str) {
     List<String> kv = str.split(RegExp("="));
-    namedMap[kv[0]] = QueryHelper.fixQueryKey(kv[1].substring(1, kv[1].length - 1));
+    String key = kv[1].substring(1, kv[1].length - 1);
+    if (fixNameSuffixIfArray) {
+      namedMap[kv[0]] = QueryHelper.fixQueryKey(key);
+    } else {
+      namedMap[kv[0]] = key;
+    }
   });
-  namedMap = QueryHelper.fixData(namedMap);
+  if (fixNameSuffixIfArray) {
+    namedMap = QueryHelper.fixData(namedMap);
+  }
   return namedMap;
 }
 
-MultipartValueMap mapResult(List<List<int>> partitions) {
+MultipartValueMap mapResult(List<List<int>> partitions, bool fixNameSuffixIfArray) {
   Map<String, List<Value>> result = Map();
 
   KnuthMorrisPrattMatcher knuthMorrisPrattMatcher = KnuthMorrisPrattMatcher(concat(DELIMITER));
@@ -99,7 +106,7 @@ MultipartValueMap mapResult(List<List<int>> partitions) {
       info = info.substring(CONTENT_DISPOSITION.length, contentTypeIndex).replaceAll(RegExp(HEADER_SEPARATOR), '');
       namedValue.bytes = contentBytes;
       namedValue.size = contentBytes.length;
-      Map props = getProps(info);
+      Map props = getProps(info, fixNameSuffixIfArray);
       namedValue.name = props['name'];
       namedValue.originName = props['filename'];
       value = namedValue;
@@ -107,7 +114,7 @@ MultipartValueMap mapResult(List<List<int>> partitions) {
       info = info.substring(CONTENT_DISPOSITION.length);
       CommonValue namedValue = CommonValue();
       namedValue.value = utf8.decode(contentBytes);
-      Map props = getProps(info);
+      Map props = getProps(info, fixNameSuffixIfArray);
       namedValue.name = props['name'];
       value = namedValue;
     }

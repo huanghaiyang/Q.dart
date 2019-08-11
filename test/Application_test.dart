@@ -16,13 +16,6 @@ void main() {
       expect(application, Application());
     });
 
-    test('users', () async {
-      dio.Response response = await dio.Dio(dio.BaseOptions(contentType: ContentType.json)).post("http://localhost:8081/users");
-      expect(response.data, [
-        {"name": "peter"}
-      ]);
-    });
-
     test('user', () async {
       dio.Response response = await dio.Dio(dio.BaseOptions(contentType: ContentType.json)).get("http://localhost:8081/user");
       expect(response.data, {"name": "peter"});
