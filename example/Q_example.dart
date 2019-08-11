@@ -13,11 +13,6 @@ void start() {
 
   // app.applicationContext.configuration.unSupportedContentTypes.add(ContentType('multipart', 'form-data'));
   // app.applicationContext.configuration.unSupportedMethods.add(HttpMethod.POST);
-  app.route(Router("/users", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
-    return [
-      {'name': 'peter'}
-    ];
-  }));
 
   // multipart/form-data
   app.route(Router("/multipart-form-data", HttpMethod.POST, (Context context,
