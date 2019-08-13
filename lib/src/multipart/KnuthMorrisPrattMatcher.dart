@@ -1,12 +1,20 @@
-class KnuthMorrisPrattMatcher {
-  List<int> delimiter;
+abstract class KnuthMorrisPrattMatcher {
+  int match(List<int> dataBuffer);
+
+  List<int> get delimiter;
+
+  factory KnuthMorrisPrattMatcher(List<int> delimiter) => _KnuthMorrisPrattMatcher(delimiter);
+}
+
+class _KnuthMorrisPrattMatcher implements KnuthMorrisPrattMatcher {
+  List<int> _delimiter;
 
   List<int> table;
 
   int matches = 0;
 
-  KnuthMorrisPrattMatcher(List<int> delimiter) {
-    this.delimiter = List.from(delimiter);
+  _KnuthMorrisPrattMatcher(List<int> delimiter) {
+    this._delimiter = List.from(delimiter);
     this.table = longestSuffixPrefixTable(delimiter);
   }
 
@@ -26,6 +34,7 @@ class KnuthMorrisPrattMatcher {
     return result;
   }
 
+  @override
   int match(List<int> dataBuffer) {
     for (int i = 0; i < dataBuffer.length; i++) {
       int b = dataBuffer[i];
@@ -47,5 +56,10 @@ class KnuthMorrisPrattMatcher {
 
   void reset() {
     this.matches = 0;
+  }
+
+  @override
+  List<int> get delimiter {
+    return this._delimiter;
   }
 }

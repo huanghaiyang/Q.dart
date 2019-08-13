@@ -6,19 +6,34 @@ import 'package:Q/src/query/MultipartFile.dart';
 import 'package:Q/src/query/Value.dart';
 import 'package:Q/src/utils/FileUtil.dart';
 
-class MultipartValueMap<K, V> implements LinkedHashMap<K, V> {
+abstract class MultipartValueMap<K, V> extends LinkedHashMap<K, V> {
+  factory MultipartValueMap.from(Map other) => _MultipartValueMap.from(other);
+
+  dynamic getFirstValue(K name);
+
+  List<dynamic> getValues(K name);
+
+  Future<File> getFirstFile(K name);
+
+  Future<List<File>> getFiles(K name);
+
+  List get(K name);
+}
+
+class _MultipartValueMap<K, V> implements MultipartValueMap<K, V> {
   Map<K, V> store = Map();
 
-  MultipartValueMap(this.store);
+  _MultipartValueMap(this.store);
 
-  factory MultipartValueMap.from(Map other) {
-    MultipartValueMap<K, V> result = MultipartValueMap<K, V>(other);
+  factory _MultipartValueMap.from(Map other) {
+    _MultipartValueMap<K, V> result = _MultipartValueMap<K, V>(other);
     other.forEach((k, v) {
       result[k] = v;
     });
     return result;
   }
 
+  @override
   dynamic getFirstValue(K name) {
     List<dynamic> values = this.getValues(name);
     if (values != null) {
@@ -31,6 +46,7 @@ class MultipartValueMap<K, V> implements LinkedHashMap<K, V> {
     return null;
   }
 
+  @override
   List<dynamic> getValues(K name) {
     if (this.containsKey(name)) {
       V values = this[name];
@@ -46,6 +62,7 @@ class MultipartValueMap<K, V> implements LinkedHashMap<K, V> {
     return null;
   }
 
+  @override
   Future<File> getFirstFile(K name) async {
     dynamic value = this.getFirstValue(name);
     if (value != null && value is List<int>) {
@@ -54,6 +71,7 @@ class MultipartValueMap<K, V> implements LinkedHashMap<K, V> {
     return null;
   }
 
+  @override
   Future<List<File>> getFiles(K name) async {
     List<dynamic> values = this.getValues(name);
     List<Future> futures = List();
@@ -70,6 +88,7 @@ class MultipartValueMap<K, V> implements LinkedHashMap<K, V> {
     return null;
   }
 
+  @override
   List get(K name) {
     V values = this.store[name];
     if (values is List) {
