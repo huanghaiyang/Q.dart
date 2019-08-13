@@ -1,5 +1,5 @@
-class Value {
-  String name;
+abstract class Value {
+  String get name;
 
-  Value(this.name);
+  set name(String name);
 }

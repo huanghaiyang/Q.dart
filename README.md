@@ -1,11 +1,6 @@
 # Q.dart-轻量级Dart服务端框架
 ### 开发中
 
-## 参考
-+ spring-framework
-+ koa
-+ egg.js
-
 ## 使用方式
 ```dart
 import 'dart:io';
