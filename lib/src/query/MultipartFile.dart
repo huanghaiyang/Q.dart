@@ -19,6 +19,8 @@ abstract class MultipartFile extends Value {
 
   set bytes(List<int> bytes);
 
+  Future<File> transferTo(String dest);
+
   factory MultipartFile({String name, String originName, ContentType contentType, int size, List<int> bytes}) =>
       _MultipartFile(name_: name, originName_: originName, contentType_: contentType, size_: size, bytes_: bytes);
 }
@@ -84,5 +86,11 @@ class _MultipartFile implements MultipartFile {
   @override
   set originName(String originName) {
     this.originName_ = originName;
+  }
+
+  @override
+  Future<File> transferTo(String dest) {
+    File file = File(dest);
+    return file.writeAsBytes(this.bytes);
   }
 }

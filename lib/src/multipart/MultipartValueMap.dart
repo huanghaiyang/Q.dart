@@ -62,21 +62,26 @@ class _MultipartValueMap<K, V> implements MultipartValueMap<K, V> {
     return null;
   }
 
+  Future<File> createFile(MultipartFile multipartFile) async {
+    return createTempFile(multipartFile.bytes, getPathExtension(multipartFile.originName));
+  }
+
   @override
   Future<File> getFirstFile(K name) async {
-    dynamic value = this.getFirstValue(name);
-    if (value != null && value is List<int>) {
-      return createTempFile(value);
+    List<MultipartFile> multipartFiles = List<MultipartFile>.from(this.store[name] as List);
+    if (multipartFiles.isNotEmpty) {
+      MultipartFile multipartFile = multipartFiles.first;
+      return createFile(multipartFile);
     }
     return null;
   }
 
   @override
   Future<List<File>> getFiles(K name) async {
-    List<dynamic> values = this.getValues(name);
+    List<MultipartFile> multipartFiles = List<MultipartFile>.from(this.store[name] as List);
     List<Future> futures = List();
-    values.forEach((value) {
-      futures.add(createTempFile(value));
+    multipartFiles.forEach((multipartFile) {
+      futures.add(createFile(multipartFile));
     });
     if (values != null) {
       if (values.isNotEmpty) {
