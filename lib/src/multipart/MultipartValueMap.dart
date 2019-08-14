@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:io';
 
+import 'package:Q/src/helpers/MultipartFileUploadHelper.dart';
 import 'package:Q/src/query/CommonValue.dart';
 import 'package:Q/src/query/MultipartFile.dart';
 import 'package:Q/src/query/Value.dart';
@@ -63,7 +64,8 @@ class _MultipartValueMap<K, V> implements MultipartValueMap<K, V> {
   }
 
   Future<File> createFile(MultipartFile multipartFile) async {
-    return createTempFile(multipartFile.bytes, getPathExtension(multipartFile.originName));
+    File file = File(await MultipartFileUploadHelper.createTempFileUploadPath(getPathExtension(multipartFile.originName)));
+    return file.writeAsBytes(multipartFile.bytes);
   }
 
   @override
