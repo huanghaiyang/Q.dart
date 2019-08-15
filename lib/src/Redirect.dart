@@ -10,8 +10,8 @@ abstract class Redirect extends HttpMethodAware<HttpMethod> {
 
   Map<String, Attribute> get attributes;
 
-  factory Redirect(String address, HttpMethod method, {List<Attribute> attributes, Map pathVariables}) =>
-      _Redirect(address, method, attributes_: attributes, pathVariables_: pathVariables);
+  factory Redirect(String address, HttpMethod method, {Map<String, String> attributes, Map pathVariables}) =>
+      _Redirect(address, method, attributeMap: attributes, pathVariables_: pathVariables);
 
   String get path;
 
@@ -27,15 +27,17 @@ abstract class Redirect extends HttpMethodAware<HttpMethod> {
 class _Redirect implements Redirect {
   String address_;
 
-  List<Attribute> attributes_;
+  List<Attribute> attributes_ = List();
 
   HttpMethod method_ = HttpMethod.GET;
 
   Map pathVariables_;
 
-  _Redirect(this.address_, this.method_, {this.attributes_, this.pathVariables_}) {
-    if (this.attributes_ == null) {
-      this.attributes_ = List();
+  _Redirect(this.address_, this.method_, {Map<String, String> attributeMap, this.pathVariables_}) {
+    if (attributeMap != null) {
+      attributeMap.forEach((name, value) {
+        this.attributes_.add(Attribute(name, value));
+      });
     }
     if (this.pathVariables_ == null) {
       this.pathVariables_ = Map();

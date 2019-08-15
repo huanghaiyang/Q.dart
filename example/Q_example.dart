@@ -39,11 +39,11 @@ void start() {
   }, name: 'user_redirect'));
 
   app.route(Router("/redirect", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
-    return Redirect("/user_redirect", HttpMethod.POST, attributes: [Attribute('hello', 'world')]);
+    return Redirect("/user_redirect", HttpMethod.POST, attributes: {"hello": "world"});
   }));
 
   app.route(Router("/redirect_name", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
-    return Redirect("name:user_redirect", HttpMethod.POST, attributes: [Attribute('hello', 'world')]);
+    return Redirect("name:user_redirect", HttpMethod.POST, attributes: {"hello": "world"});
   }));
 
   app.route(Router("/redirect_user", HttpMethod.POST, (Context context, [HttpRequest req, HttpResponse res]) async {
