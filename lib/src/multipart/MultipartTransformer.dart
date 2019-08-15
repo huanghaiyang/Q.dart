@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:Q/src/helpers/QueryHelper.dart';
 import 'package:Q/src/multipart/KnuthMorrisPrattMatcher.dart';
 import 'package:Q/src/multipart/MultipartValueMap.dart';
+import 'package:Q/src/multipart/RequestPart.dart';
 import 'package:Q/src/query/CommonValue.dart';
 import 'package:Q/src/query/MultipartFile.dart';
 import 'package:Q/src/query/Value.dart';
@@ -44,8 +45,8 @@ Future<MultipartValueMap> transform(HttpRequest req, List<int> data, bool fixNam
   List<int> needle = concat([FIRST_BOUNDARY_PREFIX, boundaryUnits]);
   KnuthMorrisPrattMatcher matcher = KnuthMorrisPrattMatcher(needle);
   List<int> body = skipUntilFirstBoundary(data, matcher);
-  List<List<int>> partitions = split(body, needle, matcher);
-  MultipartValueMap result = mapResult(partitions, fixNameSuffixIfArray);
+  List<RequestPart> requestParts = split(body, needle, matcher);
+  MultipartValueMap result = mapResult(requestParts, fixNameSuffixIfArray);
   return result;
 }
 
@@ -59,18 +60,18 @@ List<int> skipUntilFirstBoundary(List<int> data, KnuthMorrisPrattMatcher matcher
   return [];
 }
 
-List<List<int>> split(List<int> data, List<int> needle, KnuthMorrisPrattMatcher matcher) {
-  List<List<int>> partitions = List();
+List<RequestPart> split(List<int> data, List<int> needle, KnuthMorrisPrattMatcher matcher) {
+  List<RequestPart> requestParts = List();
   while (true) {
     int endIndex = matcher.match(data);
     if (endIndex == -1) {
       break;
     }
     List<int> bytes = List.from(data.getRange(0, endIndex - needle.length));
-    partitions.add(bytes.sublist(2, bytes.length - 1));
+    requestParts.add(RequestPart(bytes.sublist(2, bytes.length - 1)));
     data = List.from(data.getRange(endIndex + 1, data.length));
   }
-  return partitions;
+  return requestParts;
 }
 
 Map getProps(String info, bool fixNameSuffixIfArray) {
@@ -90,16 +91,16 @@ Map getProps(String info, bool fixNameSuffixIfArray) {
   return namedMap;
 }
 
-MultipartValueMap mapResult(List<List<int>> partitions, bool fixNameSuffixIfArray) {
+MultipartValueMap mapResult(List<RequestPart> requestParts, bool fixNameSuffixIfArray) {
   Map<String, List<Value>> result = Map();
 
   KnuthMorrisPrattMatcher knuthMorrisPrattMatcher = KnuthMorrisPrattMatcher(concat(DELIMITER));
-  partitions.forEach((List<int> partition) {
+  requestParts.forEach((RequestPart requestPart) {
     Value value;
-    int splitIndex = knuthMorrisPrattMatcher.match(partition);
-    String info = String.fromCharCodes(partition.getRange(0, splitIndex - knuthMorrisPrattMatcher.delimiter.length + 1));
+    int splitIndex = knuthMorrisPrattMatcher.match(requestPart.bytes);
+    String info = String.fromCharCodes(requestPart.bytes.getRange(0, splitIndex - knuthMorrisPrattMatcher.delimiter.length + 1));
     int contentTypeIndex = info.indexOf(RegExp(CONTENT_TYPE));
-    List<int> contentBytes = partition.sublist(splitIndex + 1, partition.length);
+    List<int> contentBytes = requestPart.bytes.sublist(splitIndex + 1, requestPart.bytes.length);
     if (contentTypeIndex != -1) {
       MultipartFile namedValue = MultipartFile();
       namedValue.contentType = ContentType.parse(info.substring(contentTypeIndex + CONTENT_TYPE.length));

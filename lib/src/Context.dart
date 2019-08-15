@@ -106,7 +106,7 @@ class _Context implements Context {
   void setAttribute(String name, dynamic value) {
     assert(name != null);
     assert(value != null);
-    this.attributes_[name] = Attribute(name, value, this.router);
+    this.attributes_[name] = Attribute(name, value);
   }
 
   @override
@@ -151,7 +151,7 @@ class _Context implements Context {
       if (attributes is Map<String, Attribute>) {
         Map<String, Attribute> newAttributes = Map();
         attributes.entries.forEach((entry) {
-          newAttributes[entry.key] = Attribute(entry.value.name, entry.value.value, this.router);
+          newAttributes[entry.key] = Attribute(entry.value.name, entry.value.value);
         });
         this.attributes_.addAll(newAttributes);
       }

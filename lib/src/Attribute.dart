@@ -1,27 +1,17 @@
-import 'package:Q/src/Router.dart';
-
 // 用户当前请求上下文中的数据传递
 abstract class Attribute {
-  factory Attribute(String name, dynamic value, [Router router]) => _Attribute(name, value, router);
+  factory Attribute(String name, dynamic value) => _Attribute(name, value);
 
   String get name;
 
   dynamic get value;
-
-  Router get router;
 }
 
 class _Attribute implements Attribute {
   final String name_;
   final dynamic value_;
-  final Router router_;
 
-  _Attribute(this.name_, this.value_, [this.router_]);
-
-  @override
-  Router get router {
-    return this.router_;
-  }
+  _Attribute(this.name_, this.value_);
 
   @override
   dynamic get value {
