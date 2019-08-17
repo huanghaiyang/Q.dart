@@ -78,6 +78,25 @@ class _ApplicationContext implements ApplicationContext {
   @override
   set currentStage(ApplicationStage applicationStage) {
     this._applicationStage = applicationStage;
+    switch (this._applicationStage) {
+      case ApplicationStage.RUNNING:
+        print('Q.dart.server running.');
+        break;
+      case ApplicationStage.STOPPING:
+        print('Q.dart.server stopping.');
+        break;
+      case ApplicationStage.STOPPED:
+        print('Q.dart.server stopped.');
+        break;
+      case ApplicationStage.STARTED:
+        print('Q.dart.server started.');
+        break;
+      case ApplicationStage.STARTING:
+        print('Q.dart.server starting.');
+        break;
+      default:
+        break;
+    }
   }
 
   @override

@@ -214,7 +214,12 @@ class _Application implements Application {
 
   // 错误处理
   @override
-  void onError(dynamic error, {StackTrace stackTrace}) async {}
+  void onError(dynamic error, {StackTrace stackTrace}) async {
+    print("Q.dart server occured error:" + error.toString());
+    if (stackTrace != null) {
+      print('Q.dart.server stacktrace:' + stackTrace.toString());
+    }
+  }
 
   // 创建上下文
   Future<Context> createContext(HttpRequest req, HttpResponse res) async {
