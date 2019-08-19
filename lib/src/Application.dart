@@ -10,7 +10,7 @@ typedef ApplicationStartUpCallback = Future<dynamic> Function(Application applic
 typedef ApplicationCloseCallback = void Function(Application application, [Future<dynamic> prevCloseableResult]);
 
 abstract class Application extends CloseableAware<Application, ApplicationCloseCallback>
-    with RouteAware<Router>, InterceptorRegistryAware<AbstractInterceptor> {
+    with RouteAware<Router>, InterceptorRegistryAware<AbstractInterceptor>, HttpRequestResolverAware<AbstractResolver, Request> {
   factory Application() => _Application.getInstance();
 
   static ApplicationContext getApplicationContext() {
@@ -236,6 +236,7 @@ class _Application implements Application {
   }
 
   // 匹配请求的content-type
+  @override
   Future<AbstractResolver> matchResolver(HttpRequest req) async {
     if (this.resolvers_.isEmpty) {
       return null;
@@ -265,8 +266,9 @@ class _Application implements Application {
   }
 
   // 预处理请求
+  @override
   Future<Request> resolveRequest(HttpRequest req) async {
-    AbstractResolver resolver = await matchResolver(req);
+    AbstractResolver resolver = await this.matchResolver(req);
     if (resolver != null) {
       return resolver.resolve(req);
     } else {

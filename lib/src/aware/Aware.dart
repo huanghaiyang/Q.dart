@@ -7,6 +7,7 @@ export 'package:Q/src/aware/CloseableAware.dart';
 export 'package:Q/src/aware/ContextAware.dart';
 export 'package:Q/src/aware/CookieAware.dart';
 export 'package:Q/src/aware/HttpMethodAware.dart';
+export 'package:Q/src/aware/HttpRequestResolverAware.dart';
 export 'package:Q/src/aware/InterceptorRegistryAware.dart';
 export 'package:Q/src/aware/PathVariablesAware.dart';
 export 'package:Q/src/aware/RouteAware.dart';
