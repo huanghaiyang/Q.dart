@@ -235,9 +235,11 @@ class _Application implements Application {
     return context;
   }
 
-  // 预处理请求
-  Future<Request> resolveRequest(HttpRequest req) async {
-    if (this.resolvers_.isEmpty) return Request();
+  // 匹配请求的content-type
+  Future<AbstractResolver> matchResolver(HttpRequest req) async {
+    if (this.resolvers_.isEmpty) {
+      return null;
+    }
     List<Function> functions = List();
     List<ResolverType> keys = List.from(this.resolvers_.keys);
     for (int i = 0; i < keys.length; i++) {
@@ -246,20 +248,30 @@ class _Application implements Application {
         return await this.resolvers_[resolverType].match(req);
       });
     }
-    Completer<Request> completer = Completer();
+    Completer<AbstractResolver> completer = Completer();
     await someLimit(functions, 5, (Map<int, bool> result) {
       if (result.values.every((v) => !v)) {
-        completer.complete(Request());
+        completer.complete(null);
       } else {
         for (MapEntry entry in result.entries) {
           if (entry.value) {
-            completer.complete(this.resolvers_[keys[entry.key]].resolve(req));
+            completer.complete(this.resolvers_[keys[entry.key]]);
             break;
           }
         }
       }
     });
     return completer.future;
+  }
+
+  // 预处理请求
+  Future<Request> resolveRequest(HttpRequest req) async {
+    AbstractResolver resolver = await matchResolver(req);
+    if (resolver != null) {
+      return resolver.resolve(req);
+    } else {
+      return Request();
+    }
   }
 
   // 添加路由
