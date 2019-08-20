@@ -8,7 +8,7 @@ import 'package:Q/src/multipart/MultipartValueMap.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 import 'package:Q/src/utils/ListUtil.dart';
 
-class MultipartResolver extends AbstractResolver {
+class MultipartResolver implements AbstractResolver {
   MultipartResolver._();
 
   static MultipartResolver _instance;
@@ -31,8 +31,8 @@ class MultipartResolver extends AbstractResolver {
   @override
   Future<Request> resolve(HttpRequest req) async {
     List<int> requestData = concat(await req.toList());
-    MultipartValueMap data =
-        await transform(req, requestData, Application.getApplicationContext().configuration.multipartConfigure.fixNameSuffixIfArray);
+    MultipartValueMap data = await transform(req, requestData,
+        fixNameSuffixIfArray: Application.getApplicationContext().configuration.multipartConfigure.fixNameSuffixIfArray);
     Request request = Request(data: data);
     return request;
   }

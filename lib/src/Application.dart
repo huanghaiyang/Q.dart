@@ -134,6 +134,7 @@ class _Application implements Application {
     this.resolvers_[ResolverType.MULTIPART] = MultipartResolver.getInstance();
     this.resolvers_[ResolverType.JSON] = JsonResolver.getInstance();
     this.resolvers_[ResolverType.FORM_URLENCODED] = X3WFormUrlEncodedResolver.getInstance();
+    this.resolvers_[ResolverType.DEFAULT] = DefaultRequestResolver.getInstance();
   }
 
   // ip/端口监听
@@ -272,7 +273,7 @@ class _Application implements Application {
     if (resolver != null) {
       return resolver.resolve(req);
     } else {
-      return Request();
+      return throw NoMatchRequestResolverException(contentType: req.headers.contentType);
     }
   }
 

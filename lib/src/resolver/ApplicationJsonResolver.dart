@@ -7,7 +7,7 @@ import 'package:Q/src/exception/UnExpectedRequestApplicationJsonException.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 import 'package:Q/src/utils/ListUtil.dart';
 
-class JsonResolver extends AbstractResolver {
+class JsonResolver implements AbstractResolver {
   JsonResolver._();
 
   static JsonResolver _instance;

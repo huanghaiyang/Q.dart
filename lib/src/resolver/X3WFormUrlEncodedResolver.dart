@@ -6,7 +6,7 @@ import 'package:Q/src/helpers/QueryHelper.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 import 'package:Q/src/utils/ListUtil.dart';
 
-class X3WFormUrlEncodedResolver extends AbstractResolver {
+class X3WFormUrlEncodedResolver implements AbstractResolver {
   X3WFormUrlEncodedResolver._();
 
   static X3WFormUrlEncodedResolver _instance;

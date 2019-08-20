@@ -40,7 +40,9 @@ List<int> boundary(HttpRequest req) {
   return null;
 }
 
-Future<MultipartValueMap> transform(HttpRequest req, List<int> data, bool fixNameSuffixIfArray) async {
+Future<MultipartValueMap> transform(HttpRequest req, List<int> data, {
+  bool fixNameSuffixIfArray = true
+}) async {
   List<int> boundaryUnits = boundary(req);
   List<int> needle = concat([FIRST_BOUNDARY_PREFIX, boundaryUnits]);
   KnuthMorrisPrattMatcher matcher = KnuthMorrisPrattMatcher(needle);
