@@ -13,6 +13,7 @@ void start() {
 
   // app.applicationContext.configuration.unSupportedContentTypes.add(ContentType('multipart', 'form-data'));
   // app.applicationContext.configuration.unSupportedMethods.add(HttpMethod.POST);
+  // app.applicationContext.configuration.multipartConfigure.maxUploadSize = FileSizeUnits.MB(1);
 
   // multipart/form-data
   app.route(Router("/multipart-form-data", HttpMethod.POST, (Context context,
