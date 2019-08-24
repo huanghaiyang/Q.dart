@@ -13,7 +13,9 @@ class _UnSupportedRequestMethodException implements UnSupportedRequestMethodExce
   _UnSupportedRequestMethodException({this.message, this.method});
 
   String toString() {
-    if (message == null) return "Exception: 服务器禁止${HttpMethodHelper.getMethodName(this.method)}请求类型访问";
+    if (message == null) {
+      return "Exception: Request method '${HttpMethodHelper.getMethodName(this.method)}' not supported.";
+    }
     return "Exception: $message";
   }
 }

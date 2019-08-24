@@ -64,7 +64,7 @@ class _MultipartValueMap<K, V> implements MultipartValueMap<K, V> {
   }
 
   Future<File> createFile(MultipartFile multipartFile) async {
-    File file = File(await MultipartFileUploadHelper.createTempFileUploadPath(getPathExtension(multipartFile.originName)));
+    File file = File(await MultipartFileUploadHelper.createTempFileUploadPath(getPathExtension(multipartFile.originalName)));
     return file.writeAsBytes(multipartFile.bytes);
   }
 

@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:Q/src/query/Value.dart';
 
 abstract class MultipartFile extends Value {
-  String get originName;
+  String get originalName;
 
-  set originName(String originName);
+  set originalName(String originalName);
 
   ContentType get contentType;
 
@@ -19,16 +19,18 @@ abstract class MultipartFile extends Value {
 
   set bytes(List<int> bytes);
 
+  bool get isEmpty;
+
   Future<File> transferTo(String dest);
 
-  factory MultipartFile({String name, String originName, ContentType contentType, int size, List<int> bytes}) =>
-      _MultipartFile(name_: name, originName_: originName, contentType_: contentType, size_: size, bytes_: bytes);
+  factory MultipartFile({String name, String originalName, ContentType contentType, int size, List<int> bytes}) =>
+      _MultipartFile(name_: name, originalName_: originalName, contentType_: contentType, size_: size, bytes_: bytes);
 }
 
 class _MultipartFile implements MultipartFile {
   String name_;
 
-  String originName_;
+  String originalName_;
 
   ContentType contentType_;
 
@@ -36,7 +38,7 @@ class _MultipartFile implements MultipartFile {
 
   List<int> bytes_;
 
-  _MultipartFile({this.name_, this.originName_, this.contentType_, this.size_, this.bytes_});
+  _MultipartFile({this.name_, this.originalName_, this.contentType_, this.size_, this.bytes_});
 
   @override
   ContentType get contentType {
@@ -69,8 +71,8 @@ class _MultipartFile implements MultipartFile {
   }
 
   @override
-  String get originName {
-    return this.originName_;
+  String get originalName {
+    return this.originalName_;
   }
 
   @override
@@ -84,13 +86,18 @@ class _MultipartFile implements MultipartFile {
   }
 
   @override
-  set originName(String originName) {
-    this.originName_ = originName;
+  set originalName(String originalName) {
+    this.originalName_ = originalName;
   }
 
   @override
   Future<File> transferTo(String dest) {
     File file = File(dest);
     return file.writeAsBytes(this.bytes);
+  }
+
+  @override
+  bool get isEmpty {
+    return this.size_ <= 0;
   }
 }

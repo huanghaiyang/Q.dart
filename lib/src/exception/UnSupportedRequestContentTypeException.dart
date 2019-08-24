@@ -12,7 +12,9 @@ class _UnSupportedRequestContentTypeException implements UnSupportedRequestConte
   _UnSupportedRequestContentTypeException({this.message, this.contentType});
 
   String toString() {
-    if (message == null) return "Exception: 服务器禁止${contentType.value}类型数据访问";
+    if (message == null) {
+      return "Exception: Unsupported media type '${contentType.value}'";
+    }
     return "Exception: $message";
   }
 }

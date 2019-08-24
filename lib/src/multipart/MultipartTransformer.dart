@@ -40,9 +40,7 @@ List<int> boundary(HttpRequest req) {
   return null;
 }
 
-Future<MultipartValueMap> transform(HttpRequest req, List<int> data, {
-  bool fixNameSuffixIfArray = true
-}) async {
+Future<MultipartValueMap> transform(HttpRequest req, List<int> data, {bool fixNameSuffixIfArray = true}) async {
   List<int> boundaryUnits = boundary(req);
   List<int> needle = concat([FIRST_BOUNDARY_PREFIX, boundaryUnits]);
   KnuthMorrisPrattMatcher matcher = KnuthMorrisPrattMatcher(needle);
@@ -111,7 +109,7 @@ MultipartValueMap mapResult(List<RequestPart> requestParts, bool fixNameSuffixIf
       namedValue.size = contentBytes.length;
       Map props = getProps(info, fixNameSuffixIfArray);
       namedValue.name = props['name'];
-      namedValue.originName = props['filename'];
+      namedValue.originalName = props['filename'];
       value = namedValue;
     } else {
       info = info.substring(CONTENT_DISPOSITION.length);
