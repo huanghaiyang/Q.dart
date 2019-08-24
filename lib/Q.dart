@@ -2,6 +2,7 @@ library Q;
 
 export 'src/Application.dart';
 export 'src/ApplicationContext.dart';
+export 'src/ApplicationInitializer.dart';
 export 'src/ApplicationStage.dart';
 export 'src/Attribute.dart';
 export 'src/Configuration.dart';

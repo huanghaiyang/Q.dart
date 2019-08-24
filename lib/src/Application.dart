@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Q/Q.dart';
-import 'package:Q/src/ApplicationContext.dart';
 import 'package:curie/curie.dart';
 
 typedef ApplicationStartUpCallback = Future<dynamic> Function(Application application);
@@ -10,7 +9,12 @@ typedef ApplicationStartUpCallback = Future<dynamic> Function(Application applic
 typedef ApplicationCloseCallback = void Function(Application application, [Future<dynamic> prevCloseableResult]);
 
 abstract class Application extends CloseableAware<Application, ApplicationCloseCallback>
-    with RouteAware<Router>, InterceptorRegistryAware<AbstractInterceptor>, HttpRequestResolverAware<AbstractResolver, Request> {
+    with
+        RouteAware<Router>,
+        InterceptorRegistryAware<AbstractInterceptor>,
+        HttpRequestResolverAware<AbstractResolver, Request, ResolverType>,
+        HttpResponseConverter<ContentType, AbstractHttpMessageConverter>,
+        HttpRequestHandlerAware<int, HandlerAdapter> {
   factory Application() => _Application.getInstance();
 
   static ApplicationContext getApplicationContext() {
@@ -50,10 +54,6 @@ abstract class Application extends CloseableAware<Application, ApplicationCloseC
   void onFinished(Context context);
 
   void onError(Context context);
-
-  void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter);
-
-  void replaceConverter(ContentType type, AbstractHttpMessageConverter converter);
 }
 
 class _Application implements Application {
@@ -64,12 +64,16 @@ class _Application implements Application {
   static _Application getInstance() {
     if (_instance == null) {
       _instance = _Application._();
+      _instance.applicationContext_ = ApplicationContext(_instance);
+      _instance.applicationInitializer_ = ApplicationInitializer(_instance);
       _instance.init();
     }
     return _instance;
   }
 
-  ApplicationContext applicationContext_ = ApplicationContext(_instance);
+  ApplicationContext applicationContext_;
+
+  ApplicationInitializer applicationInitializer_;
 
   // 当前环境
   String env_ = 'development';
@@ -103,38 +107,7 @@ class _Application implements Application {
   ApplicationStartUpCallback applicationStartUpCallback;
 
   init() {
-    this.initHandlers();
-    this.initConverters();
-    this.initInterceptors();
-    this.initResolvers();
-  }
-
-  // 初始化默认处理器
-  initHandlers() {
-    this.handlers_[HttpStatus.notFound] = NotFoundHandler.getInstance();
-    this.handlers_[HttpStatus.ok] = OKHandler.getInstance();
-  }
-
-  // 初始化转换器
-  initConverters() {
-    this.converters_[ContentType.json] = JSONHttpMessageConverter.getInstance();
-    this.converters_[ContentType.text] = StringHttpMessageConverter.getInstance();
-    this.converters_[ContentType.html] = StringHttpMessageConverter.getInstance();
-  }
-
-  // 内置拦截器初始化
-  initInterceptors() {
-    this.interceptors_.add(I18nInterceptor.getInstance());
-    this.interceptors_.add(UnSupportedContentTypeInterceptor.getInstance());
-    this.interceptors_.add(UnSupportedMethodInterceptor.getInstance());
-  }
-
-  // 初始化内置解析器
-  initResolvers() {
-    this.resolvers_[ResolverType.MULTIPART] = MultipartResolver.getInstance();
-    this.resolvers_[ResolverType.JSON] = JsonResolver.getInstance();
-    this.resolvers_[ResolverType.FORM_URLENCODED] = X3WFormUrlEncodedResolver.getInstance();
-    this.resolvers_[ResolverType.DEFAULT] = DefaultRequestResolver.getInstance();
+    this.applicationInitializer_.init();
   }
 
   // ip/端口监听
@@ -149,9 +122,8 @@ class _Application implements Application {
         this.applicationStartUpCallback(this);
       }
     });
-
     this.applicationContext.currentStage = ApplicationStage.RUNNING;
-
+    this.applicationInitializer_.onStartUp();
     // 处理请求
     await for (HttpRequest req in this.server_) {
       try {
@@ -182,17 +154,10 @@ class _Application implements Application {
         // 执行后置拦截器方法
         await this.applyPostHandler(req, res);
       }
-      await makeSureResponseRelease(res);
+      await ApplicationHelper.makeSureResponseRelease(res);
       return true;
     }
     return false;
-  }
-
-  // 确保response被正确的释放并关闭
-  Future<bool> makeSureResponseRelease(HttpResponse res) async {
-    await res.flush();
-    await res.close();
-    return true;
   }
 
   // 加入一个中间件
@@ -234,6 +199,11 @@ class _Application implements Application {
     request.response = response;
     response.request = request;
     return context;
+  }
+
+  @override
+  void addResolver(ResolverType type, AbstractResolver resolver) {
+    this.resolvers_[type] = resolver;
   }
 
   // 匹配请求的content-type
@@ -335,6 +305,11 @@ class _Application implements Application {
     return context;
   }
 
+  @override
+  void addHandler(int httpStatus, HandlerAdapter handlerAdapter) {
+    this.handlers_[httpStatus] = handlerAdapter;
+  }
+
   // 替换内置默认的handler
   @override
   void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter) {
@@ -349,6 +324,11 @@ class _Application implements Application {
     if (this.converters_.containsKey(type)) {
       this.converters_[type] = converter;
     }
+  }
+
+  @override
+  void addConverter(ContentType type, AbstractHttpMessageConverter converter) {
+    this.converters_[type] = converter;
   }
 
   // 拦截器注册
