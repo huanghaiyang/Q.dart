@@ -89,7 +89,7 @@ void start() {
     return context.request.data;
   }));
 
-  app.route(Router("/path_params", HttpMethod.GET, (Context context,
+  app.route(Router("path_params", HttpMethod.GET, (Context context,
       [HttpRequest req,
       HttpResponse res,
       @UrlParam('age') int age,

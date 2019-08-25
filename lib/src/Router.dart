@@ -67,7 +67,7 @@ class _Router implements Router {
 
   final String name_;
 
-  final String path_;
+  String path_;
 
   String requestUri_;
 
@@ -96,6 +96,7 @@ class _Router implements Router {
     if (this.handle_ == null) {
       throw IllegalArgumentException(message: 'The handler function of router:${this.path_} should not be null.');
     }
+    this.path_ = RouterHelper.getPath(this.path_);
     RouterHelper.checkoutRouterHandlerParameterAnnotations(this);
     if (!HttpMethodHelper.checkValidMethod(this.method_)) {
       throw UnKnowRouterMethodException(method: this.method_);

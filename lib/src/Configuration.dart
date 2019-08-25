@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:Q/src/Method.dart';
 import 'package:Q/src/configure/MultipartConfigure.dart';
+import 'package:Q/src/configure/RouterMappingConfigure.dart';
 
 // 应用程序配置
 abstract class Configuration {
@@ -16,6 +17,8 @@ abstract class Configuration {
 
   MultipartConfigure get multipartConfigure;
 
+  RouterMappingConfigure get routerMappingConfigure;
+
   factory Configuration() => _Configuration();
 }
 
@@ -29,6 +32,8 @@ class _Configuration implements Configuration {
   ContentType defaultProducedType_ = ContentType.json;
 
   MultipartConfigure _multipartConfigure = MultipartConfigure();
+
+  RouterMappingConfigure _routerMappingConfigure = RouterMappingConfigure();
 
   @override
   List<ContentType> get unSupportedContentTypes {
@@ -48,5 +53,10 @@ class _Configuration implements Configuration {
   @override
   MultipartConfigure get multipartConfigure {
     return this._multipartConfigure;
+  }
+
+  @override
+  RouterMappingConfigure get routerMappingConfigure {
+    return this._routerMappingConfigure;
   }
 }

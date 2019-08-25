@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:mirrors';
 
+import 'package:Q/src/Application.dart';
 import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/Router.dart';
 import 'package:Q/src/annotation/AttributeValue.dart';
@@ -10,6 +11,7 @@ import 'package:Q/src/annotation/RequestHeader.dart';
 import 'package:Q/src/annotation/RequestParam.dart';
 import 'package:Q/src/annotation/SessionValue.dart';
 import 'package:Q/src/annotation/UrlParam.dart';
+import 'package:Q/src/configure/RouterMappingConfigure.dart';
 import 'package:Q/src/exception/UnSupportRouterHandlerParameterAnnotationException.dart';
 import 'package:Q/src/helpers/AnnotationHelpers.dart';
 import 'package:Q/src/helpers/RedirectHelper.dart';
@@ -132,5 +134,13 @@ class RouterHelper {
         }
       }
     }
+  }
+
+  static String getPath(String path) {
+    if (!path.startsWith(RouterMappingConfigure.defaultMappingPattern)) {
+      String defaultMappingBasePath = Application.getApplicationContext().configuration.routerMappingConfigure.defaultMapping;
+      path = '$defaultMappingBasePath${path}';
+    }
+    return path;
   }
 }
