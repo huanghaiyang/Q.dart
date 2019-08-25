@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Q/src/Application.dart';
+import 'package:Q/src/ApplicationContext.dart';
 import 'package:Q/src/converter/JSONHttpMessageConverter.dart';
 import 'package:Q/src/converter/StringHttpMessageConverter.dart';
 import 'package:Q/src/handler/NotFoundHandler.dart';
@@ -19,7 +20,9 @@ abstract class ApplicationInitializer {
 
   init();
 
-  onStartUp() {}
+  onStartUp();
+
+  createApplicationContext();
 
   factory ApplicationInitializer(Application application) => _ApplicationInitializer(application);
 }
@@ -42,6 +45,7 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
   @override
   init() {
+    this.createApplicationContext();
     this.initHandlers();
     this.initConverters();
     this.initInterceptors();
@@ -73,5 +77,10 @@ class _ApplicationInitializer implements ApplicationInitializer {
     this.application.addResolver(ResolverType.JSON, JsonResolver.getInstance());
     this.application.addResolver(ResolverType.FORM_URLENCODED, X3WFormUrlEncodedResolver.getInstance());
     this.application.addResolver(ResolverType.DEFAULT, DefaultRequestResolver.getInstance());
+  }
+
+  @override
+  createApplicationContext() {
+    this.application.applicationContext = ApplicationContext(this.application);
   }
 }

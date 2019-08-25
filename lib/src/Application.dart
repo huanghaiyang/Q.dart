@@ -11,10 +11,12 @@ typedef ApplicationCloseCallback = void Function(Application application, [Futur
 abstract class Application extends CloseableAware<Application, ApplicationCloseCallback>
     with
         RouteAware<Router>,
+        ResourceAware<String, Resource>,
         InterceptorRegistryAware<AbstractInterceptor>,
         HttpRequestResolverAware<AbstractResolver, Request, ResolverType>,
         HttpResponseConverter<ContentType, AbstractHttpMessageConverter>,
-        HttpRequestHandlerAware<int, HandlerAdapter> {
+        HttpRequestHandlerAware<int, HandlerAdapter>,
+        ApplicationContextAware<ApplicationContext> {
   factory Application() => _Application.getInstance();
 
   static ApplicationContext getApplicationContext() {
@@ -43,8 +45,6 @@ abstract class Application extends CloseableAware<Application, ApplicationCloseC
 
   Map<ResolverType, AbstractResolver> get resolvers;
 
-  ApplicationContext get applicationContext;
-
   void listen(int port, {InternetAddress internetAddress});
 
   void onStartup(ApplicationStartUpCallback applicationStartUpCallback);
@@ -64,7 +64,6 @@ class _Application implements Application {
   static _Application getInstance() {
     if (_instance == null) {
       _instance = _Application._();
-      _instance.applicationContext_ = ApplicationContext(_instance);
       _instance.applicationInitializer_ = ApplicationInitializer(_instance);
       _instance.init();
     }
@@ -382,7 +381,13 @@ class _Application implements Application {
   }
 
   // 资源维护
+  @override
   void resource(String pattern, Resource resource) {}
+
+  @override
+  Future<dynamic> flush(String pattern) {
+    return null;
+  }
 
   @override
   Map<ResolverType, AbstractResolver> get resolvers {
@@ -422,6 +427,11 @@ class _Application implements Application {
   @override
   String get env {
     return this.env_;
+  }
+
+  @override
+  set applicationContext(ApplicationContext applicationContext) {
+    this.applicationContext_ = applicationContext;
   }
 
   @override
