@@ -4,13 +4,10 @@ import 'dart:io';
 import 'package:Q/Q.dart';
 import 'package:curie/curie.dart';
 
-typedef ApplicationStartUpCallback = Future<dynamic> Function(Application application);
-
-typedef ApplicationCloseCallback = void Function(Application application, [Future<dynamic> prevCloseableResult]);
-
-abstract class Application extends CloseableAware<Application, ApplicationCloseCallback>
+abstract class Application extends CloseableAware
     with
         RouteAware<Router>,
+        SimplifyRouteAware<Router>,
         ResourceAware<String, Resource>,
         InterceptorRegistryAware<AbstractInterceptor>,
         HttpRequestResolverAware<AbstractResolver, Request, ResolverType>,
@@ -47,13 +44,7 @@ abstract class Application extends CloseableAware<Application, ApplicationCloseC
 
   void listen(int port, {InternetAddress internetAddress});
 
-  void onStartup(ApplicationStartUpCallback applicationStartUpCallback);
-
   void use(Middleware middleware);
-
-  void onFinished(Context context);
-
-  void onError(Context context);
 }
 
 class _Application implements Application {
@@ -101,11 +92,19 @@ class _Application implements Application {
   // 请求解析器
   Map<ResolverType, AbstractResolver> resolvers_ = Map();
 
-  ApplicationCloseCallback applicationCloseCallback;
+  HttpRequestDelegate httpRequestDelegate;
 
-  ApplicationStartUpCallback applicationStartUpCallback;
+  ApplicationDelegate applicationDelegate;
+
+  ApplicationSimplifyRouteDelegate applicationSimplifyRouteDelegate;
+
+  ApplicationResourceDelegate applicationResourceDelegate;
 
   init() {
+    applicationDelegate = ApplicationDelegate(this);
+    applicationSimplifyRouteDelegate = ApplicationSimplifyRouteDelegate(this);
+    applicationResourceDelegate = ApplicationResourceDelegate(this);
+    httpRequestDelegate = HttpRequestDelegate(this);
     this.applicationInitializer_.init();
   }
 
@@ -116,11 +115,9 @@ class _Application implements Application {
     // 默认ipv4
     internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;
     // 创建服务
-    this.server_ = await HttpServer.bind(internetAddress, port).catchError(this.onError).whenComplete(() {
-      if (this.applicationStartUpCallback != null) {
-        this.applicationStartUpCallback(this);
-      }
-    });
+    this.server_ = await HttpServer.bind(internetAddress, port)
+        .catchError(this.applicationDelegate.onError)
+        .whenComplete(this.applicationDelegate.onStartup);
     this.applicationContext.currentStage = ApplicationStage.RUNNING;
     this.applicationInitializer_.onStartUp();
     // 处理请求
@@ -145,11 +142,13 @@ class _Application implements Application {
         // 创建请求上下文
         Context context = await this.createContext(req, res);
         // 前置中间件处理
-        await this.handleWithMiddleware(context, MiddlewareType.BEFORE, this.onFinished, this.onError);
+        await this.handleWithMiddleware(
+            context, MiddlewareType.BEFORE, this.httpRequestDelegate.onMiddleware, this.httpRequestDelegate.onMiddlewareError);
         // 匹配路由并处理请求
         await this.applyRouter(context, req);
         // 后置中间件处理
-        await this.handleWithMiddleware(context, MiddlewareType.AFTER, this.onFinished, this.onError);
+        await this.handleWithMiddleware(
+            context, MiddlewareType.AFTER, this.httpRequestDelegate.onMiddleware, this.httpRequestDelegate.onMiddlewareError);
         // 执行后置拦截器方法
         await this.applyPostHandler(req, res);
       }
@@ -171,19 +170,6 @@ class _Application implements Application {
       await middleware.handle(context, onFinished, onError);
     }
     return context;
-  }
-
-  // 请求完成处理回调函数
-  @override
-  void onFinished(Context context) async {}
-
-  // 错误处理
-  @override
-  void onError(dynamic error, {StackTrace stackTrace}) async {
-    print("Q.dart server occured error:" + error.toString());
-    if (stackTrace != null) {
-      print('Q.dart.server stacktrace:' + stackTrace.toString());
-    }
   }
 
   // 创建上下文
@@ -380,15 +366,6 @@ class _Application implements Application {
     await eachSeries(functions);
   }
 
-  // 资源维护
-  @override
-  void resource(String pattern, Resource resource) {}
-
-  @override
-  Future<dynamic> flush(String pattern) {
-    return null;
-  }
-
   @override
   Map<ResolverType, AbstractResolver> get resolvers {
     return this.resolvers_;
@@ -463,70 +440,65 @@ class _Application implements Application {
   Future<dynamic> close() async {
     this.applicationContext.currentStage = ApplicationStage.STOPPING;
     dynamic prevCloseableResult = await this.server_.close();
-    if (this.applicationCloseCallback != null) {
-      return await this.applicationCloseCallback(this, prevCloseableResult);
-    }
+    await this.applicationDelegate.onError(prevCloseableResult);
     this.applicationContext.currentStage = ApplicationStage.STOPPED;
     return prevCloseableResult;
   }
 
+  // 资源维护
   @override
-  Future<dynamic> onClose(ApplicationCloseCallback applicationCloseCallback) async {
-    this.applicationCloseCallback = applicationCloseCallback;
-    return true;
-  }
+  void resource(String pattern, Resource resource) => applicationResourceDelegate.resource(pattern, resource);
 
   @override
-  void onStartup(ApplicationStartUpCallback applicationStartUpCallback) {
-    this.applicationStartUpCallback = applicationStartUpCallback;
-    if (this.applicationContext.currentStage == ApplicationStage.RUNNING) {
-      this.applicationStartUpCallback(this);
-    }
-  }
+  Future<dynamic> flush(String pattern) => applicationResourceDelegate.flush(pattern);
 
-  //-----------------------------------------------路由 简便使用方法-------------------------------------------//
   @override
   Router patch(String path, RouterHandleFunction handle,
-      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
-    Router router = Router(path, HttpMethod.PATCH, handle,
-        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
-    this.route(router);
-    return router;
-  }
+          {Map pathVariables,
+          ContentType produceType,
+          AbstractHttpMessageConverter converter,
+          HandlerAdapter handlerAdapter,
+          String name}) =>
+      this.applicationSimplifyRouteDelegate.patch(path, handle,
+          pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
 
   @override
   Router delete(String path, RouterHandleFunction handle,
-      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
-    Router router = Router(path, HttpMethod.DELETE, handle,
-        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
-    this.route(router);
-    return router;
-  }
+          {Map pathVariables,
+          ContentType produceType,
+          AbstractHttpMessageConverter converter,
+          HandlerAdapter handlerAdapter,
+          String name}) =>
+      this.applicationSimplifyRouteDelegate.delete(path, handle,
+          pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
 
   @override
   Router put(String path, RouterHandleFunction handle,
-      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
-    Router router = Router(path, HttpMethod.PUT, handle,
-        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
-    this.route(router);
-    return router;
-  }
+          {Map pathVariables,
+          ContentType produceType,
+          AbstractHttpMessageConverter converter,
+          HandlerAdapter handlerAdapter,
+          String name}) =>
+      this.applicationSimplifyRouteDelegate.put(path, handle,
+          pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
 
   @override
   Router post(String path, RouterHandleFunction handle,
-      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
-    Router router = Router(path, HttpMethod.POST, handle,
-        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
-    this.route(router);
-    return router;
-  }
+          {Map pathVariables,
+          ContentType produceType,
+          AbstractHttpMessageConverter converter,
+          HandlerAdapter handlerAdapter,
+          String name}) =>
+      this.applicationSimplifyRouteDelegate.post(path, handle,
+          pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
 
   @override
   Router get(String path, RouterHandleFunction handle,
-      {Map pathVariables, ContentType produceType, AbstractHttpMessageConverter converter, HandlerAdapter handlerAdapter, String name}) {
-    Router router = Router(path, HttpMethod.GET, handle,
-        pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
-    this.route(router);
-    return router;
-  }
+          {Map pathVariables,
+          ContentType produceType,
+          AbstractHttpMessageConverter converter,
+          HandlerAdapter handlerAdapter,
+          String name}) =>
+      this.applicationSimplifyRouteDelegate.get(path, handle,
+          pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
 }

@@ -9,6 +9,7 @@ import 'package:Q/src/aware/BindApplicationAware.dart';
 import 'package:Q/src/aware/ContextAware.dart';
 import 'package:Q/src/aware/HttpMethodAware.dart';
 import 'package:Q/src/aware/PathVariablesAware.dart';
+import 'package:Q/src/aware/RouterMatchAware.dart';
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
 import 'package:Q/src/exception/IllegalArgumentException.dart';
 import 'package:Q/src/exception/InvalidRouterPathException.dart';
@@ -21,7 +22,7 @@ import 'package:path_to_regexp/path_to_regexp.dart';
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
 
 abstract class Router extends BindApplicationAware<Application>
-    with PathVariablesAware<Map>, HttpMethodAware<HttpMethod>, ContextAware<Context> {
+    with PathVariablesAware<Map>, HttpMethodAware<HttpMethod>, ContextAware<Context>, RouterMatchAware<HttpRequest, Redirect> {
   factory Router(String path, HttpMethod method, RouterHandleFunction handle,
           {Map pathVariables,
           ContentType produceType,
@@ -49,13 +50,7 @@ abstract class Router extends BindApplicationAware<Application>
 
   set requestUri(String requestUri);
 
-  Future<bool> match(HttpRequest request);
-
-  Future<bool> matchPath(String path);
-
   void apply(HttpRequest request);
-
-  Future<bool> matchRedirect(Redirect redirect);
 
   Future convert(ResponseEntry entry);
 
