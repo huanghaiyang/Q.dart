@@ -45,6 +45,10 @@ abstract class Application extends CloseableAware
   void listen(int port, {InternetAddress internetAddress});
 
   void use(Middleware middleware);
+
+  dynamic closeServer();
+
+  dynamic getDelegate(Type delegateType);
 }
 
 class _Application implements Application {
@@ -94,16 +98,22 @@ class _Application implements Application {
 
   HttpRequestDelegate httpRequestDelegate;
 
-  ApplicationDelegate applicationDelegate;
+  ApplicationLifecycleDelegate applicationLifecycleDelegate;
 
   ApplicationSimplifyRouteDelegate applicationSimplifyRouteDelegate;
 
   ApplicationResourceDelegate applicationResourceDelegate;
 
+  ApplicationRouteDelegate applicationRouteDelegate;
+
+  ApplicationClosableDelegate applicationClosableDelegate;
+
   init() {
-    applicationDelegate = ApplicationDelegate(this);
+    applicationLifecycleDelegate = ApplicationLifecycleDelegate(this);
+    applicationRouteDelegate = ApplicationRouteDelegate(this);
     applicationSimplifyRouteDelegate = ApplicationSimplifyRouteDelegate(this);
     applicationResourceDelegate = ApplicationResourceDelegate(this);
+    applicationClosableDelegate = ApplicationClosableDelegate(this);
     httpRequestDelegate = HttpRequestDelegate(this);
     this.applicationInitializer_.init();
   }
@@ -116,10 +126,9 @@ class _Application implements Application {
     internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;
     // 创建服务
     this.server_ = await HttpServer.bind(internetAddress, port)
-        .catchError(this.applicationDelegate.onError)
-        .whenComplete(this.applicationDelegate.onStartup);
+        .catchError(this.applicationLifecycleDelegate.onError)
+        .whenComplete(this.applicationLifecycleDelegate.onStartup);
     this.applicationContext.currentStage = ApplicationStage.RUNNING;
-    this.applicationInitializer_.onStartUp();
     // 处理请求
     await for (HttpRequest req in this.server_) {
       try {
@@ -230,22 +239,6 @@ class _Application implements Application {
     } else {
       return throw NoMatchRequestResolverException(contentType: req.headers.contentType);
     }
-  }
-
-  // 添加路由
-  @override
-  void route(Router router) {
-    this.routers_.add(router);
-    router.app = this;
-    // 查找路由的响应结果转换器
-    router.converter = this.converters_[router.produceType];
-    router.handlerAdapter = this.handlers_[HttpStatus.ok];
-  }
-
-  // 同时添加多个路由
-  @override
-  void routes(Iterable<Router> routers) {
-    routers.forEach((router) => this.route(router));
   }
 
   // 匹配路由，并处理请求
@@ -437,13 +430,18 @@ class _Application implements Application {
   }
 
   @override
-  Future<dynamic> close() async {
-    this.applicationContext.currentStage = ApplicationStage.STOPPING;
-    dynamic prevCloseableResult = await this.server_.close();
-    await this.applicationDelegate.onError(prevCloseableResult);
-    this.applicationContext.currentStage = ApplicationStage.STOPPED;
-    return prevCloseableResult;
+  Future<dynamic> close() => applicationClosableDelegate.close();
+
+  @override
+  dynamic closeServer() {
+    return this.server_.close();
   }
+
+  @override
+  void route(Router t) => applicationRouteDelegate.route(t);
+
+  @override
+  void routes(Iterable<Router> t) => applicationRouteDelegate.routes(t);
 
   // 资源维护
   @override
@@ -501,4 +499,14 @@ class _Application implements Application {
           String name}) =>
       this.applicationSimplifyRouteDelegate.get(path, handle,
           pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+
+  @override
+  dynamic getDelegate(Type delegateType) => ApplicationReflectHelper.getDelegate(delegateType, [
+        httpRequestDelegate,
+        applicationLifecycleDelegate,
+        applicationSimplifyRouteDelegate,
+        applicationResourceDelegate,
+        applicationRouteDelegate,
+        applicationClosableDelegate
+      ]);
 }

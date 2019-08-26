@@ -1,14 +1,15 @@
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/aware/ApplicationLifecycleAware.dart';
+import 'package:Q/src/delegate/AbstractDelegate.dart';
 
-abstract class ApplicationDelegate extends ApplicationLifecycle {
-  factory ApplicationDelegate(Application application) => _ApplicationDelegate(application);
+abstract class ApplicationLifecycleDelegate extends ApplicationLifecycle with AbstractDelegate {
+  factory ApplicationLifecycleDelegate(Application application) => _ApplicationLifecycleDelegate(application);
 }
 
-class _ApplicationDelegate implements ApplicationDelegate {
+class _ApplicationLifecycleDelegate implements ApplicationLifecycleDelegate {
   final Application application_;
 
-  _ApplicationDelegate(this.application_);
+  _ApplicationLifecycleDelegate(this.application_);
 
   // 错误处理
   @override

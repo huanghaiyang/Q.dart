@@ -1,8 +1,9 @@
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/Resource.dart';
 import 'package:Q/src/aware/ResourceAware.dart';
+import 'package:Q/src/delegate/AbstractDelegate.dart';
 
-abstract class ApplicationResourceDelegate extends ResourceAware<String, Resource> {
+abstract class ApplicationResourceDelegate extends ResourceAware<String, Resource> with AbstractDelegate {
   factory ApplicationResourceDelegate(Application application) => _ApplicationResourceDelegate(application);
 }
 

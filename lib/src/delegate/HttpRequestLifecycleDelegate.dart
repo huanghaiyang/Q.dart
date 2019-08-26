@@ -1,8 +1,9 @@
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/Context.dart';
 import 'package:Q/src/aware/HttpRequestLifecycleAware.dart';
+import 'package:Q/src/delegate/AbstractDelegate.dart';
 
-abstract class HttpRequestDelegate extends HttpRequestLifeCycleAware<Context> {
+abstract class HttpRequestDelegate extends HttpRequestLifeCycleAware<Context> with AbstractDelegate {
   factory HttpRequestDelegate(Application application) => _HttpRequestDelegate(application);
 }
 

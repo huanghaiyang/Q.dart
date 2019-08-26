@@ -20,8 +20,6 @@ abstract class ApplicationInitializer {
 
   init();
 
-  onStartUp();
-
   createApplicationContext();
 
   factory ApplicationInitializer(Application application) => _ApplicationInitializer(application);
@@ -35,12 +33,6 @@ class _ApplicationInitializer implements ApplicationInitializer {
   @override
   Application get application {
     return this._application;
-  }
-
-  @override
-  onStartUp() {
-    String applicationName = this._application.applicationContext.applicationName;
-    assert(applicationName == null && applicationName.isEmpty, 'application name must not be null or empty');
   }
 
   @override

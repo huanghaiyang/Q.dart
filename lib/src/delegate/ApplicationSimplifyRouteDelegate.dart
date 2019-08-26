@@ -5,9 +5,10 @@ import 'package:Q/src/Method.dart';
 import 'package:Q/src/Router.dart';
 import 'package:Q/src/aware/SimplifyRouteAware.dart';
 import 'package:Q/src/converter/AbstractHttpMessageConverter.dart';
+import 'package:Q/src/delegate/AbstractDelegate.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 
-abstract class ApplicationSimplifyRouteDelegate extends SimplifyRouteAware<Router> {
+abstract class ApplicationSimplifyRouteDelegate extends SimplifyRouteAware<Router> with AbstractDelegate {
   factory ApplicationSimplifyRouteDelegate(Application application) => _ApplicationSimplifyRouteDelegate(application);
 }
 
