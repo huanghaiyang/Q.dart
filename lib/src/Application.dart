@@ -13,7 +13,8 @@ abstract class Application extends CloseableAware
         HttpRequestResolverAware<AbstractResolver, Request, ResolverType>,
         HttpResponseConverter<ContentType, AbstractHttpMessageConverter>,
         HttpRequestHandlerAware<int, HandlerAdapter>,
-        ApplicationContextAware<ApplicationContext> {
+        ApplicationContextAware<ApplicationContext>,
+        ApplicationListenerAware<AbstractListener, ApplicationListenerType, List> {
   factory Application() => _Application.getInstance();
 
   static ApplicationContext getApplicationContext() {
@@ -59,7 +60,6 @@ class _Application implements Application {
   static _Application getInstance() {
     if (_instance == null) {
       _instance = _Application._();
-      _instance.applicationInitializer_ = ApplicationInitializer(_instance);
       _instance.init();
     }
     return _instance;
@@ -108,12 +108,16 @@ class _Application implements Application {
 
   ApplicationClosableDelegate applicationClosableDelegate;
 
+  ApplicationLifecycleListener applicationLifecycleListener;
+
   init() {
+    applicationInitializer_ = ApplicationInitializer(this);
     applicationLifecycleDelegate = ApplicationLifecycleDelegate(this);
     applicationRouteDelegate = ApplicationRouteDelegate(this);
     applicationSimplifyRouteDelegate = ApplicationSimplifyRouteDelegate(this);
     applicationResourceDelegate = ApplicationResourceDelegate(this);
     applicationClosableDelegate = ApplicationClosableDelegate(this);
+    applicationLifecycleListener = ApplicationLifecycleListener(this);
     httpRequestDelegate = HttpRequestDelegate(this);
     this.applicationInitializer_.init();
   }
@@ -509,4 +513,10 @@ class _Application implements Application {
         applicationRouteDelegate,
         applicationClosableDelegate
       ]);
+
+  @override
+  void addListener(AbstractListener listener) => applicationLifecycleListener.addListener(listener);
+
+  @override
+  void trigger(ApplicationListenerType type, List payload) => applicationLifecycleListener.trigger(type, payload);
 }

@@ -21,19 +21,23 @@ abstract class ApplicationContext extends BindApplicationAware<Application> with
 }
 
 class _ApplicationContext implements ApplicationContext {
-  Configuration configuration_ = Configuration();
+  Configuration configuration_;
 
   String applicationName_;
 
   String displayName_;
 
-  DateTime startTime_ = DateTime.now();
+  DateTime startTime_;
 
   Application _application;
 
-  ApplicationStage _applicationStage = ApplicationStage.STOPPED;
+  ApplicationStage _applicationStage;
 
-  _ApplicationContext(this._application);
+  _ApplicationContext(this._application) {
+    this.configuration_ = Configuration();
+    this.startTime_ = DateTime.now();
+    this._applicationStage = ApplicationStage.STOPPED;
+  }
 
   @override
   Configuration get configuration {
