@@ -25,7 +25,7 @@ class _ApplicationLifecycleListener implements ApplicationLifecycleListener {
 
   @override
   void addListener(AbstractListener listener) {
-    Type type = reflect(listener).type.reflectedType;
+    Type type = reflect(listener).type.superinterfaces.first.reflectedType;
     switch (type) {
       case ApplicationStartUpListener:
         startUpListeners.add(listener);

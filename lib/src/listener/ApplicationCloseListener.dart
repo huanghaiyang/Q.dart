@@ -1,6 +1,6 @@
 import 'package:Q/src/listener/AbstractListener.dart';
 
-typedef ApplicationCloseCallback = Future<dynamic> Function(Future<dynamic> prevCloseableResult);
+typedef ApplicationCloseCallback = Future<dynamic> Function(dynamic prevCloseableResult);
 
 abstract class ApplicationCloseListener extends AbstractListener<List> {
   factory ApplicationCloseListener(ApplicationCloseCallback applicationCloseCallback) =>

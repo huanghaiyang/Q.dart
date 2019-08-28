@@ -17,7 +17,8 @@ class _ApplicationClosableDelegate implements ApplicationClosableDelegate {
   Future<dynamic> close() async {
     this.application_.applicationContext.currentStage = ApplicationStage.STOPPING;
     dynamic prevCloseableResult = await this.application_.closeServer();
-    await this.application_.getDelegate(ApplicationLifecycleDelegate).onError(prevCloseableResult);
+    ApplicationLifecycleDelegate applicationLifecycleDelegate = await this.application_.getDelegate(ApplicationLifecycleDelegate);
+    await applicationLifecycleDelegate.onClose(prevCloseableResult);
     this.application_.applicationContext.currentStage = ApplicationStage.STOPPED;
     return prevCloseableResult;
   }
