@@ -14,7 +14,8 @@ abstract class Application extends CloseableAware
         HttpResponseConverter<ContentType, AbstractHttpMessageConverter>,
         HttpRequestHandlerAware<int, HandlerAdapter>,
         ApplicationContextAware<ApplicationContext>,
-        ApplicationListenerAware<AbstractListener, ApplicationListenerType, List> {
+        ApplicationListenerAware<AbstractListener, ApplicationListenerType, List>,
+        HttpRequestContextAware<Context> {
   factory Application() => _Application.getInstance();
 
   static ApplicationContext getApplicationContext() {
@@ -110,6 +111,8 @@ class _Application implements Application {
 
   ApplicationLifecycleListener applicationLifecycleListener;
 
+  HttpRequestContextDelegate httpRequestContextDelegate;
+
   init() {
     applicationInitializer_ = ApplicationInitializer(this);
     applicationLifecycleDelegate = ApplicationLifecycleDelegate(this);
@@ -119,6 +122,7 @@ class _Application implements Application {
     applicationClosableDelegate = ApplicationClosableDelegate(this);
     applicationLifecycleListener = ApplicationLifecycleListener(this);
     httpRequestDelegate = HttpRequestDelegate(this);
+    httpRequestContextDelegate = HttpRequestContextDelegate(this);
     this.applicationInitializer_.init();
   }
 
@@ -182,20 +186,6 @@ class _Application implements Application {
     await for (Middleware middleware in Stream.fromIterable(this.middleWares_.where((Middleware middleware) => middleware.type == type))) {
       await middleware.handle(context, onFinished, onError);
     }
-    return context;
-  }
-
-  // 创建上下文
-  Future<Context> createContext(HttpRequest req, HttpResponse res) async {
-    Request request = await this.resolveRequest(req);
-    request.req = req;
-    Response response = Response();
-    response.res = res;
-    Context context = Context(request, response);
-    context.app = request.app = response.app = this;
-    request.context = response.context = context;
-    request.response = response;
-    response.request = request;
     return context;
   }
 
@@ -511,7 +501,8 @@ class _Application implements Application {
         applicationSimplifyRouteDelegate,
         applicationResourceDelegate,
         applicationRouteDelegate,
-        applicationClosableDelegate
+        applicationClosableDelegate,
+        httpRequestContextDelegate
       ]);
 
   @override
@@ -519,4 +510,8 @@ class _Application implements Application {
 
   @override
   void trigger(ApplicationListenerType type, List payload) => applicationLifecycleListener.trigger(type, payload);
+
+  @override
+  Future<Context> createContext(HttpRequest httpRequest, HttpResponse httpResponse) =>
+      httpRequestContextDelegate.createContext(httpRequest, httpResponse);
 }
