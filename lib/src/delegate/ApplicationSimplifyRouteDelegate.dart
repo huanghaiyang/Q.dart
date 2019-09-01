@@ -10,6 +10,10 @@ import 'package:Q/src/handler/HandlerAdapter.dart';
 
 abstract class ApplicationSimplifyRouteDelegate extends SimplifyRouteAware<Router> with AbstractDelegate {
   factory ApplicationSimplifyRouteDelegate(Application application) => _ApplicationSimplifyRouteDelegate(application);
+
+  factory ApplicationSimplifyRouteDelegate.from(Application application) {
+    return application.getDelegate(ApplicationSimplifyRouteDelegate);
+  }
 }
 
 class _ApplicationSimplifyRouteDelegate implements ApplicationSimplifyRouteDelegate {

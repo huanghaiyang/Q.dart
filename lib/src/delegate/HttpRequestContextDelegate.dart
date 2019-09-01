@@ -9,6 +9,10 @@ import 'package:Q/src/delegate/AbstractDelegate.dart';
 
 abstract class HttpRequestContextDelegate extends AbstractDelegate with HttpRequestContextAware<Context> {
   factory HttpRequestContextDelegate(Application application) => _HttpRequestContextDelegate(application);
+
+  factory HttpRequestContextDelegate.from(Application application) {
+    return application.getDelegate(HttpRequestContextDelegate);
+  }
 }
 
 class _HttpRequestContextDelegate implements HttpRequestContextDelegate {

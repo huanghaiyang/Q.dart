@@ -5,6 +5,10 @@ import 'package:Q/src/delegate/AbstractDelegate.dart';
 
 abstract class ApplicationResourceDelegate extends ResourceAware<String, Resource> with AbstractDelegate {
   factory ApplicationResourceDelegate(Application application) => _ApplicationResourceDelegate(application);
+
+  factory ApplicationResourceDelegate.from(Application application) {
+    return application.getDelegate(ApplicationResourceDelegate);
+  }
 }
 
 class _ApplicationResourceDelegate implements ApplicationResourceDelegate {

@@ -7,6 +7,10 @@ import 'package:Q/src/delegate/AbstractDelegate.dart';
 
 abstract class ApplicationRouteDelegate extends RouteAware<Router> with AbstractDelegate {
   factory ApplicationRouteDelegate(Application application) => _ApplicationRouteDelegate(application);
+
+  factory ApplicationRouteDelegate.from(Application application) {
+    return application.getDelegate(ApplicationRouteDelegate);
+  }
 }
 
 class _ApplicationRouteDelegate implements ApplicationRouteDelegate {

@@ -1,6 +1,7 @@
 library q_aware;
 
 export 'package:Q/src/aware/ApplicationContextAware.dart';
+export 'package:Q/src/aware/ApplicationHttpServerAware.dart';
 export 'package:Q/src/aware/ApplicationLifecycleAware.dart';
 export 'package:Q/src/aware/ApplicationListenerAware.dart';
 export 'package:Q/src/aware/ApplicationStageAware.dart';

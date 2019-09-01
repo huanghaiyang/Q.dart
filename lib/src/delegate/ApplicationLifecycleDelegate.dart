@@ -5,12 +5,16 @@ import 'package:Q/src/listener/ApplicationListenerType.dart';
 
 abstract class ApplicationLifecycleDelegate extends ApplicationLifecycle with AbstractDelegate {
   factory ApplicationLifecycleDelegate(Application application) => _ApplicationLifecycleDelegate(application);
+
+  factory ApplicationLifecycleDelegate.from(Application application) {
+    return application.getDelegate(ApplicationLifecycleDelegate);
+  }
 }
 
 class _ApplicationLifecycleDelegate implements ApplicationLifecycleDelegate {
-  final Application application_;
+  final Application application;
 
-  _ApplicationLifecycleDelegate(this.application_);
+  _ApplicationLifecycleDelegate(this.application);
 
   // 错误处理
   @override
@@ -19,7 +23,7 @@ class _ApplicationLifecycleDelegate implements ApplicationLifecycleDelegate {
     if (stackTrace != null) {
       print('Q.dart.server stacktrace:' + stackTrace.toString());
     }
-    this.application_.trigger(ApplicationListenerType.ERROR, [error, stackTrace]);
+    this.application.trigger(ApplicationListenerType.ERROR, [error, stackTrace]);
   }
 
   @override
@@ -27,11 +31,11 @@ class _ApplicationLifecycleDelegate implements ApplicationLifecycleDelegate {
 
   @override
   Future<dynamic> onClose(dynamic prevCloseableResult) async {
-    this.application_.trigger(ApplicationListenerType.CLOSE, [prevCloseableResult]);
+    this.application.trigger(ApplicationListenerType.CLOSE, [prevCloseableResult]);
   }
 
   @override
   Future<dynamic> onStartup() async {
-    this.application_.trigger(ApplicationListenerType.STARTUP, []);
+    this.application.trigger(ApplicationListenerType.STARTUP, []);
   }
 }

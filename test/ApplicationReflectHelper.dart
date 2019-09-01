@@ -15,7 +15,7 @@ void main() {
         ApplicationLifecycleDelegate(application),
         ApplicationResourceDelegate(application),
         ApplicationSimplifyRouteDelegate(application),
-        HttpRequestDelegate(application),
+        HttpRequestLifecycleDelegate(application),
         applicationRouteDelegate
       ]);
       expect(abstractDelegate, applicationRouteDelegate);

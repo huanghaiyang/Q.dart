@@ -3,14 +3,18 @@ import 'package:Q/src/Context.dart';
 import 'package:Q/src/aware/HttpRequestLifecycleAware.dart';
 import 'package:Q/src/delegate/AbstractDelegate.dart';
 
-abstract class HttpRequestDelegate extends HttpRequestLifeCycleAware<Context> with AbstractDelegate {
-  factory HttpRequestDelegate(Application application) => _HttpRequestDelegate(application);
+abstract class HttpRequestLifecycleDelegate extends HttpRequestLifeCycleAware<Context> with AbstractDelegate {
+  factory HttpRequestLifecycleDelegate(Application application) => _HttpRequestLifecycleDelegate(application);
+
+  factory HttpRequestLifecycleDelegate.from(Application application) {
+    return application.getDelegate(HttpRequestLifecycleDelegate);
+  }
 }
 
-class _HttpRequestDelegate implements HttpRequestDelegate {
+class _HttpRequestLifecycleDelegate implements HttpRequestLifecycleDelegate {
   final Application application_;
 
-  _HttpRequestDelegate(this.application_);
+  _HttpRequestLifecycleDelegate(this.application_);
 
   @override
   Future<dynamic> onBeforeConverter(Context context) {}
