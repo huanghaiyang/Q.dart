@@ -24,7 +24,7 @@ class _ApplicationInterceptorRegistryDelegate implements ApplicationInterceptorR
     if (interceptor == null) {
       throw IllegalArgumentException(message: '(AbstractInterceptor interceptor) argument could not be null.');
     }
-    this.application.interceptors.add(interceptor);
+    this.application.httpRequestInterceptorChain.add(interceptor);
   }
 
   // 注册多个拦截器

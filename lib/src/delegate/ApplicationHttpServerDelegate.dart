@@ -13,7 +13,6 @@ import 'package:Q/src/delegate/ApplicationLifecycleDelegate.dart';
 import 'package:Q/src/delegate/HttpRequestLifecycleDelegate.dart';
 import 'package:Q/src/helpers/ApplicationHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
-import 'package:curie/curie.dart';
 
 abstract class ApplicationHttpServerDelegate extends ApplicationHttpServerAware with AbstractDelegate {
   factory ApplicationHttpServerDelegate(Application application) => _ApplicationHttpServerDelegate(application);
@@ -64,7 +63,8 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
     if (this.application.applicationContext.currentStage == ApplicationStage.RUNNING) {
       HttpResponse res = req.response;
       // 处理拦截
-      bool suspend = await this.applyPreHandler(req, res);
+      bool suspend =
+          await this.application.httpRequestInterceptorChain.applyPreHandle(req, res, this.application.httpRequestInterceptorChain);
       // 如果返回false，则表示拦截器已经处理了当前请求，不需要再匹配路由、处理请求、消费中间件
       if (suspend) {
         // 创建请求上下文
@@ -84,33 +84,12 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
             this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddleware,
             this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddlewareError);
         // 执行后置拦截器方法
-        await this.applyPostHandler(req, res);
+        await this.application.httpRequestInterceptorChain.applyPostHandle(req, res, this.application.httpRequestInterceptorChain);
       }
       await ApplicationHelper.makeSureResponseRelease(res);
       return true;
     }
     return false;
-  }
-
-  // 执行拦截器的preHandler
-  Future<bool> applyPreHandler(HttpRequest req, HttpResponse res) async {
-    List<Function> functions = List();
-    for (int i = 0; i < this.application.interceptors.length; i++) {
-      functions.add(() async {
-        bool suspend;
-        try {
-          suspend = await this.application.interceptors[i].preHandle(req, res);
-        } catch (e, s) {
-          // 如果拦截器执行preHandler时抛出异常，则终止请求
-          suspend = true;
-          print('Exception details:\n $e');
-          print('Stack trace:\n $s');
-        }
-        return suspend;
-      });
-    }
-    bool suspend = await everySeries(functions);
-    return suspend;
   }
 
   // response中间件
@@ -182,17 +161,5 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
     } else {
       throw Exception('redirect ${redirect.address} not found.');
     }
-  }
-
-  // 执行拦截器的postHandler
-  void applyPostHandler(HttpRequest req, HttpResponse res) async {
-    List<Function> functions = List();
-    for (int i = this.application.interceptors.length - 1; i >= 0; i--) {
-      functions.add(() async {
-        return this.application.interceptors[i].postHandle(req, res);
-      });
-    }
-    // 处理每一个拦截器的后置处理方法
-    await eachSeries(functions);
   }
 }

@@ -13,6 +13,7 @@ export 'package:Q/src/aware/CookieAware.dart';
 export 'package:Q/src/aware/HttpMethodAware.dart';
 export 'package:Q/src/aware/HttpRequestContextAware.dart';
 export 'package:Q/src/aware/HttpRequestHandlerAware.dart';
+export 'package:Q/src/aware/HttpRequestInterceptorChainAware.dart';
 export 'package:Q/src/aware/HttpRequestLifecycleAware.dart';
 export 'package:Q/src/aware/HttpRequestResolverAware.dart';
 export 'package:Q/src/aware/HttpResponseConverterAware.dart';

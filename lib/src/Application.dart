@@ -44,7 +44,9 @@ abstract class Application extends CloseableAware
 
   Map<ResolverType, AbstractResolver> get resolvers;
 
-  List<AbstractInterceptor> get interceptors;
+  HttpRequestInterceptorChain get httpRequestInterceptorChain;
+
+  set httpRequestInterceptorChain(HttpRequestInterceptorChain httpRequestInterceptorChain);
 
   void use(Middleware middleware);
 
@@ -83,14 +85,13 @@ class _Application implements Application {
   // 转换器
   Map<ContentType, AbstractHttpMessageConverter> converters_ = Map();
 
-  // 拦截器
-  List<AbstractInterceptor> interceptors_ = List();
-
   // 资源
   List<Resource> resources_ = List();
 
   // 请求解析器
   Map<ResolverType, AbstractResolver> resolvers_ = Map();
+
+  HttpRequestInterceptorChain httpRequestInterceptorChain_;
 
   HttpRequestLifecycleDelegate httpRequestLifecycleDelegate;
 
@@ -194,11 +195,6 @@ class _Application implements Application {
   }
 
   @override
-  List<AbstractInterceptor> get interceptors {
-    return this.interceptors_;
-  }
-
-  @override
   Map<ContentType, AbstractHttpMessageConverter> get converters {
     return this.converters_;
   }
@@ -231,6 +227,16 @@ class _Application implements Application {
   @override
   ApplicationContext get applicationContext {
     return this.applicationContext_;
+  }
+
+  @override
+  HttpRequestInterceptorChain get httpRequestInterceptorChain {
+    return httpRequestInterceptorChain_;
+  }
+
+  @override
+  set httpRequestInterceptorChain(HttpRequestInterceptorChain httpRequestInterceptorChain) {
+    this.httpRequestInterceptorChain_ = httpRequestInterceptorChain;
   }
 
   @override

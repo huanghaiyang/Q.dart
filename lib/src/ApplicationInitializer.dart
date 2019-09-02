@@ -6,6 +6,7 @@ import 'package:Q/src/converter/JSONHttpMessageConverter.dart';
 import 'package:Q/src/converter/StringHttpMessageConverter.dart';
 import 'package:Q/src/handler/NotFoundHandler.dart';
 import 'package:Q/src/handler/OKHandler.dart';
+import 'package:Q/src/interceptor/HttpRequestInterceptorChain.dart';
 import 'package:Q/src/interceptor/I18nInterceptor.dart';
 import 'package:Q/src/interceptor/UnSupportedContentTypeInterceptor.dart';
 import 'package:Q/src/interceptor/UnSupportedMethodInterceptor.dart';
@@ -59,7 +60,7 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
   // 内置拦截器初始化
   initInterceptors() {
-    this.application.registryInterceptors(
+    this.application.httpRequestInterceptorChain = HttpRequestInterceptorChain(
         [I18nInterceptor.getInstance(), UnSupportedContentTypeInterceptor.getInstance(), UnSupportedMethodInterceptor.getInstance()]);
   }
 
