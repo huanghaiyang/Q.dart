@@ -329,6 +329,6 @@ class _Application implements Application {
   void trigger(ApplicationListenerType type, List payload) => applicationLifecycleListener.trigger(type, payload);
 
   @override
-  Future<Context> createContext(HttpRequest httpRequest, HttpResponse httpResponse) =>
-      httpRequestContextDelegate.createContext(httpRequest, httpResponse);
+  Future<Context> createContext(HttpRequest httpRequest, HttpResponse httpResponse, {HttpRequestInterceptorState interceptorState}) =>
+      httpRequestContextDelegate.createContext(httpRequest, httpResponse, interceptorState: interceptorState);
 }

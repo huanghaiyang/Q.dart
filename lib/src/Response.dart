@@ -1,16 +1,14 @@
 import 'dart:io';
 
-import 'package:Q/src/Application.dart';
 import 'package:Q/src/Context.dart';
 import 'package:Q/src/Request.dart';
 import 'package:Q/src/ResponseEntry.dart';
-import 'package:Q/src/aware/BindApplicationAware.dart';
 import 'package:Q/src/aware/ContextAware.dart';
 import 'package:Q/src/aware/StatusAware.dart';
 
 String _FINE = 'fine';
 
-abstract class Response extends BindApplicationAware<Application> with StatusAware, ContextAware<Context> {
+abstract class Response extends StatusAware with ContextAware<Context> {
   set res(HttpResponse res);
 
   set request(Request request);
@@ -23,13 +21,11 @@ abstract class Response extends BindApplicationAware<Application> with StatusAwa
 
   ResponseEntry get responseEntry;
 
-  factory Response([Application app, HttpResponse res, Request request, Context context, ResponseEntry responseEntry]) =>
-      _Response(app, res, request, context, responseEntry);
+  factory Response([HttpResponse res, Request request, Context context, ResponseEntry responseEntry]) =>
+      _Response(res, request, context, responseEntry);
 }
 
 class _Response implements Response {
-  Application app_;
-
   HttpResponse res_;
 
   Request request_;
@@ -42,7 +38,7 @@ class _Response implements Response {
 
   ResponseEntry responseEntry_;
 
-  _Response([this.app_, this.res_, this.request_, this.context_, this.responseEntry_]);
+  _Response([this.res_, this.request_, this.context_, this.responseEntry_]);
 
   @override
   ResponseEntry get responseEntry {
@@ -65,11 +61,6 @@ class _Response implements Response {
   }
 
   @override
-  Application get app {
-    return this.app_;
-  }
-
-  @override
   set responseEntry(ResponseEntry responseEntry) {
     this.responseEntry_ = responseEntry;
   }
@@ -87,11 +78,6 @@ class _Response implements Response {
   @override
   set res(HttpResponse res) {
     this.res_ = res;
-  }
-
-  @override
-  set app(Application app) {
-    this.app_ = app;
   }
 
   @override

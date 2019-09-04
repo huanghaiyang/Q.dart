@@ -6,6 +6,7 @@ import 'package:Q/src/Request.dart';
 import 'package:Q/src/Response.dart';
 import 'package:Q/src/aware/HttpRequestContextAware.dart';
 import 'package:Q/src/delegate/AbstractDelegate.dart';
+import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
 
 abstract class HttpRequestContextDelegate extends AbstractDelegate with HttpRequestContextAware<Context> {
   factory HttpRequestContextDelegate(Application application) => _HttpRequestContextDelegate(application);
@@ -22,13 +23,12 @@ class _HttpRequestContextDelegate implements HttpRequestContextDelegate {
 
   // 创建上下文
   @override
-  Future<Context> createContext(HttpRequest req, HttpResponse res) async {
+  Future<Context> createContext(HttpRequest req, HttpResponse res, {HttpRequestInterceptorState interceptorState}) async {
     Response response = Response();
     Request request = await this.application.resolveRequest(req);
     request.req = req;
     response.res = res;
-    Context context = Context(request, response);
-    context.app = request.app = response.app = this.application;
+    Context context = Context(request, response, this.application, interceptorState: interceptorState);
     request.context = response.context = context;
     request.response = response;
     response.request = request;

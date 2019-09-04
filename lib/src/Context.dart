@@ -8,10 +8,12 @@ import 'package:Q/src/Router.dart';
 import 'package:Q/src/aware/AttributeAware.dart';
 import 'package:Q/src/aware/BindApplicationAware.dart';
 import 'package:Q/src/aware/CookieAware.dart';
+import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
 import 'package:Q/src/utils/UuidUtil.dart';
 
 abstract class Context extends AttributeAware<Attribute> with CookieAware<Cookie>, BindApplicationAware<Application> {
-  factory Context([Request request, Response response, Application app]) => _Context(request, response, app);
+  factory Context(Request request, Response response, Application app, {HttpRequestInterceptorState interceptorState}) =>
+      _Context(request, response, app, interceptorState_: interceptorState);
 
   Request get request;
 
@@ -33,11 +35,13 @@ abstract class Context extends AttributeAware<Attribute> with CookieAware<Cookie
 }
 
 class _Context implements Context {
-  Request request_;
+  final Request request_;
 
-  Response response_;
+  final Response response_;
 
-  Application app_;
+  final Application app_;
+
+  final HttpRequestInterceptorState interceptorState_;
 
   String id_;
 
@@ -47,7 +51,7 @@ class _Context implements Context {
 
   int routeCount_ = 0;
 
-  _Context([this.request_, this.response_, this.app_]) {
+  _Context(this.request_, this.response_, this.app_, {this.interceptorState_}) {
     this.id_ = uuid5;
   }
 
@@ -137,12 +141,6 @@ class _Context implements Context {
   @override
   Request get request {
     return this.request_;
-  }
-
-  @override
-  set app(Application app) {
-    assert(app != null);
-    this.app_ = app;
   }
 
   @override

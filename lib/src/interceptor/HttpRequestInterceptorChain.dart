@@ -2,14 +2,13 @@ import 'dart:io';
 
 import 'package:Q/src/aware/HttpRequestInterceptorChainAware.dart';
 import 'package:Q/src/interceptor/AbstractInterceptor.dart';
+import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
 import 'package:curie/curie.dart';
 
-abstract class HttpRequestInterceptorChain extends HttpRequestInterceptorChainAware<HttpRequestInterceptorChain> {
-  int get currentIndex;
+abstract class HttpRequestInterceptorChain extends HttpRequestInterceptorChainAware<HttpRequestInterceptorState> {
+  Future<dynamic> applyPreHandle(HttpRequest httpRequest, HttpResponse httpResponse, HttpRequestInterceptorState interceptorState);
 
-  Future<dynamic> applyPreHandle(HttpRequest httpRequest, HttpResponse httpResponse, HttpRequestInterceptorChain interceptorChain);
-
-  Future<dynamic> applyPostHandle(HttpRequest httpRequest, HttpResponse httpResponse, HttpRequestInterceptorChain interceptorChain);
+  Future<dynamic> applyPostHandle(HttpRequest httpRequest, HttpResponse httpResponse, HttpRequestInterceptorState interceptorState);
 
   void add(AbstractInterceptor interceptor);
 
@@ -19,38 +18,37 @@ abstract class HttpRequestInterceptorChain extends HttpRequestInterceptorChainAw
 class _HttpRequestInterceptorChain implements HttpRequestInterceptorChain {
   List<AbstractInterceptor> interceptors_;
 
-  int currentIndex_;
-
   _HttpRequestInterceptorChain(this.interceptors_);
 
   @override
-  Future<dynamic> applyPreHandle(HttpRequest httpRequest, HttpResponse httpResponse, HttpRequestInterceptorChain interceptorChain) async {
+  Future<dynamic> applyPreHandle(HttpRequest httpRequest, HttpResponse httpResponse, HttpRequestInterceptorState interceptorState) async {
+    interceptorState.total = this.interceptors_.length;
     List<Function> functions = List();
     for (int i = 0; i < this.interceptors_.length; i++) {
       functions.add(() async {
+        interceptorState.preProcessIndex = i;
         bool suspend;
         try {
-          currentIndex_ = i;
           suspend = await this.interceptors_[i].preHandle(httpRequest, httpResponse);
-        } catch (e, s) {
+        } catch (error, stackTrace) {
           // 如果拦截器执行preHandler时抛出异常，则终止请求
           suspend = true;
-          print('Exception details:\n $e');
-          print('Stack trace:\n $s');
+          this.onError(error, stackTrace: stackTrace);
         }
         return suspend;
       });
     }
     bool suspend = await everySeries(functions);
+    interceptorState.preProcessSuspend = suspend;
     return suspend;
   }
 
   @override
-  Future<dynamic> applyPostHandle(HttpRequest httpRequest, HttpResponse httpResponse, HttpRequestInterceptorChain interceptorChain) async {
+  Future<dynamic> applyPostHandle(HttpRequest httpRequest, HttpResponse httpResponse, HttpRequestInterceptorState interceptorState) async {
     List<Function> functions = List();
     for (int i = this.interceptors_.length - 1; i >= 0; i--) {
       functions.add(() async {
-        currentIndex_ = i;
+        interceptorState.postProcessIndex = i;
         return this.interceptors_[i].postHandle(httpRequest, httpResponse);
       });
     }
@@ -64,7 +62,8 @@ class _HttpRequestInterceptorChain implements HttpRequestInterceptorChain {
   }
 
   @override
-  int get currentIndex {
-    return currentIndex_;
+  void onError(Error error, {StackTrace stackTrace}) {
+    print('Exception details:\n $error');
+    print('Stack trace:\n $stackTrace');
   }
 }

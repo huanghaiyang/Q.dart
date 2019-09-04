@@ -22,7 +22,6 @@ class _ApplicationRouteDelegate implements ApplicationRouteDelegate {
   @override
   void route(Router router) {
     this.application_.routers.add(router);
-    router.app = this.application_;
     // 查找路由的响应结果转换器
     router.converter = this.application_.converters[router.produceType];
     router.handlerAdapter = this.application_.handlers[HttpStatus.ok];

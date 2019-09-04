@@ -1,12 +1,10 @@
 import 'dart:io';
 
-import 'package:Q/src/Application.dart';
 import 'package:Q/src/Context.dart';
 import 'package:Q/src/Response.dart';
-import 'package:Q/src/aware/BindApplicationAware.dart';
 import 'package:Q/src/aware/ContextAware.dart';
 
-abstract class Request extends BindApplicationAware<Application> with ContextAware<Context> {
+abstract class Request extends ContextAware<Context> {
   HttpRequest get req;
 
   Response get response;
@@ -23,8 +21,6 @@ abstract class Request extends BindApplicationAware<Application> with ContextAwa
 }
 
 class _Request implements Request {
-  Application app_;
-
   HttpRequest req_;
 
   Context context_;
@@ -56,11 +52,6 @@ class _Request implements Request {
   }
 
   @override
-  set app(Application app) {
-    this.app_ = app;
-  }
-
-  @override
   Map get data {
     return this.data_;
   }
@@ -78,10 +69,5 @@ class _Request implements Request {
   @override
   HttpRequest get req {
     return this.req_;
-  }
-
-  @override
-  Application get app {
-    return this.app_;
   }
 }

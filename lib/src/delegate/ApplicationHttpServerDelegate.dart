@@ -13,6 +13,7 @@ import 'package:Q/src/delegate/ApplicationLifecycleDelegate.dart';
 import 'package:Q/src/delegate/HttpRequestLifecycleDelegate.dart';
 import 'package:Q/src/helpers/ApplicationHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
+import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
 
 abstract class ApplicationHttpServerDelegate extends ApplicationHttpServerAware with AbstractDelegate {
   factory ApplicationHttpServerDelegate(Application application) => _ApplicationHttpServerDelegate(application);
@@ -62,13 +63,13 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
   Future<dynamic> handleRequest(HttpRequest req) async {
     if (this.application.applicationContext.currentStage == ApplicationStage.RUNNING) {
       HttpResponse res = req.response;
+      HttpRequestInterceptorState interceptorState = HttpRequestInterceptorState();
       // 处理拦截
-      bool suspend =
-          await this.application.httpRequestInterceptorChain.applyPreHandle(req, res, this.application.httpRequestInterceptorChain);
+      bool suspend = await this.application.httpRequestInterceptorChain.applyPreHandle(req, res, interceptorState);
       // 如果返回false，则表示拦截器已经处理了当前请求，不需要再匹配路由、处理请求、消费中间件
       if (suspend) {
         // 创建请求上下文
-        Context context = await this.application.createContext(req, res);
+        Context context = await this.application.createContext(req, res, interceptorState: interceptorState);
         // 前置中间件处理
         await this.handleWithMiddleware(
             context,
@@ -84,7 +85,7 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
             this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddleware,
             this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddlewareError);
         // 执行后置拦截器方法
-        await this.application.httpRequestInterceptorChain.applyPostHandle(req, res, this.application.httpRequestInterceptorChain);
+        await this.application.httpRequestInterceptorChain.applyPostHandle(req, res, interceptorState);
       }
       await ApplicationHelper.makeSureResponseRelease(res);
       return true;

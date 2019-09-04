@@ -135,11 +135,6 @@ class _Router implements Router {
   }
 
   @override
-  set app(Application app) {
-    this.app_ = app;
-  }
-
-  @override
   set handlerAdapter(HandlerAdapter handlerAdapter) {
     this.handlerAdapter_ = handlerAdapter;
   }
