@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:Q/src/aware/StoreService.dart';
 import 'package:Q/src/exception/UnSupportedRequestContentTypeException.dart';
 import 'package:Q/src/helpers/UnSupportedContentTypeHelper.dart';
 import 'package:Q/src/interceptor/AbstractInterceptor.dart';
@@ -18,7 +19,7 @@ class UnSupportedContentTypeInterceptor implements AbstractInterceptor {
   }
 
   @override
-  Future<bool> preHandle(HttpRequest req, HttpResponse res) async {
+  Future<bool> preHandle(HttpRequest req, HttpResponse res, StoreService storeService) async {
     bool passed = await UnSupportedContentTypeHelper.checkSupported(req);
     if (!passed) {
       res.write(UnSupportedContentTypeView().toRaw(req, res, extra: {'unSupported': req.headers.contentType.mimeType}));
@@ -28,5 +29,5 @@ class UnSupportedContentTypeInterceptor implements AbstractInterceptor {
   }
 
   @override
-  void postHandle(HttpRequest req, HttpResponse res) {}
+  void postHandle(HttpRequest req, HttpResponse res, StoreService storeService) {}
 }

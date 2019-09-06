@@ -29,7 +29,7 @@ class _HttpRequestInterceptorChain implements HttpRequestInterceptorChain {
         interceptorState.preProcessIndex = i;
         bool suspend;
         try {
-          suspend = await this.interceptors_[i].preHandle(httpRequest, httpResponse);
+          suspend = await this.interceptors_[i].preHandle(httpRequest, httpResponse, interceptorState);
         } catch (error, stackTrace) {
           // 如果拦截器执行preHandler时抛出异常，则终止请求
           suspend = true;
@@ -49,7 +49,7 @@ class _HttpRequestInterceptorChain implements HttpRequestInterceptorChain {
     for (int i = this.interceptors_.length - 1; i >= 0; i--) {
       functions.add(() async {
         interceptorState.postProcessIndex = i;
-        return this.interceptors_[i].postHandle(httpRequest, httpResponse);
+        return this.interceptors_[i].postHandle(httpRequest, httpResponse, interceptorState);
       });
     }
     // 处理每一个拦截器的后置处理方法

@@ -1,4 +1,6 @@
-abstract class HttpRequestInterceptorState {
+import 'package:Q/src/aware/StoreService.dart';
+
+abstract class HttpRequestInterceptorState extends StoreService<int, dynamic> {
   int get preProcessIndex;
 
   int get postProcessIndex;
@@ -26,6 +28,8 @@ class _HttpRequestInterceptorState implements HttpRequestInterceptorState {
   bool preProcessSuspend_;
 
   int total_;
+
+  Map<int, dynamic> store;
 
   @override
   int get preProcessIndex {
@@ -65,5 +69,15 @@ class _HttpRequestInterceptorState implements HttpRequestInterceptorState {
   @override
   int get total {
     return this.total_;
+  }
+
+  @override
+  void setState(int index, dynamic state) {
+    this.store[index] = state;
+  }
+
+  @override
+  void getState(int index) {
+    return this.store[index];
   }
 }

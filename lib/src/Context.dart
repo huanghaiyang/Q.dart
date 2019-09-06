@@ -29,6 +29,8 @@ abstract class Context extends AttributeAware<Attribute> with CookieAware<Cookie
 
   int get routeCount;
 
+  HttpRequestInterceptorState get interceptorState;
+
   void incrementRouteCount();
 
   void setRouter(Router router);
@@ -182,6 +184,11 @@ class _Context implements Context {
   @override
   int get routeCount {
     return this.routeCount_;
+  }
+
+  @override
+  HttpRequestInterceptorState get interceptorState {
+    return this.interceptorState_;
   }
 
   @override
