@@ -33,6 +33,7 @@ export 'src/listener/Listener.dart';
 export 'src/multipart/Multipart.dart';
 export 'src/query/Query.dart';
 export 'src/query/Value.dart';
+export 'src/request/Request.dart';
 export 'src/resolver/Resolver.dart';
 export 'src/utils/Utils.dart';
 export 'src/views/Views.dart';

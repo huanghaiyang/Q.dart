@@ -30,8 +30,6 @@ abstract class Application extends CloseableAware
     return Application().middleWares;
   }
 
-  String get env;
-
   List<Middleware> get middleWares;
 
   List<Router> get routers;
@@ -70,26 +68,23 @@ class _Application implements Application {
 
   ApplicationInitializer applicationInitializer_;
 
-  // 当前环境
-  String env_ = 'development';
-
   // 中间件
-  List<Middleware> middleWares_ = List();
+  List<Middleware> middleWares_;
 
   // 路由
-  List<Router> routers_ = List();
+  List<Router> routers_;
 
   // default handlers
-  Map<int, HandlerAdapter> handlers_ = Map();
+  Map<int, HandlerAdapter> handlers_;
 
   // 转换器
-  Map<ContentType, AbstractHttpMessageConverter> converters_ = Map();
+  Map<ContentType, AbstractHttpMessageConverter> converters_;
 
   // 资源
-  List<Resource> resources_ = List();
+  List<Resource> resources_;
 
   // 请求解析器
-  Map<ResolverType, AbstractResolver> resolvers_ = Map();
+  Map<ResolverType, AbstractResolver> resolvers_;
 
   HttpRequestInterceptorChain httpRequestInterceptorChain_;
 
@@ -120,6 +115,12 @@ class _Application implements Application {
   ApplicationInterceptorRegistryDelegate applicationInterceptorRegistryDelegate;
 
   init() {
+    this.middleWares_ = List();
+    this.routers_ = List();
+    this.handlers_ = Map();
+    this.converters_ = Map();
+    this.resolvers_ = Map();
+
     applicationInitializer_ = ApplicationInitializer(this);
     applicationLifecycleDelegate = ApplicationLifecycleDelegate(this);
     applicationRouteDelegate = ApplicationRouteDelegate(this);
@@ -212,11 +213,6 @@ class _Application implements Application {
   @override
   List<Middleware> get middleWares {
     return this.middleWares_;
-  }
-
-  @override
-  String get env {
-    return this.env_;
   }
 
   @override

@@ -17,6 +17,7 @@ import 'package:Q/src/exception/UnKnowRouterMethodException.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:Q/src/helpers/HttpMethodHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
+import 'package:Q/src/request/RequestTimeout.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
@@ -28,9 +29,15 @@ abstract class Router extends BindApplicationAware<Application>
           ContentType produceType,
           AbstractHttpMessageConverter converter,
           HandlerAdapter handlerAdapter,
-          String name}) =>
+          String name,
+          RequestTimeoutResult timeout}) =>
       _Router(path, method, handle,
-          pathVariables_: pathVariables, produceType_: produceType, converter_: converter, handlerAdapter_: handlerAdapter, name_: name);
+          pathVariables_: pathVariables,
+          produceType_: produceType,
+          converter_: converter,
+          handlerAdapter_: handlerAdapter,
+          name_: name,
+          timeout_: timeout);
 
   String get name;
 
@@ -43,6 +50,8 @@ abstract class Router extends BindApplicationAware<Application>
   String get path;
 
   String get requestUri;
+
+  RequestTimeoutResult get timeout;
 
   set handlerAdapter(HandlerAdapter handlerAdapter);
 
@@ -86,8 +95,10 @@ class _Router implements Router {
 
   Context context_;
 
+  RequestTimeoutResult timeout_;
+
   _Router(this.path_, this.method_, this.handle_,
-      {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_}) {
+      {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_, this.timeout_}) {
     if (this.handle_ == null) {
       throw IllegalArgumentException(message: 'The handler function of router:${this.path_} should not be null.');
     }
@@ -250,5 +261,10 @@ class _Router implements Router {
   @override
   Context get context {
     return this.context_;
+  }
+
+  @override
+  RequestTimeoutResult get timeout {
+    return this.timeout_;
   }
 }

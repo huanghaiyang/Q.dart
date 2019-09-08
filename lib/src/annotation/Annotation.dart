@@ -6,4 +6,5 @@ export 'package:Q/src/annotation/PathVariable.dart';
 export 'package:Q/src/annotation/RequestHeader.dart';
 export 'package:Q/src/annotation/RequestParam.dart';
 export 'package:Q/src/annotation/SessionValue.dart';
+export 'package:Q/src/annotation/Timeout.dart';
 export 'package:Q/src/annotation/UrlParam.dart';
