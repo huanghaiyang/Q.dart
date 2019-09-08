@@ -1,5 +1,6 @@
 library Q_exception;
 
+export 'package:Q/src/exception/DuplicateInterceptorRegistryException.dart';
 export 'package:Q/src/exception/IllegalArgumentException.dart';
 export 'package:Q/src/exception/InvalidRouterPathException.dart';
 export 'package:Q/src/exception/MaxUploadSizeExceededException.dart';

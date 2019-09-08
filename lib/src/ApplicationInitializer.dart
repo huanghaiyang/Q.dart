@@ -61,7 +61,7 @@ class _ApplicationInitializer implements ApplicationInitializer {
   // 内置拦截器初始化
   initInterceptors() {
     this.application.httpRequestInterceptorChain = HttpRequestInterceptorChain(
-        [I18nInterceptor.getInstance(), UnSupportedContentTypeInterceptor.getInstance(), UnSupportedMethodInterceptor.getInstance()]);
+        [I18nInterceptor.getInstance(), UnSupportedContentTypeInterceptor.getInstance(), UnSupportedMethodInterceptor.getInstance(), UnSupportedMethodInterceptor.getInstance()]);
   }
 
   // 初始化内置解析器

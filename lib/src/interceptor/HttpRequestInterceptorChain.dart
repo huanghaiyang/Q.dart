@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:mirrors';
 
 import 'package:Q/src/aware/HttpRequestInterceptorChainAware.dart';
+import 'package:Q/src/exception/DuplicateInterceptorRegistryException.dart';
 import 'package:Q/src/interceptor/AbstractInterceptor.dart';
 import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
 import 'package:curie/curie.dart';
@@ -58,6 +60,14 @@ class _HttpRequestInterceptorChain implements HttpRequestInterceptorChain {
 
   @override
   void add(AbstractInterceptor interceptor) {
+    if (this.interceptors_.isNotEmpty) {
+      AbstractInterceptor existInterceptor = this.interceptors_.firstWhere((item) {
+        return reflect(item).type.reflectedType == reflect(interceptor).type.reflectedType;
+      });
+      if (existInterceptor != null) {
+        throw DuplicateInterceptorRegistryException(interceptor: interceptor);
+      }
+    }
     this.interceptors_.add(interceptor);
   }
 
