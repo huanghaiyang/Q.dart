@@ -30,7 +30,7 @@ abstract class Router extends BindApplicationAware<Application>
           AbstractHttpMessageConverter converter,
           HandlerAdapter handlerAdapter,
           String name,
-          RequestTimeoutResult timeout}) =>
+          RequestTimeout timeout}) =>
       _Router(path, method, handle,
           pathVariables_: pathVariables,
           produceType_: produceType,
@@ -51,7 +51,7 @@ abstract class Router extends BindApplicationAware<Application>
 
   String get requestUri;
 
-  RequestTimeoutResult get timeout;
+  RequestTimeout get timeout;
 
   set handlerAdapter(HandlerAdapter handlerAdapter);
 
@@ -95,7 +95,7 @@ class _Router implements Router {
 
   Context context_;
 
-  RequestTimeoutResult timeout_;
+  RequestTimeout timeout_;
 
   _Router(this.path_, this.method_, this.handle_,
       {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_, this.timeout_}) {
@@ -264,7 +264,7 @@ class _Router implements Router {
   }
 
   @override
-  RequestTimeoutResult get timeout {
+  RequestTimeout get timeout {
     return this.timeout_;
   }
 }
