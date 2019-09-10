@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:Q/src/Application.dart';
@@ -14,6 +15,7 @@ import 'package:Q/src/delegate/HttpRequestLifecycleDelegate.dart';
 import 'package:Q/src/helpers/ApplicationHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
 import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
+import 'package:Q/src/request/RequestTimeout.dart';
 
 abstract class ApplicationHttpServerDelegate extends ApplicationHttpServerAware with AbstractDelegate {
   factory ApplicationHttpServerDelegate(Application application) => _ApplicationHttpServerDelegate(application);
@@ -126,7 +128,13 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
     // 合并参数
     List positionArguments = List()..addAll([context, context.request.req, context.response.res])..addAll(reflectedParameters);
     // 等待结果处理完成
-    dynamic result = await Function.apply(matchedRouter.handle, positionArguments);
+    dynamic result;
+    dynamic handler = Function.apply(matchedRouter.handle, positionArguments);
+    if (matchedRouter.timeout != null && matchedRouter.timeout.timeoutValue > 0) {
+      result = await handleRouterTimeout(matchedRouter, handler);
+    } else {
+      result = await handler;
+    }
     // 如果执行的结果是一个重定向
     if (result is Redirect) {
       // 根据重定向匹配路由并执行
@@ -162,5 +170,14 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
     } else {
       throw Exception('redirect ${redirect.address} not found.');
     }
+  }
+
+  // 路由处理超时
+  Future<dynamic> handleRouterTimeout(Router router, Future task) async {
+    RequestTimeout requestTimeout = router.timeout;
+    Completer completer = Completer();
+    completer.complete(task);
+    Future future = completer.future.timeout(Duration(milliseconds: requestTimeout.timeoutValue), onTimeout: requestTimeout.timeoutResult);
+    return future;
   }
 }

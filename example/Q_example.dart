@@ -108,5 +108,21 @@ void start() {
     return {'age': age, 'isHero': isHero, 'friends': friends, 'grandpa': grandpa, 'money': null, 'actors': actors};
   });
 
+  app.get("/router-timeout", (Context context, [HttpRequest req, HttpResponse res]) async {
+    return await Future.delayed(Duration(milliseconds: 10), () {
+      return {'timeout': 10};
+    });
+  }).setTimeout(RequestTimeout(11, () async {
+    return {'timeout': 11};
+  }));
+
+  app.get("/router-timeout-take-effect", (Context context, [HttpRequest req, HttpResponse res]) async {
+    return await Future.delayed(Duration(milliseconds: 10), () {
+      return {'timeout': 10};
+    });
+  }).setTimeout(RequestTimeout(5, () async {
+    return {'timeout': 5};
+  }));
+
   app.listen(8081);
 }

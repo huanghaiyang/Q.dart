@@ -143,4 +143,26 @@ void main() {
       });
     });
   });
+
+  group('timeout', () {
+    Dio dio;
+
+    setUp(() {
+      dio = Dio();
+    });
+
+    test('/router-timeout', () async {
+      Response response = await dio.get("$server/router-timeout");
+      expect(response.data, {'timeout': 10});
+    });
+
+    test('/router-timeout-take-effect', () async {
+      Response response = await dio.get("$server/router-timeout-take-effect");
+      expect(response.data, {'timeout': 5});
+    });
+
+    tearDown(() {
+      dio = null;
+    });
+  });
 }

@@ -30,14 +30,16 @@ abstract class Router extends BindApplicationAware<Application>
           AbstractHttpMessageConverter converter,
           HandlerAdapter handlerAdapter,
           String name,
-          RequestTimeout timeout}) =>
+          RequestTimeout timeout,
+          RequestTimeout requestTimeout}) =>
       _Router(path, method, handle,
           pathVariables_: pathVariables,
           produceType_: produceType,
           converter_: converter,
           handlerAdapter_: handlerAdapter,
           name_: name,
-          timeout_: timeout);
+          timeout_: timeout,
+          requestTimeout_: requestTimeout);
 
   String get name;
 
@@ -53,6 +55,9 @@ abstract class Router extends BindApplicationAware<Application>
 
   RequestTimeout get timeout;
 
+  // http请求超时
+  RequestTimeout get requestTimeout;
+
   set handlerAdapter(HandlerAdapter handlerAdapter);
 
   set converter(AbstractHttpMessageConverter converter);
@@ -64,6 +69,10 @@ abstract class Router extends BindApplicationAware<Application>
   Future convert(ResponseEntry entry);
 
   Future write(Context context);
+
+  Router setTimeout(RequestTimeout timeout);
+
+  Router setRequestTimeout(RequestTimeout timeout);
 }
 
 class _Router implements Router {
@@ -97,8 +106,10 @@ class _Router implements Router {
 
   RequestTimeout timeout_;
 
+  RequestTimeout requestTimeout_;
+
   _Router(this.path_, this.method_, this.handle_,
-      {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_, this.timeout_}) {
+      {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_, this.timeout_, this.requestTimeout_}) {
     if (this.handle_ == null) {
       throw IllegalArgumentException(message: 'The handler function of router:${this.path_} should not be null.');
     }
@@ -266,5 +277,22 @@ class _Router implements Router {
   @override
   RequestTimeout get timeout {
     return this.timeout_;
+  }
+
+  @override
+  RequestTimeout get requestTimeout {
+    return this.requestTimeout_;
+  }
+
+  @override
+  Router setTimeout(RequestTimeout timeout) {
+    this.timeout_ = timeout;
+    return this;
+  }
+
+  @override
+  Router setRequestTimeout(RequestTimeout timeout) {
+    this.requestTimeout_ = timeout;
+    return this;
   }
 }
