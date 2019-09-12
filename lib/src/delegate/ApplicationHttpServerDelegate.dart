@@ -17,6 +17,7 @@ import 'package:Q/src/helpers/AsyncHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
 import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
 import 'package:Q/src/request/RequestTimeout.dart';
+import 'package:Q/src/request/RouterStage.dart';
 
 abstract class ApplicationHttpServerDelegate extends ApplicationHttpServerAware with AbstractDelegate {
   factory ApplicationHttpServerDelegate(Application application) => _ApplicationHttpServerDelegate(application);
@@ -108,13 +109,13 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
   // 匹配路由，并处理请求
   Future<Context> applyRouter(Context context, HttpRequest req) async {
     // 匹配路由
-    Router matchedRouter = await RouterHelper.matchRouter(req, this.application.routers);
-    if (matchedRouter != null) {
+    Router router = await RouterHelper.matchRouter(req, this.application.routers);
+    if (router != null) {
       // 设置当前请求上下文的路由
-      context.setRouter(matchedRouter);
-      matchedRouter.context = context;
+      context.setRouter(router);
+      router.context = context;
       // 处理路由请求
-      await this.handleRouter(matchedRouter, context, req);
+      await this.handleRouter(router, context, req);
     } else {
       // TODO throw router not found exception
       await this.application.handlers[HttpStatus.notFound].handle(context);
@@ -123,51 +124,82 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
   }
 
   // 路由处理，响应请求
-  Future<Context> handleRouter(Router matchedRouter, Context context, HttpRequest req) async {
-    // 通过反射获取当前请求处理函数上定义的路径参数
-    List<dynamic> reflectedParameters = await RouterHelper.listParameters(matchedRouter);
-    // 合并参数
-    List positionArguments = List()..addAll([context, context.request.req, context.response.res])..addAll(reflectedParameters);
+  Future<Context> handleRouter(Router router, Context context, HttpRequest req) async {
+    List positionArguments = await this._applyReflectParams(router, context);
+    dynamic result = await this._applyHandler(router, positionArguments);
+    // 如果执行的结果是一个重定向
+    if (result is Redirect) {
+      await this._applyRedirect(router, context, result, req);
+    } else {
+      await this._applyConvertResult(router, result, context);
+      await this._applyWrite(router, context);
+    }
+    return context;
+  }
+
+  Future _applyHandler(Router router, List positionArguments) async {
+    router.state.stage = RouterStage.AFTER_APPLY_HANDLER;
     // 等待结果处理完成
     dynamic result;
-    dynamic handler = Function.apply(matchedRouter.handle, positionArguments);
-    if (matchedRouter.timeout != null && matchedRouter.timeout.timeoutValue > Duration(milliseconds: 0)) {
-      result = await handleRouterTimeout(matchedRouter, handler);
+    dynamic handler = Function.apply(router.handle, positionArguments);
+    if (router.timeout != null && router.timeout.timeoutValue > Duration(milliseconds: 0)) {
+      result = await handleRouterTimeout(router, handler);
     } else {
       result = await handler;
     }
-    // 如果执行的结果是一个重定向
-    if (result is Redirect) {
-      // 根据重定向匹配路由并执行
-      await this.handleRedirect(context, result, req);
-    } else {
-      ResponseEntry responseEntry = ResponseEntry.from(result);
-      // 将执行结果赋值给上线文的响应
-      context.response.responseEntry = responseEntry;
-      // 转换后的而结果，类型为String
-      dynamic convertedResult = await matchedRouter.convert(responseEntry);
-      responseEntry.convertedResult = convertedResult;
-      // 写response,完成请求
-      await matchedRouter.write(context);
-    }
-    return context;
+    router.state.stage = RouterStage.AFTER_APPLY_HANDLER;
+    return result;
+  }
+
+  Future _applyReflectParams(Router router, Context context) async {
+    router.state.stage = RouterStage.BEFORE_REFLECT_PARAMS;
+    // 通过反射获取当前请求处理函数上定义的路径参数
+    List<dynamic> reflectedParameters = await RouterHelper.listParameters(router);
+    // 合并参数
+    List positionArguments = List()..addAll([context, context.request.req, context.response.res])..addAll(reflectedParameters);
+    router.state.stage = RouterStage.AFTER_REFLECT_PARAMS;
+    return positionArguments;
+  }
+
+  Future _applyConvertResult(Router router, dynamic result, Context context) async {
+    router.state.stage = RouterStage.BEFORE_CONVERT_RESULT;
+    ResponseEntry responseEntry = ResponseEntry.from(result);
+    // 将执行结果赋值给上线文的响应
+    context.response.responseEntry = responseEntry;
+    // 转换后的而结果，类型为String
+    dynamic convertedResult = await router.convert(responseEntry);
+    responseEntry.convertedResult = convertedResult;
+    router.state.stage = RouterStage.AFTER_CONVERT_RESULT;
+  }
+
+  Future _applyRedirect(Router router, Context context, dynamic result, HttpRequest req) async {
+    router.state.stage = RouterStage.BEFORE_REDIRECT;
+    // 根据重定向匹配路由并执行
+    await this.handleRedirect(context, result, req);
+    router.state.stage = RouterStage.AFTER_REDIRECT;
+  }
+
+  Future _applyWrite(Router router, Context context) async {
+    router.state.stage = RouterStage.BEFORE_WRITE;
+    // 写response,完成请求
+    await router.write(context);
+    router.state.stage = RouterStage.AFTER_WRITE;
   }
 
   // 处理重定向
   Future<Context> handleRedirect(Context context, Redirect redirect, HttpRequest req) async {
     // 根据重定向的地址匹配路由
-    Router matchedRouter = await RouterHelper.matchRedirect(redirect, this.application.routers);
-    if (matchedRouter != null) {
-      matchedRouter.mergePathVariables(
-          redirect.isName ? redirect.pathVariables : RouterHelper.applyPathVariables(matchedRouter.path, redirect.path));
+    Router router = await RouterHelper.matchRedirect(redirect, this.application.routers);
+    if (router != null) {
+      router.mergePathVariables(redirect.isName ? redirect.pathVariables : RouterHelper.applyPathVariables(router.path, redirect.path));
       // 根据参数构建请求地址，此地址不是从request.uri.path取到的
-      matchedRouter.requestUri = RouterHelper.reBuildPathByVariables(matchedRouter);
+      router.requestUri = RouterHelper.reBuildPathByVariables(router);
       // 重新设置请求上下文的路由
-      context.setRouter(matchedRouter);
+      context.setRouter(router);
       // 合并当前请求上下文中的attributes数据
       context.mergeAttributes(redirect.attributes);
       // 处理路由请求
-      return this.handleRouter(matchedRouter, context, req);
+      return this.handleRouter(router, context, req);
     } else {
       throw Exception('redirect ${redirect.address} not found.');
     }

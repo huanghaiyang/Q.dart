@@ -18,6 +18,7 @@ import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:Q/src/helpers/HttpMethodHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
 import 'package:Q/src/request/RequestTimeout.dart';
+import 'package:Q/src/request/RouterState.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
 typedef RouterHandleFunction = Future<dynamic> Function(Context, [HttpRequest, HttpResponse]);
@@ -57,6 +58,8 @@ abstract class Router extends BindApplicationAware<Application>
 
   // http请求超时
   RequestTimeout get requestTimeout;
+
+  RouterState get state;
 
   set handlerAdapter(HandlerAdapter handlerAdapter);
 
@@ -107,6 +110,8 @@ class _Router implements Router {
   RequestTimeout timeout_;
 
   RequestTimeout requestTimeout_;
+
+  RouterState _state = RouterState();
 
   _Router(this.path_, this.method_, this.handle_,
       {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_, this.timeout_, this.requestTimeout_}) {
@@ -294,5 +299,10 @@ class _Router implements Router {
   Router setRequestTimeout(RequestTimeout timeout) {
     this.requestTimeout_ = timeout;
     return this;
+  }
+
+  @override
+  RouterState get state {
+    return this._state;
   }
 }
