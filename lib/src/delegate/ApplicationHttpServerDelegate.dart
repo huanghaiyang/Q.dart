@@ -13,6 +13,7 @@ import 'package:Q/src/delegate/AbstractDelegate.dart';
 import 'package:Q/src/delegate/ApplicationLifecycleDelegate.dart';
 import 'package:Q/src/delegate/HttpRequestLifecycleDelegate.dart';
 import 'package:Q/src/helpers/ApplicationHelper.dart';
+import 'package:Q/src/helpers/AsyncHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
 import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
 import 'package:Q/src/request/RequestTimeout.dart';
@@ -130,7 +131,7 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
     // 等待结果处理完成
     dynamic result;
     dynamic handler = Function.apply(matchedRouter.handle, positionArguments);
-    if (matchedRouter.timeout != null && matchedRouter.timeout.timeoutValue > 0) {
+    if (matchedRouter.timeout != null && matchedRouter.timeout.timeoutValue > Duration(milliseconds: 0)) {
       result = await handleRouterTimeout(matchedRouter, handler);
     } else {
       result = await handler;
@@ -175,9 +176,6 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
   // 路由处理超时
   Future<dynamic> handleRouterTimeout(Router router, Future task) async {
     RequestTimeout requestTimeout = router.timeout;
-    Completer completer = Completer();
-    completer.complete(task);
-    Future future = completer.future.timeout(Duration(milliseconds: requestTimeout.timeoutValue), onTimeout: requestTimeout.timeoutResult);
-    return future;
+    return AsyncHelper.timeout(requestTimeout.timeoutValue, task, requestTimeout.timeoutResult);
   }
 }

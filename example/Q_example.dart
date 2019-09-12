@@ -112,7 +112,7 @@ void start() {
     return await Future.delayed(Duration(milliseconds: 10), () {
       return {'timeout': 10};
     });
-  }).setTimeout(RequestTimeout(11, () async {
+  }).setTimeout(RequestTimeout(Duration(milliseconds: 11), () async {
     return {'timeout': 11};
   }));
 
@@ -120,7 +120,7 @@ void start() {
     return await Future.delayed(Duration(milliseconds: 10), () {
       return {'timeout': 10};
     });
-  }).setTimeout(RequestTimeout(5, () async {
+  }).setTimeout(RequestTimeout(Duration(milliseconds: 5), () async {
     return {'timeout': 5};
   }));
 

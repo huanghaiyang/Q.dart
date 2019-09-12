@@ -1,15 +1,15 @@
 typedef RequestTimeoutResult = Future<dynamic> Function();
 
 abstract class RequestTimeout {
-  int get timeoutValue;
+  Duration get timeoutValue;
 
   RequestTimeoutResult get timeoutResult;
 
-  factory RequestTimeout(int timeoutValue, RequestTimeoutResult timeoutResult) => _RequestTimeout(timeoutValue, timeoutResult);
+  factory RequestTimeout(Duration timeoutValue, RequestTimeoutResult timeoutResult) => _RequestTimeout(timeoutValue, timeoutResult);
 }
 
 class _RequestTimeout implements RequestTimeout {
-  final int timeoutValue_;
+  final Duration timeoutValue_;
 
   final RequestTimeoutResult timeoutResult_;
 
@@ -24,7 +24,7 @@ class _RequestTimeout implements RequestTimeout {
   }
 
   @override
-  int get timeoutValue {
+  Duration get timeoutValue {
     return this.timeoutValue_;
   }
 }
