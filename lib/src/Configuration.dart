@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:Q/src/Method.dart';
+import 'package:Q/src/configure/InterceptorConfigure.dart';
 import 'package:Q/src/configure/MultipartConfigure.dart';
 import 'package:Q/src/configure/RouterMappingConfigure.dart';
 
@@ -19,6 +20,8 @@ abstract class Configuration {
 
   RouterMappingConfigure get routerMappingConfigure;
 
+  InterceptorConfigure get interceptorConfigure;
+
   factory Configuration() => _Configuration();
 }
 
@@ -34,6 +37,8 @@ class _Configuration implements Configuration {
   MultipartConfigure _multipartConfigure = MultipartConfigure();
 
   RouterMappingConfigure _routerMappingConfigure = RouterMappingConfigure();
+
+  InterceptorConfigure _interceptorConfigure = InterceptorConfigure();
 
   @override
   List<ContentType> get unSupportedContentTypes {
@@ -58,5 +63,10 @@ class _Configuration implements Configuration {
   @override
   RouterMappingConfigure get routerMappingConfigure {
     return this._routerMappingConfigure;
+  }
+
+  @override
+  InterceptorConfigure get interceptorConfigure {
+    return this._interceptorConfigure;
   }
 }

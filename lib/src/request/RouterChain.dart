@@ -7,6 +7,8 @@ abstract class RouterChain {
 
   int get length;
 
+  int get index;
+
   RouterState get currentState;
 
   RouterState getState(int index);
@@ -19,7 +21,7 @@ abstract class RouterChain {
 }
 
 class _RouterChain implements RouterChain {
-  List<Router> routers;
+  List<Router> routers = List();
 
   RouterChain next_;
 
@@ -62,5 +64,10 @@ class _RouterChain implements RouterChain {
   @override
   set next(RouterChain next) {
     this.next_ = next;
+  }
+
+  @override
+  int get index {
+    return this.length;
   }
 }

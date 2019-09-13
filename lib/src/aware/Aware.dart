@@ -1,6 +1,8 @@
 library q_aware;
 
+export 'package:Q/src/aware/ApplicationConfigurationLoaderAware.dart';
 export 'package:Q/src/aware/ApplicationContextAware.dart';
+export 'package:Q/src/aware/ApplicationEnvironmentResolverAware.dart';
 export 'package:Q/src/aware/ApplicationHttpServerAware.dart';
 export 'package:Q/src/aware/ApplicationLifecycleAware.dart';
 export 'package:Q/src/aware/ApplicationListenerAware.dart';
@@ -17,6 +19,7 @@ export 'package:Q/src/aware/HttpRequestInterceptorChainAware.dart';
 export 'package:Q/src/aware/HttpRequestLifecycleAware.dart';
 export 'package:Q/src/aware/HttpRequestResolverAware.dart';
 export 'package:Q/src/aware/HttpResponseConverterAware.dart';
+export 'package:Q/src/aware/InterceptorContext.dart';
 export 'package:Q/src/aware/InterceptorRegistryAware.dart';
 export 'package:Q/src/aware/PathVariablesAware.dart';
 export 'package:Q/src/aware/ResourceAware.dart';
@@ -24,4 +27,3 @@ export 'package:Q/src/aware/RouteAware.dart';
 export 'package:Q/src/aware/RouterMatchAware.dart';
 export 'package:Q/src/aware/SimplifyRouteAware.dart';
 export 'package:Q/src/aware/StatusAware.dart';
-export 'package:Q/src/aware/StoreService.dart';

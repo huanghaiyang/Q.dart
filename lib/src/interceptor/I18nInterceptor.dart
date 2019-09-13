@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:Q/src/aware/StoreService.dart';
+import 'package:Q/src/aware/InterceptorContext.dart';
 import 'package:Q/src/interceptor/AbstractInterceptor.dart';
 
 class I18nInterceptor implements AbstractInterceptor {
@@ -16,10 +16,10 @@ class I18nInterceptor implements AbstractInterceptor {
   }
 
   @override
-  Future<bool> preHandle(HttpRequest req, HttpResponse res, StoreService storeService) async {
+  Future<bool> preHandle(HttpRequest req, HttpResponse res, InterceptorContext interceptorContext) async {
     return true;
   }
 
   @override
-  void postHandle(HttpRequest req, HttpResponse res, StoreService storeService) {}
+  void postHandle(HttpRequest req, HttpResponse res, InterceptorContext interceptorContext) {}
 }

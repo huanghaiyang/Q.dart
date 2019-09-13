@@ -1,7 +1,10 @@
 library Q;
 
 export 'src/Application.dart';
+export 'src/ApplicationConfigurationLoader.dart';
 export 'src/ApplicationContext.dart';
+export 'src/ApplicationEnvironment.dart';
+export 'src/ApplicationEnvironmentResolver.dart';
 export 'src/ApplicationInitializer.dart';
 export 'src/ApplicationLifecycleListener.dart';
 export 'src/ApplicationStage.dart';

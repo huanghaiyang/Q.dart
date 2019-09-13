@@ -1,6 +1,6 @@
-import 'package:Q/src/aware/StoreService.dart';
+import 'package:Q/src/aware/InterceptorContext.dart';
 
-abstract class HttpRequestInterceptorState extends StoreService<int, dynamic> {
+abstract class HttpRequestInterceptorState extends InterceptorContext<int, dynamic> {
   int get preProcessIndex;
 
   int get postProcessIndex;

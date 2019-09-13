@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:Q/src/aware/StoreService.dart';
+import 'package:Q/src/aware/InterceptorContext.dart';
 import 'package:Q/src/exception/UnSupportedRequestMethodException.dart';
 import 'package:Q/src/helpers/HttpMethodHelper.dart';
 import 'package:Q/src/helpers/UnSupportedMethodHelper.dart';
@@ -20,7 +20,7 @@ class UnSupportedMethodInterceptor implements AbstractInterceptor {
   }
 
   @override
-  Future<bool> preHandle(HttpRequest req, HttpResponse res, StoreService storeService) async {
+  Future<bool> preHandle(HttpRequest req, HttpResponse res, InterceptorContext interceptorContext) async {
     bool passed = await UnSupportedMethodHelper.checkSupported(req);
     if (!passed) {
       res.write(UnSupportedMethodView().toRaw(req, res, extra: {'unSupported': req.method}));
@@ -30,5 +30,5 @@ class UnSupportedMethodInterceptor implements AbstractInterceptor {
   }
 
   @override
-  void postHandle(HttpRequest req, HttpResponse res, StoreService storeService) {}
+  void postHandle(HttpRequest req, HttpResponse res, InterceptorContext interceptorContext) {}
 }
