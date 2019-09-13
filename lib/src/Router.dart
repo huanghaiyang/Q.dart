@@ -18,6 +18,7 @@ import 'package:Q/src/handler/HandlerAdapter.dart';
 import 'package:Q/src/helpers/HttpMethodHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
 import 'package:Q/src/request/RequestTimeout.dart';
+import 'package:Q/src/request/RouterChain.dart';
 import 'package:Q/src/request/RouterState.dart';
 import 'package:path_to_regexp/path_to_regexp.dart';
 
@@ -60,6 +61,8 @@ abstract class Router extends BindApplicationAware<Application>
   RequestTimeout get requestTimeout;
 
   RouterState get state;
+
+  RouterChain get chain;
 
   set handlerAdapter(HandlerAdapter handlerAdapter);
 
@@ -112,6 +115,8 @@ class _Router implements Router {
   RequestTimeout requestTimeout_;
 
   RouterState _state = RouterState();
+
+  RouterChain chain = RouterChain();
 
   _Router(this.path_, this.method_, this.handle_,
       {this.pathVariables_, this.produceType_, this.converter_, this.handlerAdapter_, this.name_, this.timeout_, this.requestTimeout_}) {

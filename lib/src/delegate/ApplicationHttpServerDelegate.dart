@@ -125,6 +125,7 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
 
   // 路由处理，响应请求
   Future<Context> handleRouter(Router router, Context context, HttpRequest req) async {
+    await this._applyRouterChain(router, router);
     List positionArguments = await this._applyReflectParams(router, context);
     dynamic result = await this._applyHandler(router, positionArguments);
     // 如果执行的结果是一个重定向
@@ -135,6 +136,10 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
       await this._applyWrite(router, context);
     }
     return context;
+  }
+
+  Future _applyRouterChain(Router router, Router next) async {
+    router.chain.nextRouter(next);
   }
 
   Future _applyHandler(Router router, List positionArguments) async {
@@ -172,10 +177,10 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
     router.state.stage = RouterStage.AFTER_CONVERT_RESULT;
   }
 
-  Future _applyRedirect(Router router, Context context, dynamic result, HttpRequest req) async {
+  Future _applyRedirect(Router router, Context context, Redirect redirect, HttpRequest req) async {
     router.state.stage = RouterStage.BEFORE_REDIRECT;
     // 根据重定向匹配路由并执行
-    await this.handleRedirect(context, result, req);
+    await this.handleRedirect(context, redirect, req);
     router.state.stage = RouterStage.AFTER_REDIRECT;
   }
 
@@ -190,6 +195,7 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
   Future<Context> handleRedirect(Context context, Redirect redirect, HttpRequest req) async {
     // 根据重定向的地址匹配路由
     Router router = await RouterHelper.matchRedirect(redirect, this.application.routers);
+    await this._applyRouterChain(context.router, router);
     if (router != null) {
       router.mergePathVariables(redirect.isName ? redirect.pathVariables : RouterHelper.applyPathVariables(router.path, redirect.path));
       // 根据参数构建请求地址，此地址不是从request.uri.path取到的

@@ -8,6 +8,7 @@ export 'package:Q/src/exception/NoMatchRequestResolverException.dart';
 export 'package:Q/src/exception/RedirectNotFoundException.dart';
 export 'package:Q/src/exception/RequestParamRequiredException.dart';
 export 'package:Q/src/exception/RouterNotFoundException.dart';
+export 'package:Q/src/exception/RouterNotFoundOfRouterChain.dart';
 export 'package:Q/src/exception/UnExpectedRequestApplicationJsonException.dart';
 export 'package:Q/src/exception/UnKnowRouterMethodException.dart';
 export 'package:Q/src/exception/UnSupportRouterHandlerParameterAnnotationException.dart';
