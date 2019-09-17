@@ -1,6 +1,7 @@
 library Q;
 
 export 'src/Application.dart';
+export 'src/ApplicationBootstrapArgsResolver.dart';
 export 'src/ApplicationConfigurationLoader.dart';
 export 'src/ApplicationContext.dart';
 export 'src/ApplicationEnvironment.dart';
@@ -24,6 +25,7 @@ export 'src/Router.dart';
 export 'src/Sign.dart';
 export 'src/annotation/Annotation.dart';
 export 'src/aware/Aware.dart';
+export 'src/command/Command.dart';
 export 'src/common/Common.dart';
 export 'src/configure/Configure.dart';
 export 'src/converter/Converter.dart';

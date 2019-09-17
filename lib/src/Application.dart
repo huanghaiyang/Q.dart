@@ -18,6 +18,8 @@ abstract class Application extends CloseableAware
         ApplicationHttpServerAware {
   factory Application() => _Application.getInstance();
 
+  factory Application.instance() => _Application.getInstance();
+
   static ApplicationContext getApplicationContext() {
     return Application().applicationContext;
   }
@@ -44,11 +46,17 @@ abstract class Application extends CloseableAware
 
   HttpRequestInterceptorChain get httpRequestInterceptorChain;
 
+  List<String> get arguments;
+
   set httpRequestInterceptorChain(HttpRequestInterceptorChain httpRequestInterceptorChain);
 
   void use(Middleware middleware);
 
   dynamic getDelegate(Type delegateType);
+
+  void args(List<String> arguments);
+
+  void init();
 }
 
 class _Application implements Application {
@@ -59,10 +67,11 @@ class _Application implements Application {
   static _Application getInstance() {
     if (_instance == null) {
       _instance = _Application._();
-      _instance.init();
     }
     return _instance;
   }
+
+  List<String> _arguments;
 
   ApplicationContext applicationContext_;
 
@@ -114,7 +123,8 @@ class _Application implements Application {
 
   ApplicationInterceptorRegistryDelegate applicationInterceptorRegistryDelegate;
 
-  init() {
+  @override
+  void init() {
     this.middleWares_ = List();
     this.routers_ = List();
     this.handlers_ = Map();
@@ -327,4 +337,12 @@ class _Application implements Application {
   @override
   Future<Context> createContext(HttpRequest httpRequest, HttpResponse httpResponse, {HttpRequestInterceptorState interceptorState}) =>
       httpRequestContextDelegate.createContext(httpRequest, httpResponse, interceptorState: interceptorState);
+
+  @override
+  void args(List<String> arguments) {
+    this._arguments = arguments;
+  }
+
+  @override
+  List<String> get arguments => _arguments;
 }

@@ -4,13 +4,12 @@ import 'package:Q/Q.dart';
 
 Application app;
 
-void main() {
-  start();
+void main(List<String> arguments) {
+  start(arguments);
 }
 
-void start() {
-  app = Application();
-
+void start(List<String> arguments) {
+  app = Application()..args(arguments)..init();
   // app.applicationContext.configuration.unSupportedContentTypes.add(ContentType('multipart', 'form-data'));
   // app.applicationContext.configuration.unSupportedMethods.add(HttpMethod.POST);
   // app.applicationContext.configuration.multipartConfigure.maxUploadSize = FileSizeUnits.MB(1);
