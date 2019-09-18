@@ -1,5 +1,5 @@
 abstract class ApplicationBootstrapArgsResolverAware<T, R, S> {
   Future<T> resolve();
 
-  Future<S> define(R commandStructure);
+  Future<S> define(S argParser, R commandStructure);
 }
