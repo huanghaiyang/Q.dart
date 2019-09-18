@@ -16,9 +16,9 @@ abstract class Application extends CloseableAware
         ApplicationListenerAware<AbstractListener, ApplicationListenerType, List>,
         HttpRequestContextAware<Context>,
         ApplicationHttpServerAware {
-  factory Application() => _Application.getInstance();
+  factory Application() => _Application.instance();
 
-  factory Application.instance() => _Application.getInstance();
+  factory Application.instance() => _Application.instance();
 
   static ApplicationContext getApplicationContext() {
     return Application().applicationContext;
@@ -64,7 +64,7 @@ class _Application implements Application {
 
   static _Application _instance;
 
-  static _Application getInstance() {
+  static _Application instance() {
     if (_instance == null) {
       _instance = _Application._();
     }

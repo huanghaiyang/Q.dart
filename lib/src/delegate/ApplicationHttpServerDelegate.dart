@@ -38,7 +38,7 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
 
   // ip/端口监听
   @override
-  void listen(int port,  {InternetAddress internetAddress}) async {
+  void listen(int port, {InternetAddress internetAddress}) async {
     this.application.applicationContext.currentStage = ApplicationStage.STARTING;
     // 默认ipv4
     internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;

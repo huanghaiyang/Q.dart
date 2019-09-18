@@ -11,7 +11,7 @@ class UnSupportedContentTypeInterceptor implements AbstractInterceptor {
 
   static UnSupportedContentTypeInterceptor _instance;
 
-  static UnSupportedContentTypeInterceptor getInstance() {
+  static UnSupportedContentTypeInterceptor instance() {
     if (_instance == null) {
       _instance = UnSupportedContentTypeInterceptor._();
     }

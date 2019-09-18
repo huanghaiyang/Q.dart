@@ -8,7 +8,7 @@ class I18nInterceptor implements AbstractInterceptor {
 
   static I18nInterceptor _instance;
 
-  static I18nInterceptor getInstance() {
+  static I18nInterceptor instance() {
     if (_instance == null) {
       _instance = I18nInterceptor._();
     }

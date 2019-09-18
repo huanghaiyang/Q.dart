@@ -5,7 +5,7 @@ class ApplicationConfigurationLoader extends ApplicationConfigurationLoaderAware
 
   static ApplicationConfigurationLoader _instance;
 
-  static ApplicationConfigurationLoader getInstance() {
+  static ApplicationConfigurationLoader instance() {
     if (_instance == null) {
       _instance = ApplicationConfigurationLoader._();
     }

@@ -6,7 +6,7 @@ class ApplicationEnvironmentResolver implements ApplicationEnvironmentResolverAw
 
   static ApplicationEnvironmentResolver _instance;
 
-  static ApplicationEnvironmentResolver getInstance() {
+  static ApplicationEnvironmentResolver instance() {
     if (_instance == null) {
       _instance = ApplicationEnvironmentResolver._();
     }

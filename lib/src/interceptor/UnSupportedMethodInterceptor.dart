@@ -12,7 +12,7 @@ class UnSupportedMethodInterceptor implements AbstractInterceptor {
 
   static UnSupportedMethodInterceptor _instance;
 
-  static UnSupportedMethodInterceptor getInstance() {
+  static UnSupportedMethodInterceptor instance() {
     if (_instance == null) {
       _instance = UnSupportedMethodInterceptor._();
     }

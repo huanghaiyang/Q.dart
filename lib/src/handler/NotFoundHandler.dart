@@ -8,7 +8,7 @@ class NotFoundHandler implements HandlerAdapter {
 
   static NotFoundHandler _instance;
 
-  static NotFoundHandler getInstance() {
+  static NotFoundHandler instance() {
     if (_instance == null) {
       _instance = NotFoundHandler._();
     }

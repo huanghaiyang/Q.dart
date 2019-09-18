@@ -5,7 +5,7 @@ class StringHttpMessageConverter implements AbstractHttpMessageConverter {
 
   static StringHttpMessageConverter _instance;
 
-  static StringHttpMessageConverter getInstance() {
+  static StringHttpMessageConverter instance() {
     if (_instance == null) {
       _instance = StringHttpMessageConverter._();
     }

@@ -17,7 +17,7 @@ class MultipartResolver implements AbstractResolver {
 
   static MultipartResolver _instance;
 
-  static MultipartResolver getInstance() {
+  static MultipartResolver instance() {
     if (_instance == null) {
       _instance = MultipartResolver._();
     }

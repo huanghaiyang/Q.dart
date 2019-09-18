@@ -32,11 +32,11 @@ abstract class ApplicationInitializer {
 class _ApplicationInitializer implements ApplicationInitializer {
   final Application _application;
 
-  final ApplicationBootstrapArgsResolver applicationBootstrapArgsResolver = ApplicationBootstrapArgsResolver.getInstance();
+  final ApplicationBootstrapArgsResolver applicationBootstrapArgsResolver = ApplicationBootstrapArgsResolver.instance();
 
-  final ApplicationEnvironmentResolver applicationEnvironmentResolver = ApplicationEnvironmentResolver.getInstance();
+  final ApplicationEnvironmentResolver applicationEnvironmentResolver = ApplicationEnvironmentResolver.instance();
 
-  final ApplicationConfigurationLoader applicationConfigurationLoader = ApplicationConfigurationLoader.getInstance();
+  final ApplicationConfigurationLoader applicationConfigurationLoader = ApplicationConfigurationLoader.instance();
 
   _ApplicationInitializer(this._application);
 
@@ -61,29 +61,29 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
   // 初始化默认处理器
   initHandlers() {
-    this.application.addHandler(HttpStatus.notFound, NotFoundHandler.getInstance());
-    this.application.addHandler(HttpStatus.ok, OKHandler.getInstance());
+    this.application.addHandler(HttpStatus.notFound, NotFoundHandler.instance());
+    this.application.addHandler(HttpStatus.ok, OKHandler.instance());
   }
 
   // 初始化转换器
   initConverters() {
-    this.application.addConverter(ContentType.json, JSONHttpMessageConverter.getInstance());
-    this.application.addConverter(ContentType.text, StringHttpMessageConverter.getInstance());
-    this.application.addConverter(ContentType.html, StringHttpMessageConverter.getInstance());
+    this.application.addConverter(ContentType.json, JSONHttpMessageConverter.instance());
+    this.application.addConverter(ContentType.text, StringHttpMessageConverter.instance());
+    this.application.addConverter(ContentType.html, StringHttpMessageConverter.instance());
   }
 
   // 内置拦截器初始化
   initInterceptors() {
     this.application.httpRequestInterceptorChain = HttpRequestInterceptorChain(
-        [I18nInterceptor.getInstance(), UnSupportedContentTypeInterceptor.getInstance(), UnSupportedMethodInterceptor.getInstance()]);
+        [I18nInterceptor.instance(), UnSupportedContentTypeInterceptor.instance(), UnSupportedMethodInterceptor.instance()]);
   }
 
   // 初始化内置解析器
   initResolvers() {
-    this.application.addResolver(ResolverType.MULTIPART, MultipartResolver.getInstance());
-    this.application.addResolver(ResolverType.JSON, JsonResolver.getInstance());
-    this.application.addResolver(ResolverType.FORM_URLENCODED, X3WFormUrlEncodedResolver.getInstance());
-    this.application.addResolver(ResolverType.DEFAULT, DefaultRequestResolver.getInstance());
+    this.application.addResolver(ResolverType.MULTIPART, MultipartResolver.instance());
+    this.application.addResolver(ResolverType.JSON, JsonResolver.instance());
+    this.application.addResolver(ResolverType.FORM_URLENCODED, X3WFormUrlEncodedResolver.instance());
+    this.application.addResolver(ResolverType.DEFAULT, DefaultRequestResolver.instance());
   }
 
   @override

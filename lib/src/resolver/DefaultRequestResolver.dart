@@ -8,7 +8,7 @@ class DefaultRequestResolver implements AbstractResolver {
 
   static DefaultRequestResolver _instance;
 
-  static DefaultRequestResolver getInstance() {
+  static DefaultRequestResolver instance() {
     if (_instance == null) {
       _instance = DefaultRequestResolver._();
     }

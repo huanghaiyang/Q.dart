@@ -11,7 +11,7 @@ class X3WFormUrlEncodedResolver implements AbstractResolver {
 
   static X3WFormUrlEncodedResolver _instance;
 
-  static X3WFormUrlEncodedResolver getInstance() {
+  static X3WFormUrlEncodedResolver instance() {
     if (_instance == null) {
       _instance = X3WFormUrlEncodedResolver._();
     }

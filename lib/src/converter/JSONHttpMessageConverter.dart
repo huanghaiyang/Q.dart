@@ -8,7 +8,7 @@ class JSONHttpMessageConverter implements AbstractHttpMessageConverter {
 
   static JSONHttpMessageConverter _instance;
 
-  static JSONHttpMessageConverter getInstance() {
+  static JSONHttpMessageConverter instance() {
     if (_instance == null) {
       _instance = JSONHttpMessageConverter._();
     }

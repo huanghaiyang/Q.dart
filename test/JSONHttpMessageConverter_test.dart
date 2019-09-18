@@ -6,17 +6,17 @@ void main() {
     JSONHttpMessageConverter jsonHttpMessageConverter;
 
     setUp(() {
-      jsonHttpMessageConverter = JSONHttpMessageConverter.getInstance();
+      jsonHttpMessageConverter = JSONHttpMessageConverter.instance();
     });
 
     test('JSONHttpMessageConverter单例模式', () {
-      expect(jsonHttpMessageConverter, JSONHttpMessageConverter.getInstance());
+      expect(jsonHttpMessageConverter, JSONHttpMessageConverter.instance());
     });
 
     test('JSONHttpMessageConverter转换数据', () async {
-      expect(await JSONHttpMessageConverter.getInstance().convert(1), '1');
-      expect(await JSONHttpMessageConverter.getInstance().convert({'name': 'Q'}), '{"name":"Q"}');
-      expect(await JSONHttpMessageConverter.getInstance().convert(["name", "age"]), '["name","age"]');
+      expect(await JSONHttpMessageConverter.instance().convert(1), '1');
+      expect(await JSONHttpMessageConverter.instance().convert({'name': 'Q'}), '{"name":"Q"}');
+      expect(await JSONHttpMessageConverter.instance().convert(["name", "age"]), '["name","age"]');
     });
 
     tearDown(() {

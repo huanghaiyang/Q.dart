@@ -8,7 +8,7 @@ class OKHandler implements HandlerAdapter {
 
   static OKHandler _instance;
 
-  static OKHandler getInstance() {
+  static OKHandler instance() {
     if (_instance == null) {
       _instance = OKHandler._();
     }
