@@ -13,5 +13,6 @@ class ApplicationEnvironmentResolver implements ApplicationEnvironmentResolverAw
     return _instance;
   }
 
-  Future<ApplicationEnvironment> resolve() async {}
+  @override
+  Future<ApplicationEnvironment> resolve() {}
 }

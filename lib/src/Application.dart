@@ -22,15 +22,15 @@ abstract class Application extends CloseableAware
   factory Application.instance() => _Application.instance();
 
   static ApplicationContext getApplicationContext() {
-    return Application().applicationContext;
+    return Application.instance().applicationContext;
   }
 
   static List<Router> getRouters() {
-    return Application().routers;
+    return List.unmodifiable(Application.instance().routers);
   }
 
   static List<Middleware> getMiddleWares() {
-    return Application().middleWares;
+    return List.unmodifiable(Application.instance().middleWares);
   }
 
   List<Middleware> get middleWares;
@@ -142,6 +142,7 @@ class _Application implements Application {
     applicationHttpServerDelegate = ApplicationHttpServerDelegate(this);
     httpRequestResolverDelegate = HttpRequestResolverDelegate(this);
     applicationInterceptorRegistryDelegate = ApplicationInterceptorRegistryDelegate(this);
+
     this.applicationInitializer_.init();
   }
 

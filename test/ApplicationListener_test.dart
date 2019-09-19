@@ -6,7 +6,9 @@ void main() {
     Application application;
 
     setUp(() {
-      application = Application();
+      application = Application()
+        ..args([])
+        ..init();
     });
 
     test('Application lifecycle listen', () async {

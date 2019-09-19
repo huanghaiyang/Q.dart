@@ -23,7 +23,8 @@ class _ApplicationRouteDelegate implements ApplicationRouteDelegate {
   void route(Router router) {
     this.application_.routers.add(router);
     // 查找路由的响应结果转换器
-    router.converter = this.application_.converters[router.produceType];
+    router.converter = this.application_.converters[
+        router?.produceType != null ? router.produceType : Application.getApplicationContext().configuration.defaultProducedType];
     router.handlerAdapter = this.application_.handlers[HttpStatus.ok];
   }
 

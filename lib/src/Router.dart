@@ -131,9 +131,6 @@ class _Router implements Router {
     if (!RouterHelper.checkPathAvailable(this.path_)) {
       throw InvalidRouterPathException(path: this.path_);
     }
-    if (this.produceType_ == null) {
-      this.produceType_ = Application.getApplicationContext().configuration.defaultProducedType;
-    }
     if (this.pathVariables_ == null) {
       this.pathVariables_ = Map();
     } else {

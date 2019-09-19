@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:Q/src/Application.dart';
 import 'package:Q/src/Context.dart';
 import 'package:Q/src/handler/HandlerAdapter.dart';
 
@@ -19,7 +20,9 @@ class OKHandler implements HandlerAdapter {
   Future<Context> handle(Context context) async {
     HttpResponse httpResponse = context.response.res;
     httpResponse.statusCode = context.response.status;
-    httpResponse.headers.contentType = context.router.produceType;
+    httpResponse.headers.contentType = context?.router?.produceType != null
+        ? context.router.produceType
+        : Application.getApplicationContext().configuration.defaultProducedType;
     httpResponse.write(context.response.responseEntry.convertedResult);
     return context;
   }

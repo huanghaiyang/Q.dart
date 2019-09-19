@@ -13,5 +13,5 @@ class ApplicationConfigurationLoader extends ApplicationConfigurationLoaderAware
   }
 
   @override
-  Future load() {}
+  Future load() async {}
 }

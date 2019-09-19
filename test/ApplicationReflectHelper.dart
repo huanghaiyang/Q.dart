@@ -5,7 +5,9 @@ void main() {
   group('ApplicationReflectHelper', () {
     Application application;
     setUp(() {
-      application = Application();
+      application = Application()
+        ..args([])
+        ..init();
     });
 
     test('ApplicationReflectHelper', () {
