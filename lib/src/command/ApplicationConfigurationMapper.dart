@@ -38,4 +38,10 @@ class ApplicationConfigurationMapper {
     }
     return result;
   }
+
+  static String DOT_STAND_IN_CHAR = '_';
+
+  static String getKey(String key) {
+    return key.replaceAll(RegExp("\\."), ApplicationConfigurationMapper.DOT_STAND_IN_CHAR);
+  }
 }

@@ -1,5 +1,6 @@
 library q_aware;
 
+export 'package:Q/src/aware/ApplicationArgumentsParsedAware.dart';
 export 'package:Q/src/aware/ApplicationBootstrapArgsResolverAware.dart';
 export 'package:Q/src/aware/ApplicationConfigurationLoaderAware.dart';
 export 'package:Q/src/aware/ApplicationContextAware.dart';

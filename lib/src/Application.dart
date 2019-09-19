@@ -15,7 +15,8 @@ abstract class Application extends CloseableAware
         ApplicationContextAware<ApplicationContext>,
         ApplicationListenerAware<AbstractListener, ApplicationListenerType, List>,
         HttpRequestContextAware<Context>,
-        ApplicationHttpServerAware {
+        ApplicationHttpServerAware,
+        ApplicationArgumentsParsedAware<List<String>, List<String>> {
   factory Application() => _Application.instance();
 
   factory Application.instance() => _Application.instance();
@@ -46,15 +47,11 @@ abstract class Application extends CloseableAware
 
   HttpRequestInterceptorChain get httpRequestInterceptorChain;
 
-  List<String> get arguments;
-
   set httpRequestInterceptorChain(HttpRequestInterceptorChain httpRequestInterceptorChain);
 
   void use(Middleware middleware);
 
   dynamic getDelegate(Type delegateType);
-
-  void args(List<String> arguments);
 
   void init();
 }
@@ -70,8 +67,6 @@ class _Application implements Application {
     }
     return _instance;
   }
-
-  List<String> _arguments;
 
   ApplicationContext applicationContext_;
 
@@ -122,6 +117,8 @@ class _Application implements Application {
   HttpRequestResolverDelegate httpRequestResolverDelegate;
 
   ApplicationInterceptorRegistryDelegate applicationInterceptorRegistryDelegate;
+
+  ApplicationArgumentsParsedDelegate applicationArgumentsParsedDelegate;
 
   @override
   void init() {
@@ -313,6 +310,7 @@ class _Application implements Application {
 
   @override
   dynamic getDelegate(Type delegateType) => ApplicationReflectHelper.getDelegate(delegateType, [
+        applicationArgumentsParsedDelegate,
         httpRequestLifecycleDelegate,
         applicationLifecycleDelegate,
         applicationRouteDelegate,
@@ -340,9 +338,13 @@ class _Application implements Application {
 
   @override
   void args(List<String> arguments) {
-    this._arguments = arguments;
+    applicationArgumentsParsedDelegate = ApplicationArgumentsParsedDelegate(this);
+    applicationArgumentsParsedDelegate.args(arguments);
   }
 
   @override
-  List<String> get arguments => _arguments;
+  List<String> get arguments => applicationArgumentsParsedDelegate.arguments;
+
+  @override
+  List<String> get parsedArguments => applicationArgumentsParsedDelegate.parsedArguments;
 }

@@ -1,6 +1,7 @@
 library q_delegate;
 
 export 'package:Q/src/delegate/AbstractDelegate.dart';
+export 'package:Q/src/delegate/ApplicationArgumentsParsedDelegate.dart';
 export 'package:Q/src/delegate/ApplicationClosableDelegate.dart';
 export 'package:Q/src/delegate/ApplicationHttpServerDelegate.dart';
 export 'package:Q/src/delegate/ApplicationInterceptorRegistryDelegate.dart';

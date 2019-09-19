@@ -16,25 +16,30 @@ class ApplicationBootstrapArgsResolver
     return _instance;
   }
 
-  ArgParser argParser;
+  ArgParser _parser;
 
-  ArgResults argResults;
+  ArgResults _parsedResult;
 
   @override
   Future<ArgResults> resolve() async {
-    argParser = ArgParser();
-    argParser = await this.define(argParser, ApplicationConfigurationMapper.instance());
-    argResults = argParser.parse(Application.instance().arguments);
-    return argResults;
+    _parser = ArgParser();
+    _parser = await this.define(_parser, ApplicationConfigurationMapper.instance());
+    _parsedResult = _parser.parse(Application.instance().parsedArguments);
+    return _parsedResult;
   }
 
   @override
-  Future<ArgParser> define(ArgParser argParser, ApplicationConfigurationMapper commandStructure) async {
+  Future<ArgParser> define(ArgParser _parser, ApplicationConfigurationMapper commandStructure) async {
     Map<String, dynamic> map = commandStructure.value();
     for (MapEntry entry in map.entries) {
-      String key = entry.key;
-      argParser.addOption(key);
+      String key = ApplicationConfigurationMapper.getKey(entry.key);
+      _parser.addOption(key);
     }
-    return argParser;
+    return _parser;
+  }
+
+  @override
+  Future<dynamic> get(String key) async {
+    return await _parsedResult[ApplicationConfigurationMapper.getKey(key)];
   }
 }
