@@ -7,6 +7,7 @@ export 'package:Q/src/helpers/AsyncHelper.dart';
 export 'package:Q/src/helpers/HttpMethodHelper.dart';
 export 'package:Q/src/helpers/QueryHelper.dart';
 export 'package:Q/src/helpers/RedirectHelper.dart';
+export 'package:Q/src/helpers/ResourceHelper.dart';
 export 'package:Q/src/helpers/RouterHelper.dart';
 export 'package:Q/src/helpers/TimeoutHelper.dart';
 export 'package:Q/src/helpers/UnSupportedContentTypeHelper.dart';

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/ApplicationBootstrapArgsResolver.dart';
 import 'package:Q/src/ApplicationConfigurationLoader.dart';
+import 'package:Q/src/ApplicationConfigurationResourceResolver.dart';
 import 'package:Q/src/ApplicationContext.dart';
 import 'package:Q/src/ApplicationEnvironmentResolver.dart';
 import 'package:Q/src/converter/JSONHttpMessageConverter.dart';
@@ -36,6 +37,9 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
   final ApplicationEnvironmentResolver applicationEnvironmentResolver = ApplicationEnvironmentResolver.instance();
 
+  final ApplicationConfigurationResourceResolver applicationConfigurationResourceResolver =
+      ApplicationConfigurationResourceResolver.instance();
+
   final ApplicationConfigurationLoader applicationConfigurationLoader = ApplicationConfigurationLoader.instance();
 
   _ApplicationInitializer(this._application);
@@ -51,6 +55,7 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
     await this.applicationBootstrapArgsResolver.resolve();
     await this.applicationEnvironmentResolver.resolve();
+    await this.applicationConfigurationResourceResolver.resolve();
     await this.applicationConfigurationLoader.load();
 
     this.initHandlers();

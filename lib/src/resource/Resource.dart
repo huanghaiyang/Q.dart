@@ -1,0 +1,1 @@
+library q_resource;
