@@ -4,12 +4,13 @@ import 'package:Q/Q.dart';
 
 Application app;
 
-void main(List<String> arguments) {
-  start(arguments);
+void main(List<String> arguments) async {
+  await start(arguments);
 }
 
-void start(List<String> arguments) {
-  app = Application()..args(arguments)..init();
+void start(List<String> arguments) async {
+  app = Application()..args(arguments);
+  await app.init();
   // app.applicationContext.configuration.unSupportedContentTypes.add(ContentType('multipart', 'form-data'));
   // app.applicationContext.configuration.unSupportedMethods.add(HttpMethod.POST);
   // app.applicationContext.configuration.multipartConfigure.maxUploadSize = FileSizeUnits.MB(1);
@@ -123,5 +124,5 @@ void start(List<String> arguments) {
     return {'timeout': 5};
   }));
 
-  app.listen(8081);
+  await app.listen(8081);
 }

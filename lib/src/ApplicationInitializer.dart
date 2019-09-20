@@ -46,12 +46,12 @@ class _ApplicationInitializer implements ApplicationInitializer {
   }
 
   @override
-  init() {
+  void init() async {
     this.createApplicationContext();
 
-    this.applicationBootstrapArgsResolver.resolve();
-    this.applicationEnvironmentResolver.resolve();
-    this.applicationConfigurationLoader.load();
+    await this.applicationBootstrapArgsResolver.resolve();
+    await this.applicationEnvironmentResolver.resolve();
+    await this.applicationConfigurationLoader.load();
 
     this.initHandlers();
     this.initConverters();

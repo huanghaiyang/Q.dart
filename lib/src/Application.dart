@@ -121,7 +121,7 @@ class _Application implements Application {
   ApplicationArgumentsParsedDelegate applicationArgumentsParsedDelegate;
 
   @override
-  void init() {
+  void init() async {
     this.middleWares_ = List();
     this.routers_ = List();
     this.handlers_ = Map();
@@ -143,12 +143,12 @@ class _Application implements Application {
     httpRequestResolverDelegate = HttpRequestResolverDelegate(this);
     applicationInterceptorRegistryDelegate = ApplicationInterceptorRegistryDelegate(this);
 
-    this.applicationInitializer_.init();
+    await this.applicationInitializer_.init();
   }
 
   // ip/端口监听
   @override
-  void listen(int port, {InternetAddress internetAddress}) => applicationHttpServerDelegate.listen(port, internetAddress: internetAddress);
+  void listen(int port, {InternetAddress internetAddress}) async => applicationHttpServerDelegate.listen(port, internetAddress: internetAddress);
 
   // 加入一个中间件
   @override
