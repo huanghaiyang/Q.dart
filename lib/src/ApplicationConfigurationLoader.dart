@@ -1,6 +1,12 @@
-import 'package:Q/src/aware/ApplicationConfigurationLoaderAware.dart';
+import 'dart:io';
 
-class ApplicationConfigurationLoader extends ApplicationConfigurationLoaderAware {
+import 'package:Q/src/ApplicationConfiguration.dart';
+import 'package:Q/src/aware/ApplicationConfigurationLoaderAware.dart';
+import 'package:Q/src/resource/ApplicationConfigurationResource.dart';
+import 'package:yaml/yaml.dart';
+
+class ApplicationConfigurationLoader
+    extends ApplicationConfigurationLoaderAware<List<ApplicationConfigurationResource>, List<ApplicationConfiguration>> {
   ApplicationConfigurationLoader._();
 
   static ApplicationConfigurationLoader _instance;
@@ -13,5 +19,13 @@ class ApplicationConfigurationLoader extends ApplicationConfigurationLoaderAware
   }
 
   @override
-  Future load() async {}
+  Future<List<ApplicationConfiguration>> load(List<ApplicationConfigurationResource> resources) async {
+    List<ApplicationConfiguration> configurations = List();
+    await for (ApplicationConfigurationResource resource in Stream.fromIterable(resources)) {
+      File file = File(resource.filepath);
+      YamlDocument document = loadYamlDocument(await file.readAsString());
+      ApplicationConfiguration configuration = ApplicationConfiguration(Map());
+    }
+    return configurations;
+  }
 }

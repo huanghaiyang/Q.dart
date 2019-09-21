@@ -2,8 +2,10 @@ library Q;
 
 export 'src/Application.dart';
 export 'src/ApplicationBootstrapArgsResolver.dart';
+export 'src/ApplicationConfiguration.dart';
 export 'src/ApplicationConfigurationLoader.dart';
 export 'src/ApplicationConfigurationResourceFinder.dart';
+export 'src/ApplicationConfigurationMixer.dart';
 export 'src/ApplicationConfigurationResourceResolver.dart';
 export 'src/ApplicationContext.dart';
 export 'src/ApplicationEnvironment.dart';

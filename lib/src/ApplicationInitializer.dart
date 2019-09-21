@@ -2,7 +2,9 @@ import 'dart:io';
 
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/ApplicationBootstrapArgsResolver.dart';
+import 'package:Q/src/ApplicationConfiguration.dart';
 import 'package:Q/src/ApplicationConfigurationLoader.dart';
+import 'package:Q/src/ApplicationConfigurationMixer.dart';
 import 'package:Q/src/ApplicationConfigurationResourceResolver.dart';
 import 'package:Q/src/ApplicationContext.dart';
 import 'package:Q/src/ApplicationEnvironmentResolver.dart';
@@ -19,6 +21,7 @@ import 'package:Q/src/resolver/DefaultRequestResolver.dart';
 import 'package:Q/src/resolver/MultipartFormDataResolver.dart';
 import 'package:Q/src/resolver/ResolverType.dart';
 import 'package:Q/src/resolver/X3WFormUrlEncodedResolver.dart';
+import 'package:Q/src/resource/ApplicationConfigurationResource.dart';
 
 abstract class ApplicationInitializer {
   Application get application;
@@ -42,6 +45,8 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
   final ApplicationConfigurationLoader applicationConfigurationLoader = ApplicationConfigurationLoader.instance();
 
+  final ApplicationConfigurationMixer applicationConfigurationMixer = ApplicationConfigurationMixer.instance();
+
   _ApplicationInitializer(this._application);
 
   @override
@@ -55,8 +60,9 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
     await this.applicationBootstrapArgsResolver.resolve();
     await this.applicationEnvironmentResolver.resolve();
-    await this.applicationConfigurationResourceResolver.resolve();
-    await this.applicationConfigurationLoader.load();
+    List<ApplicationConfigurationResource> resources = await this.applicationConfigurationResourceResolver.resolve();
+    List<ApplicationConfiguration> configurations = await this.applicationConfigurationLoader.load(resources);
+    ApplicationConfiguration configuration = await this.applicationConfigurationMixer.mix(configurations);
 
     this.initHandlers();
     this.initConverters();

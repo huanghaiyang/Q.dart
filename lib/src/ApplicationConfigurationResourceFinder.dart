@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:Q/src/aware/ApplicationConfigurationResourceFinderAware.dart';
 import 'package:Q/src/common/ResourceFileTypes.dart';
 import 'package:Q/src/helpers/ResourceHelper.dart';
 import 'package:Q/src/utils/FileUtil.dart';
@@ -8,9 +9,8 @@ final String APPLICATION_CONFIGURATION_RESOURCE_PREFIX = 'application';
 
 final ResourceFileTypes defaultConfigurationResourceFileType = ResourceFileTypes.YML;
 
-abstract class ApplicationConfigurationResourceFinder {
-  Future<Map<String, String>> search(ResourceFileTypes type);
-
+abstract class ApplicationConfigurationResourceFinder
+    implements ApplicationConfigurationResourceFinderAware<ResourceFileTypes, Map<String, String>> {
   factory ApplicationConfigurationResourceFinder() => _ApplicationConfigurationResourceFinder();
 
   Map<String, String> get paths;
