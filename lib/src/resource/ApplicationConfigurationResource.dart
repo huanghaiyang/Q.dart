@@ -21,8 +21,8 @@ class _ApplicationConfigurationResource implements ApplicationConfigurationResou
   final ResourceType type_ = ResourceType.CONFIGURATION;
 
   _ApplicationConfigurationResource(this.name_, this.filepath_, {this.file_}) {
-    assert(this.name_ == null, 'file name should not be null.');
-    assert(this.filepath_ == null, 'file path should not be null.');
+    assert(this.name_ != null, 'file name should not be null.');
+    assert(this.filepath_ != null, 'file path should not be null.');
     if (this.file_ == null) {
       this.file_ = File(this.filepath_);
       if (!this.file_.existsSync()) {

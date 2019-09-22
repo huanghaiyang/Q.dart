@@ -1,3 +1,3 @@
-abstract class ApplicationConfigurationResourceResolverAware<T> {
-  Future<T> resolve();
+abstract class ApplicationConfigurationResourceResolverAware<T, R> {
+  Future<R> resolve(T environment);
 }

@@ -1,5 +1,6 @@
 library Q_exception;
 
+export 'package:Q/src/exception/ApplicationConfigurationResourceNotFoundException.dart';
 export 'package:Q/src/exception/DuplicateInterceptorRegistryException.dart';
 export 'package:Q/src/exception/IllegalArgumentException.dart';
 export 'package:Q/src/exception/InterceptorTimeoutException.dart';

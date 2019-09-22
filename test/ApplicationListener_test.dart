@@ -7,7 +7,7 @@ void main() {
 
     setUp(() {
       application = Application()
-        ..args([])
+        ..args(['--application.environment=dev'])
         ..init();
     });
 

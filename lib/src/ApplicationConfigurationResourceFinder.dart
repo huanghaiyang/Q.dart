@@ -1,7 +1,9 @@
 import 'dart:io';
 
+import 'package:Q/src/ApplicationEnvironment.dart';
 import 'package:Q/src/aware/ApplicationConfigurationResourceFinderAware.dart';
 import 'package:Q/src/common/ResourceFileTypes.dart';
+import 'package:Q/src/exception/ApplicationConfigurationResourceNotFoundException.dart';
 import 'package:Q/src/helpers/ResourceHelper.dart';
 import 'package:Q/src/utils/FileUtil.dart';
 
@@ -10,37 +12,51 @@ final String APPLICATION_CONFIGURATION_RESOURCE_PREFIX = 'application';
 final ResourceFileTypes defaultConfigurationResourceFileType = ResourceFileTypes.YML;
 
 abstract class ApplicationConfigurationResourceFinder
-    implements ApplicationConfigurationResourceFinderAware<ResourceFileTypes, Map<String, String>> {
+    implements ApplicationConfigurationResourceFinderAware<ResourceFileTypes, ApplicationEnvironment, Map<String, String>> {
   factory ApplicationConfigurationResourceFinder() => _ApplicationConfigurationResourceFinder();
 
   Map<String, String> get paths;
 }
 
 class _ApplicationConfigurationResourceFinder implements ApplicationConfigurationResourceFinder {
-  Map<String, String> paths_;
+  Map<String, String> paths_ = Map();
+
+  Map<String, String> allPaths_ = Map();
 
   @override
-  Future<Map<String, String>> search(ResourceFileTypes type) async {
-    type = type == null ? defaultConfigurationResourceFileType : type;
-    Map<String, String> paths = Map();
+  Future<Map<String, String>> search(ResourceFileTypes type, ApplicationEnvironment environment) async {
+    String typename = type == null ? ResourceFileTypesLink.get(defaultConfigurationResourceFileType) : ResourceFileTypesLink.get(type);
+    Map<String, String> result = Map();
     String resourcePath = ResourceHelper.findResourceDirectory();
     Directory resourceDirectory = Directory(resourcePath);
     if (await resourceDirectory.exists()) {
       await for (FileSystemEntity file in resourceDirectory.list(followLinks: false)) {
-        Pattern matcher = RegExp('^${APPLICATION_CONFIGURATION_RESOURCE_PREFIX}(((\\-?)[a-z]+)?)(\\.)${ResourceFileTypesLink.get(type)}');
+        Pattern matcher = RegExp('^${APPLICATION_CONFIGURATION_RESOURCE_PREFIX}(((\\-?)[a-z]+)?)(\\.)${typename}');
         String filePath = file.path;
         String path = '${getFileName(filePath)}.${getPathExtension(filePath)}';
         if (path.contains(matcher)) {
-          paths[path] = filePath;
+          allPaths_[path] = filePath;
         }
       }
     }
-    paths_ = paths;
+    String defaultConfigurationFilename = '${APPLICATION_CONFIGURATION_RESOURCE_PREFIX}.${typename}';
+    if (allPaths_[defaultConfigurationFilename] == null) {
+      throw ApplicationConfigurationResourceNotFoundException(filename: APPLICATION_CONFIGURATION_RESOURCE_PREFIX);
+    } else {
+      result[defaultConfigurationFilename] = allPaths_[defaultConfigurationFilename];
+    }
+    String environmentFilename = '${APPLICATION_CONFIGURATION_RESOURCE_PREFIX}-${environment.value}.${typename}';
+    if (allPaths_[environmentFilename] == null) {
+      throw ApplicationConfigurationResourceNotFoundException(filename: environmentFilename);
+    } else {
+      result[environmentFilename] = allPaths_[environmentFilename];
+    }
+    paths_.addAll(result);
     return paths;
   }
 
   @override
   Map<String, String> get paths {
-    return paths_;
+    return Map.unmodifiable(paths_);
   }
 }

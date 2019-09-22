@@ -1,3 +1,3 @@
-abstract class ApplicationConfigurationResourceFinderAware<T, R> {
-  Future<R> search(T type);
+abstract class ApplicationConfigurationResourceFinderAware<T, S, R> {
+  Future<R> search(T type, S environment);
 }

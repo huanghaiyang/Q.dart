@@ -1,5 +1,5 @@
-abstract class ApplicationEnvironmentResolverAware<T> {
-  Future<T> resolve();
+abstract class ApplicationEnvironmentResolverAware<T, R> {
+  Future<R> resolve(T bootstrapArguments);
 
-  Future<T> get();
+  Future<R> get();
 }

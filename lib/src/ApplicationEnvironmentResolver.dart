@@ -1,9 +1,8 @@
-import 'package:Q/src/ApplicationBootstrapArgsResolver.dart';
 import 'package:Q/src/ApplicationEnvironment.dart';
 import 'package:Q/src/aware/ApplicationEnvironmentResolverAware.dart';
 import 'package:Q/src/command/ApplicationConfigurationContants.dart';
 
-class ApplicationEnvironmentResolver implements ApplicationEnvironmentResolverAware<ApplicationEnvironment> {
+class ApplicationEnvironmentResolver implements ApplicationEnvironmentResolverAware<Map<String, dynamic>, ApplicationEnvironment> {
   ApplicationEnvironmentResolver._();
 
   static ApplicationEnvironmentResolver _instance;
@@ -18,17 +17,13 @@ class ApplicationEnvironmentResolver implements ApplicationEnvironmentResolverAw
   ApplicationEnvironment _environment;
 
   @override
-  Future<ApplicationEnvironment> resolve() async {
-    _environment = ApplicationEnvironment(await ApplicationBootstrapArgsResolver.instance().get(APPLICATION_ENVIRONMENT_VARIABLE));
-    return _environment;
+  Future<ApplicationEnvironment> resolve(bootstrapArguments) async {
+    _environment = ApplicationEnvironment(bootstrapArguments[APPLICATION_ENVIRONMENT_VARIABLE], true);
+    return Future.value(_environment);
   }
 
   @override
   Future<ApplicationEnvironment> get() async {
-    if (_environment != null) {
-      return Future.value(_environment);
-    } else {
-      return this.resolve();
-    }
+    return Future.value(_environment);
   }
 }

@@ -35,6 +35,7 @@ class ApplicationBootstrapArgsResolver
     for (var key in keys) {
       _transformedResult[keyMap[key]] = _parsedResult[key];
     }
+    return transformedResult;
   }
 
   @override
