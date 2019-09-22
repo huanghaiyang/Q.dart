@@ -6,6 +6,7 @@ import 'package:Q/src/ApplicationConfiguration.dart';
 import 'package:Q/src/ApplicationConfigurationLoader.dart';
 import 'package:Q/src/ApplicationConfigurationMixer.dart';
 import 'package:Q/src/ApplicationConfigurationResourceResolver.dart';
+import 'package:Q/src/ApplicationConfigurationResourceValidator.dart';
 import 'package:Q/src/ApplicationContext.dart';
 import 'package:Q/src/ApplicationEnvironment.dart';
 import 'package:Q/src/ApplicationEnvironmentResolver.dart';
@@ -48,6 +49,9 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
   final ApplicationConfigurationMixer applicationConfigurationMixer = ApplicationConfigurationMixer.instance();
 
+  final ApplicationConfigurationResourceValidator applicationConfigurationResourceValidator =
+      ApplicationConfigurationResourceValidator.instance();
+
   _ApplicationInitializer(this._application);
 
   @override
@@ -62,6 +66,7 @@ class _ApplicationInitializer implements ApplicationInitializer {
     Map<String, dynamic> bootstrapArguments = await this.applicationBootstrapArgsResolver.resolve();
     ApplicationEnvironment environment = await this.applicationEnvironmentResolver.resolve(bootstrapArguments);
     List<ApplicationConfigurationResource> resources = await this.applicationConfigurationResourceResolver.resolve(environment);
+    await this.applicationConfigurationResourceValidator.check(resources);
     List<ApplicationConfiguration> configurations = await this.applicationConfigurationLoader.load(resources);
     ApplicationConfiguration configuration = await this.applicationConfigurationMixer.mix(configurations);
 

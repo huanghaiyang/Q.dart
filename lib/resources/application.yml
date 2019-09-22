@@ -1,5 +1,2 @@
 application:
-  environment: dev
-  configuration:
-      interceptor:
-        timeout: 20ms
+  name: 'sample project of Q.dart'

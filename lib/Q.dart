@@ -7,6 +7,7 @@ export 'src/ApplicationConfigurationLoader.dart';
 export 'src/ApplicationConfigurationMixer.dart';
 export 'src/ApplicationConfigurationResourceFinder.dart';
 export 'src/ApplicationConfigurationResourceResolver.dart';
+export 'src/ApplicationConfigurationResourceValidator.dart';
 export 'src/ApplicationContext.dart';
 export 'src/ApplicationEnvironment.dart';
 export 'src/ApplicationEnvironment.dart';

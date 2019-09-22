@@ -14,10 +14,14 @@ class ApplicationConfigurationMapper {
 
   final Map map = Map.unmodifiable({
     'application': {
-      'environment': 's',
+      'name': '',
+      'author': '',
+      'createTime': '',
+      'environment': 'prod',
       'configuration': {
         'interceptor': {'timeout': '10ms'}
-      }
+      },
+      'multipart': {'maxFileUploadSize': '10m'}
     }
   });
 

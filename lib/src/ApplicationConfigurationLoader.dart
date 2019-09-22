@@ -28,9 +28,10 @@ class ApplicationConfigurationLoader
       File file = File(resource.filepath);
       YamlDocument document = loadYamlDocument(await file.readAsString());
       if (document.toString() != NULL_USELESS) {
-        ApplicationConfiguration configuration = ApplicationConfiguration(convertDocument(document));
+        ApplicationConfiguration configuration = ApplicationConfiguration(convertDocument(document), resource.priority);
         configurations.add(configuration);
       }
+      continue;
     }
     return configurations;
   }

@@ -4,11 +4,13 @@ import 'package:Q/src/Resource.dart';
 import 'package:Q/src/utils/FileUtil.dart';
 
 abstract class ApplicationConfigurationResource extends Resource {
-  factory ApplicationConfigurationResource(String name, String filepath) => _ApplicationConfigurationResource(name, filepath);
+  factory ApplicationConfigurationResource(String name, String filepath, {int priority}) =>
+      _ApplicationConfigurationResource(name, filepath, priority_: priority);
 
-  factory ApplicationConfigurationResource.fromPath(String filepath) => _ApplicationConfigurationResource.fromPath(filepath);
+  factory ApplicationConfigurationResource.fromPath(String filepath, {int priority}) =>
+      _ApplicationConfigurationResource.fromPath(filepath, priority: priority);
 
-  factory ApplicationConfigurationResource.fromFile(File file) => _ApplicationConfigurationResource.fromFile(file);
+  int get priority;
 }
 
 class _ApplicationConfigurationResource implements ApplicationConfigurationResource {
@@ -18,9 +20,11 @@ class _ApplicationConfigurationResource implements ApplicationConfigurationResou
 
   File file_;
 
+  final int priority_;
+
   final ResourceType type_ = ResourceType.CONFIGURATION;
 
-  _ApplicationConfigurationResource(this.name_, this.filepath_, {this.file_}) {
+  _ApplicationConfigurationResource(this.name_, this.filepath_, {this.file_, this.priority_}) {
     assert(this.name_ != null, 'file name should not be null.');
     assert(this.filepath_ != null, 'file path should not be null.');
     if (this.file_ == null) {
@@ -31,12 +35,8 @@ class _ApplicationConfigurationResource implements ApplicationConfigurationResou
     }
   }
 
-  factory _ApplicationConfigurationResource.fromPath(String filepath) {
-    return _ApplicationConfigurationResource(getFileName(filepath), filepath);
-  }
-
-  factory _ApplicationConfigurationResource.fromFile(File file) {
-    return _ApplicationConfigurationResource(getFileName(file.path), file.path, file_: file);
+  factory _ApplicationConfigurationResource.fromPath(String filepath, {int priority}) {
+    return _ApplicationConfigurationResource(getFileName(filepath), filepath, priority_: priority);
   }
 
   @override
@@ -52,5 +52,10 @@ class _ApplicationConfigurationResource implements ApplicationConfigurationResou
   @override
   String get name {
     return name_;
+  }
+
+  @override
+  int get priority {
+    return priority_;
   }
 }

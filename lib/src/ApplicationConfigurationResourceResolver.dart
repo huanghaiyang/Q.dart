@@ -4,6 +4,8 @@ import 'package:Q/src/aware/ApplicationConfigurationResourceResolverAware.dart';
 import 'package:Q/src/common/ResourceFileTypes.dart';
 import 'package:Q/src/resource/ApplicationConfigurationResource.dart';
 
+const int DEFAULT_PRIORITY = 5;
+
 class ApplicationConfigurationResourceResolver
     implements ApplicationConfigurationResourceResolverAware<ApplicationEnvironment, List<ApplicationConfigurationResource>> {
   ApplicationConfigurationResourceResolver._();
@@ -23,8 +25,14 @@ class ApplicationConfigurationResourceResolver
   Future<List<ApplicationConfigurationResource>> resolve(ApplicationEnvironment environment) async {
     Map<String, String> paths = await applicationConfigurationResourceFinder.search(ResourceFileTypes.YML, environment);
     List<ApplicationConfigurationResource> resources = List();
-    for (var value in paths.values) {
-      resources.add(ApplicationConfigurationResource.fromPath(value));
+    for (String key in paths.keys) {
+      int priority;
+      if (key == APPLICATION_CONFIGURATION_RESOURCE_PREFIX) {
+        priority = DEFAULT_PRIORITY;
+      } else {
+        priority = DEFAULT_PRIORITY + 5;
+      }
+      resources.add(ApplicationConfigurationResource.fromPath(paths[key], priority: priority));
     }
     return resources;
   }
