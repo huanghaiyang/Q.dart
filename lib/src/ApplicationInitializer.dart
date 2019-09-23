@@ -69,7 +69,6 @@ class _ApplicationInitializer implements ApplicationInitializer {
     await this.applicationConfigurationResourceValidator.check(resources);
     List<ApplicationConfiguration> configurations = await this.applicationConfigurationLoader.load(resources);
     ApplicationConfiguration configuration = await this.applicationConfigurationMixer.mix(configurations);
-
     this.initHandlers();
     this.initConverters();
     this.initInterceptors();

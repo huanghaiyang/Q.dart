@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:Q/src/utils/MapUtil.dart';
 
 class ApplicationConfigurationMapper {
@@ -19,9 +21,16 @@ class ApplicationConfigurationMapper {
       'createTime': '',
       'environment': 'prod',
       'configuration': {
-        'interceptor': {'timeout': '10ms'}
-      },
-      'multipart': {'maxFileUploadSize': '10m'}
+        'interceptor': {'timeout': '10ms'},
+        'multipart': {'maxFileUploadSize': '10m', 'fixNameSuffixIfArray': true, 'defaultUploadTempDirPath': Directory.systemTemp.path},
+        'router': {'defaultMapping': '/'},
+        'request': {
+          'unSupportedContentTypes': [],
+          'unSupportedMethods': [],
+          'defaultProducedType': 'application/json',
+
+        }
+      }
     }
   });
 

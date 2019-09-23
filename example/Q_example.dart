@@ -11,9 +11,6 @@ void main(List<String> arguments) async {
 void start(List<String> arguments) async {
   app = Application()..args(arguments);
   await app.init();
-  // app.applicationContext.configuration.unSupportedContentTypes.add(ContentType('multipart', 'form-data'));
-  // app.applicationContext.configuration.unSupportedMethods.add(HttpMethod.POST);
-  // app.applicationContext.configuration.multipartConfigure.maxUploadSize = FileSizeUnits.MB(1);
 
   // multipart/form-data
   app.post("/multipart-form-data", (Context context,

@@ -5,6 +5,7 @@ import 'package:Q/src/common/ResourceFileTypes.dart';
 import 'package:Q/src/resource/ApplicationConfigurationResource.dart';
 
 const int DEFAULT_PRIORITY = 5;
+const int DEFAULT_PRIORITY_STEP = 5;
 
 class ApplicationConfigurationResourceResolver
     implements ApplicationConfigurationResourceResolverAware<ApplicationEnvironment, List<ApplicationConfigurationResource>> {
@@ -30,7 +31,7 @@ class ApplicationConfigurationResourceResolver
       if (key == APPLICATION_CONFIGURATION_RESOURCE_PREFIX) {
         priority = DEFAULT_PRIORITY;
       } else {
-        priority = DEFAULT_PRIORITY + 5;
+        priority = DEFAULT_PRIORITY + DEFAULT_PRIORITY_STEP;
       }
       resources.add(ApplicationConfigurationResource.fromPath(paths[key], priority: priority));
     }
