@@ -2,6 +2,27 @@ import 'dart:io';
 
 import 'package:Q/src/utils/MapUtil.dart';
 
+final Map _map = Map.unmodifiable({
+  'application': {
+    'name': '',
+    'author': '',
+    'createTime': '',
+    'environment': 'prod',
+    'configuration': {
+      'interceptor': {'timeout': '10ms'},
+      'router': {'defaultMapping': '/'},
+      'request': {
+        'unSupportedContentTypes': [],
+        'unSupportedMethods': [],
+        'multipart': {'maxFileUploadSize': '10m', 'fixNameSuffixIfArray': true, 'defaultUploadTempDirPath': Directory.systemTemp.path},
+      },
+      'response': {
+        'defaultProducedType': 'application/json',
+      }
+    }
+  }
+});
+
 class ApplicationConfigurationMapper {
   ApplicationConfigurationMapper._();
 
@@ -14,29 +35,9 @@ class ApplicationConfigurationMapper {
     return _instance;
   }
 
-  final Map map = Map.unmodifiable({
-    'application': {
-      'name': '',
-      'author': '',
-      'createTime': '',
-      'environment': 'prod',
-      'configuration': {
-        'interceptor': {'timeout': '10ms'},
-        'multipart': {'maxFileUploadSize': '10m', 'fixNameSuffixIfArray': true, 'defaultUploadTempDirPath': Directory.systemTemp.path},
-        'router': {'defaultMapping': '/'},
-        'request': {
-          'unSupportedContentTypes': [],
-          'unSupportedMethods': [],
-          'defaultProducedType': 'application/json',
-
-        }
-      }
-    }
-  });
-
   Map<String, dynamic> value() {
     Map<String, dynamic> result = Map();
-    MapUtil.flatten(Map.from(map), result);
+    MapUtil.flatten(Map.from(_map), result);
     return result;
   }
 
