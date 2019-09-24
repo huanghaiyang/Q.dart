@@ -46,7 +46,7 @@ class ApplicationBootstrapArgsResolver
       String key = ApplicationConfigurationMapper.getKey(originalKey);
       keyMap[key] = originalKey;
       keys.add(key);
-      argParser.addOption(key, defaultsTo: entry.value);
+      argParser.addOption(key, defaultsTo: entry.value.toString());
     }
     return Future.value(argParser);
   }
