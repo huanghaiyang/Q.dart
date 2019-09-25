@@ -1,6 +1,7 @@
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/aware/ApplicationBootstrapArgsResolverAware.dart';
 import 'package:Q/src/command/ApplicationConfigurationMapper.dart';
+import 'package:Q/src/helpers/ValueConvertHelper.dart';
 import 'package:args/args.dart';
 
 class ApplicationBootstrapArgsResolver
@@ -46,7 +47,7 @@ class ApplicationBootstrapArgsResolver
       String key = ApplicationConfigurationMapper.getKey(originalKey);
       keyMap[key] = originalKey;
       keys.add(key);
-      argParser.addOption(key, defaultsTo: entry.value.toString());
+      argParser.addOption(key, defaultsTo: ValueConvertHelper.convertValueToString(entry.value));
     }
     return Future.value(argParser);
   }

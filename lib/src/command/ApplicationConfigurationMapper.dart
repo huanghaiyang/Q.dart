@@ -41,6 +41,11 @@ class ApplicationConfigurationMapper {
     return result;
   }
 
+  Map<String, String> valueTypes() {
+    Map<String, dynamic> value = this.value();
+    // TODO get value types
+  }
+
   static String DOT_STAND_IN_CHAR = '_';
 
   static String getKey(String key) {
