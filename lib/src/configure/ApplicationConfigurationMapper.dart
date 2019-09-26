@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:Q/src/utils/MapUtil.dart';
 
-final Map _map = Map.unmodifiable({
+final Map _defaultConfigurations = Map.unmodifiable({
   'application': {
     'name': '',
     'author': '',
@@ -35,14 +35,14 @@ class ApplicationConfigurationMapper {
     return _instance;
   }
 
-  Map<String, dynamic> value() {
+  Map<String, dynamic> defaults() {
     Map<String, dynamic> result = Map();
-    MapUtil.flatten(Map.from(_map), result);
+    MapUtil.flatten(Map.from(_defaultConfigurations), result);
     return result;
   }
 
-  Map<String, String> valueTypes() {
-    Map<String, dynamic> value = this.value();
+  Map<String, String> regularTypes() {
+    Map<String, dynamic> value = this.defaults();
     // TODO get value types
   }
 

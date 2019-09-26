@@ -1,0 +1,19 @@
+application:
+  name: string
+  author: array|string
+  createTime: string
+  environment: String
+  configuration:
+    interceptor:
+      time: string
+    router:
+      defaultMapping: string
+    request:
+      unSupportedContentTypes: array|string
+      unSupportedMethods: array|string
+      multipart:
+        maxFileUploadSize: string
+        fixNameSuffixIfArray: bool
+        defaultUploadTempDirPath: string
+    response:
+      defaultProducedType: string

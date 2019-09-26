@@ -1,6 +1,6 @@
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/aware/ApplicationArgumentsParsedAware.dart';
-import 'package:Q/src/command/ApplicationConfigurationMapper.dart';
+import 'package:Q/src/configure/ApplicationConfigurationMapper.dart';
 import 'package:Q/src/delegate/AbstractDelegate.dart';
 
 final String EQUAL_TOKEN = '=';

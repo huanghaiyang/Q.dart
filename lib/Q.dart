@@ -32,7 +32,6 @@ export 'src/Router.dart';
 export 'src/Sign.dart';
 export 'src/annotation/Annotation.dart';
 export 'src/aware/Aware.dart';
-export 'src/command/Command.dart';
 export 'src/common/Common.dart';
 export 'src/configure/Configure.dart';
 export 'src/converter/Converter.dart';
