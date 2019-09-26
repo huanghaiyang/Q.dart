@@ -1,19 +1,19 @@
 application:
-  name: string
-  author: array|string
-  createTime: string
-  environment: String
+  name: <string>
+  author: <array|string>
+  createTime: <string>
+  environment: {prod}<String>
   configuration:
     interceptor:
-      time: string
+      time: {10ms}<string>
     router:
-      defaultMapping: string
+      defaultMapping: {/}<string>
     request:
-      unSupportedContentTypes: array|string
-      unSupportedMethods: array|string
+      unSupportedContentTypes: <array|string>
+      unSupportedMethods: <array|string>
       multipart:
-        maxFileUploadSize: string
-        fixNameSuffixIfArray: bool
-        defaultUploadTempDirPath: string
+        maxFileUploadSize: {10m}<string>
+        fixNameSuffixIfArray: {true}<bool>
+        defaultUploadTempDirPath: ${Directory.systemTemp.path}<string>
     response:
-      defaultProducedType: string
+      defaultProducedType: {application/json}<string>
