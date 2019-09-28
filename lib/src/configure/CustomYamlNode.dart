@@ -1,3 +1,5 @@
+import 'package:Q/src/exception/IllegalArgumentException.dart';
+
 abstract class CustomYamlNode {
   String get name;
 
@@ -20,7 +22,14 @@ class _CustomYamlNode implements CustomYamlNode {
 
   final List<String> defaultValues_;
 
-  _CustomYamlNode(this.name_, this.type_, this.defaultValues_, {this.subType_});
+  _CustomYamlNode(this.name_, this.type_, this.defaultValues_, {this.subType_}) {
+    if (this.name_ == null) {
+      throw IllegalArgumentException(message: 'CustomYamlNode property [name] must not be null.');
+    }
+    if (this.type_ == null) {
+      throw IllegalArgumentException(message: 'CustomYamlNode property [type] must not be null.');
+    }
+  }
 
   @override
   String get name {

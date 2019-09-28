@@ -9,6 +9,8 @@ import 'package:Q/src/utils/FileUtil.dart';
 
 final String APPLICATION_CONFIGURATION_RESOURCE_PREFIX = 'application';
 
+final String CONFIGURE_CONFIGURATION_RESOURCE = 'configure';
+
 final ResourceFileTypes defaultConfigurationResourceFileType = ResourceFileTypes.YML;
 
 abstract class ApplicationConfigurationResourceFinder

@@ -1,29 +1,18 @@
 import 'dart:io';
 
-import 'package:Q/src/utils/MapUtil.dart';
+import 'package:Q/src/aware/ApplicationConfigurationMapperAware.dart';
+import 'package:Q/src/configure/CustomYamlNode.dart';
+import 'package:Q/src/configure/CustomYamlPaser.dart';
 
-final Map _defaultConfigurations = Map.unmodifiable({
-  'application': {
-    'name': '',
-    'author': '',
-    'createTime': '',
-    'environment': 'prod',
-    'configuration': {
-      'interceptor': {'timeout': '10ms'},
-      'router': {'defaultMapping': '/'},
-      'request': {
-        'unSupportedContentTypes': [],
-        'unSupportedMethods': [],
-        'multipart': {'maxFileUploadSize': '10m', 'fixNameSuffixIfArray': true, 'defaultUploadTempDirPath': Directory.systemTemp.path},
-      },
-      'response': {
-        'defaultProducedType': 'application/json',
-      }
-    }
+final String _DEFAULT_CONFIGURATION_FILE_NAME = 'configure.yml';
+
+class ApplicationConfigurationMapper implements ApplicationConfigurationMapperAware<List<CustomYamlNode>> {
+  static String DOT_STAND_IN_CHAR = '_';
+
+  static String getKey(String key) {
+    return key.replaceAll(RegExp("\\."), ApplicationConfigurationMapper.DOT_STAND_IN_CHAR);
   }
-});
 
-class ApplicationConfigurationMapper {
   ApplicationConfigurationMapper._();
 
   static ApplicationConfigurationMapper _instance;
@@ -35,20 +24,19 @@ class ApplicationConfigurationMapper {
     return _instance;
   }
 
-  Map<String, dynamic> defaults() {
-    Map<String, dynamic> result = Map();
-    MapUtil.flatten(Map.from(_defaultConfigurations), result);
-    return result;
+  List<CustomYamlNode> nodes;
+
+  @override
+  void init() async {
+    File file = File('${Directory.current.path}/lib/resources/${_DEFAULT_CONFIGURATION_FILE_NAME}');
+    if (await file.exists()) {
+      CustomYamlPaser yamlPaser = CustomYamlPaser(await file.readAsString());
+      nodes = await yamlPaser.parse();
+    }
   }
 
-  Map<String, String> regularTypes() {
-    Map<String, dynamic> value = this.defaults();
-    // TODO get value types
-  }
-
-  static String DOT_STAND_IN_CHAR = '_';
-
-  static String getKey(String key) {
-    return key.replaceAll(RegExp("\\."), ApplicationConfigurationMapper.DOT_STAND_IN_CHAR);
+  @override
+  List<CustomYamlNode> get defaults {
+    return List.unmodifiable(nodes);
   }
 }

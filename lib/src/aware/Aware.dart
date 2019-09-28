@@ -3,6 +3,7 @@ library q_aware;
 export 'package:Q/src/aware/ApplicationArgumentsParsedAware.dart';
 export 'package:Q/src/aware/ApplicationBootstrapArgsResolverAware.dart';
 export 'package:Q/src/aware/ApplicationConfigurationLoaderAware.dart';
+export 'package:Q/src/aware/ApplicationConfigurationMapperAware.dart';
 export 'package:Q/src/aware/ApplicationConfigurationMixerAware.dart';
 export 'package:Q/src/aware/ApplicationConfigurationResourceFinderAware.dart';
 export 'package:Q/src/aware/ApplicationConfigurationResourceResolverAware.dart';

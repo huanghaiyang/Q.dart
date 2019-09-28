@@ -4,11 +4,11 @@ import 'package:Q/src/Resource.dart';
 import 'package:Q/src/utils/FileUtil.dart';
 
 abstract class ApplicationConfigurationResource extends Resource {
-  factory ApplicationConfigurationResource(String name, String filepath, {int priority}) =>
-      _ApplicationConfigurationResource(name, filepath, priority_: priority);
+  factory ApplicationConfigurationResource(String name, String filepath, {int priority, ResourceType type}) =>
+      _ApplicationConfigurationResource(name, filepath, priority_: priority, type_: type);
 
-  factory ApplicationConfigurationResource.fromPath(String filepath, {int priority}) =>
-      _ApplicationConfigurationResource.fromPath(filepath, priority: priority);
+  factory ApplicationConfigurationResource.fromPath(String filepath, {int priority, ResourceType type}) =>
+      _ApplicationConfigurationResource.fromPath(filepath, priority: priority, type: type);
 
   int get priority;
 }
@@ -22,9 +22,9 @@ class _ApplicationConfigurationResource implements ApplicationConfigurationResou
 
   final int priority_;
 
-  final ResourceType type_ = ResourceType.CONFIGURATION;
+  ResourceType type_;
 
-  _ApplicationConfigurationResource(this.name_, this.filepath_, {this.file_, this.priority_}) {
+  _ApplicationConfigurationResource(this.name_, this.filepath_, {this.file_, this.priority_, this.type_}) {
     assert(this.name_ != null, 'file name should not be null.');
     assert(this.filepath_ != null, 'file path should not be null.');
     if (this.file_ == null) {
@@ -33,10 +33,13 @@ class _ApplicationConfigurationResource implements ApplicationConfigurationResou
         throw Exception('file [${this.filepath_}] is not exist.');
       }
     }
+    if (this.type_ == null) {
+      this.type_ = ResourceType.CONFIGURATION;
+    }
   }
 
-  factory _ApplicationConfigurationResource.fromPath(String filepath, {int priority}) {
-    return _ApplicationConfigurationResource(getFileName(filepath), filepath, priority_: priority);
+  factory _ApplicationConfigurationResource.fromPath(String filepath, {int priority, ResourceType type}) {
+    return _ApplicationConfigurationResource(getFileName(filepath), filepath, priority_: priority, type_: type);
   }
 
   @override

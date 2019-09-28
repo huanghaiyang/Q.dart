@@ -1,4 +1,4 @@
-class FileSizeUnits {
+class SizeUnit {
   static int bytes(int bytes) {
     return bytes;
   }
@@ -14,4 +14,6 @@ class FileSizeUnits {
   static int GB(double GB) {
     return (GB * (2 ^ 30)).round();
   }
+
+  static SizeUnit parse(String formattedString) {}
 }

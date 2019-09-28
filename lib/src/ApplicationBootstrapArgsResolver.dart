@@ -1,6 +1,7 @@
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/aware/ApplicationBootstrapArgsResolverAware.dart';
 import 'package:Q/src/configure/ApplicationConfigurationMapper.dart';
+import 'package:Q/src/helpers/CustomYamlPaserHelper.dart';
 import 'package:Q/src/helpers/ValueConvertHelper.dart';
 import 'package:args/args.dart';
 
@@ -41,7 +42,7 @@ class ApplicationBootstrapArgsResolver
 
   @override
   Future<ArgParser> define(ArgParser argParser, ApplicationConfigurationMapper configurationMapper) async {
-    Map<String, dynamic> defaults = configurationMapper.defaults();
+    Map<String, dynamic> defaults = CustomYamlPaserHelper.convertNodesToMap(configurationMapper.defaults);
     for (MapEntry entry in defaults.entries) {
       String originalKey = entry.key;
       String key = ApplicationConfigurationMapper.getKey(originalKey);
