@@ -12,7 +12,7 @@ application:
       unSupportedContentTypes: <array<string>>
       unSupportedMethods: <array<string>>
       multipart:
-        maxFileUploadSize: 10m<sizeunit>
+        maxFileUploadSize: 10mb<sizeunit>
         fixNameSuffixIfArray: true<bool>
         defaultUploadTempDirPath: Directory.systemTemp.path<string>
     response:
