@@ -1,7 +1,7 @@
 enum ResourceFileTypes { YML, PROPERTIES, CONF, XML, JSON }
 
-class ResourceFileTypesLink {
-  static get(ResourceFileTypes type) {
+class ResourceFileTypeHelper {
+  static toExtension(ResourceFileTypes type) {
     switch (type) {
       case ResourceFileTypes.YML:
         return 'yml';

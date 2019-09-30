@@ -60,7 +60,7 @@ class CustomYamlPaserHelper {
 
   static dynamic convertStringTo(String value, CustomYamlNodeValueType type) {
     if (value == null) return null;
-    if(value.isEmpty) return value;
+    if (value.isEmpty) return value;
     switch (type) {
       case CustomYamlNodeValueType.BOOLEAN:
         return value == 'true' ? true : false;

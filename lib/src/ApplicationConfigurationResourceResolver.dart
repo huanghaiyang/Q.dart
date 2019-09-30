@@ -1,7 +1,7 @@
 import 'package:Q/src/ApplicationConfigurationResourceFinder.dart';
 import 'package:Q/src/ApplicationEnvironment.dart';
 import 'package:Q/src/aware/ApplicationConfigurationResourceResolverAware.dart';
-import 'package:Q/src/common/ResourceFileTypes.dart';
+import 'package:Q/src/common/ResourceFileTypeHelper.dart';
 import 'package:Q/src/resource/ApplicationConfigurationResource.dart';
 
 const int DEFAULT_PRIORITY = 5;

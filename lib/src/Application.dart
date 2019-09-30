@@ -148,7 +148,8 @@ class _Application implements Application {
 
   // ip/端口监听
   @override
-  void listen(int port, {InternetAddress internetAddress}) async => applicationHttpServerDelegate.listen(port, internetAddress: internetAddress);
+  void listen(int port, {InternetAddress internetAddress}) async =>
+      applicationHttpServerDelegate.listen(port, internetAddress: internetAddress);
 
   // 加入一个中间件
   @override

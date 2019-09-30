@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:Q/src/ApplicationEnvironment.dart';
 import 'package:Q/src/aware/ApplicationConfigurationResourceFinderAware.dart';
-import 'package:Q/src/common/ResourceFileTypes.dart';
+import 'package:Q/src/common/ResourceFileTypeHelper.dart';
 import 'package:Q/src/exception/ApplicationConfigurationResourceNotFoundException.dart';
 import 'package:Q/src/helpers/ResourceHelper.dart';
 import 'package:Q/src/utils/FileUtil.dart';
@@ -27,7 +27,8 @@ class _ApplicationConfigurationResourceFinder implements ApplicationConfiguratio
 
   @override
   Future<Map<String, String>> search(ResourceFileTypes type, ApplicationEnvironment environment) async {
-    String typename = type == null ? ResourceFileTypesLink.get(defaultConfigurationResourceFileType) : ResourceFileTypesLink.get(type);
+    String typename =
+        type == null ? ResourceFileTypeHelper.toExtension(defaultConfigurationResourceFileType) : ResourceFileTypeHelper.toExtension(type);
     Map<String, String> result = Map();
     String resourcePath = ResourceHelper.findResourceDirectory();
     Directory resourceDirectory = Directory(resourcePath);

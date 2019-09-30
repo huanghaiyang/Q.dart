@@ -8,8 +8,6 @@ abstract class SizeUnit {
 
   SizeUnitType get type;
 
-  String get originalString;
-
   factory SizeUnit(int bytes, SizeUnitType type) => _SizeUnit(bytes, type);
 
   static SizeUnit BYTES(int value) => _SizeUnit.BYTES(value);
@@ -29,8 +27,6 @@ class _SizeUnit implements SizeUnit {
   int bytes_;
 
   SizeUnitType type_;
-
-  String originalString_;
 
   _SizeUnit(this.bytes_, this.type_);
 
@@ -70,6 +66,8 @@ class _SizeUnit implements SizeUnit {
         return SizeUnit.TB(double.parse(value));
       case SizeUnitType.BYTES:
         return SizeUnit.BYTES(int.parse(value));
+      default:
+        return null;
     }
   }
 
@@ -84,23 +82,21 @@ class _SizeUnit implements SizeUnit {
   }
 
   @override
-  String get originalString {
-    return originalString_;
-  }
-
-  @override
   String toString() {
+    String suffix = SizeUnitHelper.toStr(this.type_);
     switch (type_) {
       case SizeUnitType.KB:
-        return '${bytes_ / (2 ^ 10)}kb';
+        return '${bytes_ / (2 ^ 10)}${suffix}';
       case SizeUnitType.MB:
-        return '${bytes_ / (2 ^ 20)}mb';
+        return '${bytes_ / (2 ^ 20)}${suffix}';
       case SizeUnitType.GB:
-        return '${bytes_ / (2 ^ 30)}gb';
+        return '${bytes_ / (2 ^ 30)}${suffix}';
       case SizeUnitType.TB:
-        return '${bytes_ / (2 ^ 40)}tb';
+        return '${bytes_ / (2 ^ 40)}${suffix}';
       case SizeUnitType.BYTES:
-        return '${bytes_}bytes';
+        return '${bytes_}${suffix}';
+      default:
+        return this.bytes_.toString();
     }
   }
 }
