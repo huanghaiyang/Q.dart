@@ -66,13 +66,14 @@ class _ApplicationInitializer implements ApplicationInitializer {
   void init() async {
     this.createApplicationContext();
 
-    await applicationConfigurationMapper.init();
+    ApplicationConfiguration defaultBootstrapConfiguration = await applicationConfigurationMapper.init();
     Map<String, dynamic> bootstrapArguments = await this.applicationBootstrapArgsResolver.resolve();
     ApplicationEnvironment environment = await this.applicationEnvironmentResolver.resolve(bootstrapArguments);
     List<ApplicationConfigurationResource> resources = await this.applicationConfigurationResourceResolver.resolve(environment);
     await this.applicationConfigurationResourceValidator.check(resources);
     List<ApplicationConfiguration> configurations = await this.applicationConfigurationLoader.load(resources);
-    ApplicationConfiguration configuration = await this.applicationConfigurationMixer.mix(configurations);
+    ApplicationConfiguration officialConfiguration =
+        await this.applicationConfigurationMixer.mix(configurations, defaultBootstrapConfiguration: defaultBootstrapConfiguration);
 
     this.initHandlers();
     this.initConverters();

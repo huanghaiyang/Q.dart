@@ -17,9 +17,13 @@ class ApplicationConfigurationMixer
   }
 
   @override
-  Future<ApplicationConfiguration> mix(List<ApplicationConfiguration> configurations) async {
+  Future<ApplicationConfiguration> mix(List<ApplicationConfiguration> configurations,
+      {ApplicationConfiguration defaultBootstrapConfiguration}) async {
     configurations.sort((prev, next) => prev.priority - next.priority);
     Map<String, dynamic> values = Map();
+    if (defaultBootstrapConfiguration != null) {
+      values.addAll(defaultBootstrapConfiguration.values);
+    }
     for (ApplicationConfiguration configuration in configurations) {
       values.addAll(configuration.values);
     }

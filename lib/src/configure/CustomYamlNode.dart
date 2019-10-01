@@ -9,6 +9,10 @@ abstract class CustomYamlNode {
 
   List<String> get defaultValues;
 
+  dynamic get value;
+
+  set value(dynamic value);
+
   factory CustomYamlNode(String name, String type, List<String> defaultValues, {String subType}) =>
       _CustomYamlNode(name, type, defaultValues, subType_: subType);
 }
@@ -21,6 +25,8 @@ class _CustomYamlNode implements CustomYamlNode {
   final String subType_;
 
   final List<String> defaultValues_;
+
+  dynamic value_;
 
   _CustomYamlNode(this.name_, this.type_, this.defaultValues_, {this.subType_}) {
     if (this.name_ == null) {
@@ -49,5 +55,15 @@ class _CustomYamlNode implements CustomYamlNode {
   @override
   String get type {
     return type_;
+  }
+
+  @override
+  dynamic get value {
+    return value_;
+  }
+
+  @override
+  set value(dynamic value) {
+    value_ = value;
   }
 }

@@ -38,23 +38,20 @@ class CustomYamlPaserHelper {
     return MapEntry(type, subType);
   }
 
-  static Map<String, dynamic> convertNodesToMap(List<CustomYamlNode> nodes) {
-    Map<String, dynamic> result = Map();
-    nodes.forEach((CustomYamlNode node) {
-      CustomYamlNodeValueType type = CustomYamlNodeConverter.toType(node.type);
-      CustomYamlNodeValueType subType = CustomYamlNodeConverter.toType(node.subType);
-      result[node.name] = convertStringListTo(node.defaultValues, type, subType);
-    });
-    return result;
+  static dynamic reflectNodeValue(CustomYamlNode node) {
+    CustomYamlNodeValueType type = CustomYamlNodeConverter.toType(node.type);
+    CustomYamlNodeValueType subType = CustomYamlNodeConverter.toType(node.subType);
+    dynamic value = convertStringListTo(node.defaultValues, type, subType);
+    return value;
   }
 
   static dynamic convertStringListTo(List<String> values, CustomYamlNodeValueType type, CustomYamlNodeValueType subType) {
     if (type != CustomYamlNodeValueType.ARRAY) {
       return convertStringTo(values.first, type);
     } else {
-      return values.map((value) {
+      return List.from(values.map((value) {
         return convertStringTo(value, subType);
-      });
+      }));
     }
   }
 

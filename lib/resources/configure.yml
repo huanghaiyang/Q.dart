@@ -2,7 +2,7 @@ application:
   name: <string>
   author: <array<string>>
   createTime: <datetime>
-  environment: prod<String>
+  environment: prod<string>
   configuration:
     interceptor:
       time: 10ms<timeunit>

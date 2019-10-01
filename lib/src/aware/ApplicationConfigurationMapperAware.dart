@@ -1,5 +1,9 @@
-abstract class ApplicationConfigurationMapperAware<R> {
-  void init();
+abstract class ApplicationConfigurationMapperAware<R, S, T> {
+  Future<T> init();
 
-  R get defaults;
+  R get nodes;
+
+  S get values;
+
+  bool get isParsed;
 }
