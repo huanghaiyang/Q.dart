@@ -64,4 +64,9 @@ class ApplicationConfigurationMapper
   bool get isParsed {
     return _isParsed;
   }
+
+  @override
+  dynamic get(String key) {
+    return this.values_[key];
+  }
 }

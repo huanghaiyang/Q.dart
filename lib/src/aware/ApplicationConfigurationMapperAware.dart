@@ -6,4 +6,6 @@ abstract class ApplicationConfigurationMapperAware<R, S, T> {
   S get values;
 
   bool get isParsed;
+
+  dynamic get(String key);
 }

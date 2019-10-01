@@ -1,6 +1,8 @@
 import 'dart:io';
 
-abstract class MultipartConfigure {
+import 'package:Q/src/configure/AbstractConfigure.dart';
+
+abstract class MultipartConfigure extends AbstractConfigure {
   factory MultipartConfigure() => _MultipartConfigure();
 
   bool get fixNameSuffixIfArray;
@@ -65,4 +67,7 @@ class _MultipartConfigure implements MultipartConfigure {
       return size > this.maxUploadSize;
     }
   }
+
+  @override
+  Future<dynamic> init() async {}
 }

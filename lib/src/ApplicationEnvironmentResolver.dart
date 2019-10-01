@@ -1,6 +1,6 @@
 import 'package:Q/src/ApplicationEnvironment.dart';
 import 'package:Q/src/aware/ApplicationEnvironmentResolverAware.dart';
-import 'package:Q/src/configure/ApplicationConfigurationContants.dart';
+import 'package:Q/src/configure/ApplicationConfigurationNames.dart';
 
 class ApplicationEnvironmentResolver implements ApplicationEnvironmentResolverAware<Map<String, dynamic>, ApplicationEnvironment> {
   ApplicationEnvironmentResolver._();

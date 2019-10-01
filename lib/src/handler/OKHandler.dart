@@ -22,7 +22,7 @@ class OKHandler implements HandlerAdapter {
     httpResponse.statusCode = context.response.status;
     httpResponse.headers.contentType = context?.router?.produceType != null
         ? context.router.produceType
-        : Application.getApplicationContext().configuration.defaultProducedType;
+        : Application.getApplicationContext().configuration.httpResponseConfigure.defaultProducedType;
     httpResponse.write(context.response.responseEntry.convertedResult);
     return context;
   }

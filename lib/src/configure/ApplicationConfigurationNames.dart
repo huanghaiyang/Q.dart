@@ -1,0 +1,12 @@
+final String APPLICATION_ENVIRONMENT_VARIABLE = 'application.environment';
+final String APPLICATION_NAME = 'application.name';
+final String APPLICATION_AUTHORS = 'application.author';
+final String APPLICATION_CREATE_TIME = 'application.createTime';
+final String APPLICATION_INTERCEPTOR_TIMEOUT = 'application.interceptor.timeout';
+final String APPLICATION_ROUTER_DEFAULT_MAPPING = 'applixation.router.defaultMapping';
+final String APPLICATION_REQUEST_UN_SUPPORTED_CONTENT_TYPES = 'application.request.unSpportedContentTypes';
+final String APPLICATION_REQUEST_UN_SUPPORTED_METHODS = 'application.request.unSupportedMethods';
+final String APPLICATION_MULTIPART_MAX_FILE_UPLOAD_SIZE = 'application.multipart.maxFileUploadSize';
+final String APPLICATION_MULTIPART_FIX_NAME_SUFFIX_IF_ARRAY = 'application.multipart.fixNameSuffixIfArray';
+final String APPLICATION_MULTIPART_DEFAULT_UPLOAD_TEMP_DIR_PATH = 'application.multipart.defaultUploadTempDirPath';
+final String APPLICATION_RESPONSE_DEFAULT_PRODUCED_TYPE = 'application.response.defaultProducedType';

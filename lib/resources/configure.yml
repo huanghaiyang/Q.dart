@@ -5,7 +5,7 @@ application:
   environment: prod<string>
   configuration:
     interceptor:
-      time: 10ms<timeunit>
+      timeout: 10ms<timeunit>
     router:
       defaultMapping: /<string>
     request:

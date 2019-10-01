@@ -1,26 +1,23 @@
-import 'dart:io';
-
-import 'package:Q/src/Method.dart';
+import 'package:Q/src/ApplicationConfiguration.dart';
+import 'package:Q/src/configure/HttpRequestConfigure.dart';
+import 'package:Q/src/configure/HttpResponseConfigure.dart';
 import 'package:Q/src/configure/InterceptorConfigure.dart';
 import 'package:Q/src/configure/MultipartConfigure.dart';
 import 'package:Q/src/configure/RouterMappingConfigure.dart';
 
 // 应用程序配置
 abstract class Configuration {
-  // 当前不支持的请求类型
-  List<ContentType> get unSupportedContentTypes;
-
-  // 当前支持的请求类型
-  List<HttpMethod> get unSupportedMethods;
-
-  // 默认返回结果的类型
-  ContentType get defaultProducedType;
-
   MultipartConfigure get multipartConfigure;
 
   RouterMappingConfigure get routerMappingConfigure;
 
   InterceptorConfigure get interceptorConfigure;
+
+  HttpRequestConfigure get httpRequestConfigure;
+
+  HttpResponseConfigure get httpResponseConfigure;
+
+  Future<dynamic> init(ApplicationConfiguration applicationConfiguration);
 
   factory Configuration() => _Configuration();
 }
@@ -28,32 +25,15 @@ abstract class Configuration {
 class _Configuration implements Configuration {
   _Configuration();
 
-  List<ContentType> unSupportedContentTypes_ = List();
-
-  List<HttpMethod> unSupportedMethods_ = List();
-
-  ContentType defaultProducedType_ = ContentType.json;
-
   MultipartConfigure _multipartConfigure = MultipartConfigure();
 
   RouterMappingConfigure _routerMappingConfigure = RouterMappingConfigure();
 
   InterceptorConfigure _interceptorConfigure = InterceptorConfigure();
 
-  @override
-  List<ContentType> get unSupportedContentTypes {
-    return this.unSupportedContentTypes_;
-  }
+  HttpRequestConfigure _httpRequestConfigure = HttpRequestConfigure();
 
-  @override
-  ContentType get defaultProducedType {
-    return this.defaultProducedType_;
-  }
-
-  @override
-  List<HttpMethod> get unSupportedMethods {
-    return this.unSupportedMethods_;
-  }
+  HttpResponseConfigure _httpResponseConfigure = HttpResponseConfigure();
 
   @override
   MultipartConfigure get multipartConfigure {
@@ -68,5 +48,26 @@ class _Configuration implements Configuration {
   @override
   InterceptorConfigure get interceptorConfigure {
     return this._interceptorConfigure;
+  }
+
+  @override
+  HttpRequestConfigure get httpRequestConfigure {
+    return this._httpRequestConfigure;
+  }
+
+  @override
+  HttpResponseConfigure get httpResponseConfigure {
+    return this._httpResponseConfigure;
+  }
+
+  @override
+  Future<dynamic> init(ApplicationConfiguration applicationConfiguration) async {
+    await Future.wait([
+      _multipartConfigure.init(),
+      _routerMappingConfigure.init(),
+      _httpResponseConfigure.init(),
+      _httpRequestConfigure.init(),
+      _interceptorConfigure.init()
+    ]);
   }
 }
