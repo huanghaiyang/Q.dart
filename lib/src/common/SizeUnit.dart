@@ -1,5 +1,6 @@
 import 'package:Q/src/common/SizeUnitHelper.dart';
 import 'package:Q/src/common/SizeUnitType.dart';
+import 'package:Q/src/exception/SizeUnitParseException.dart';
 
 final Pattern _SIZE_UNIT_MATCHER = RegExp('^([0-9]+)(([mkgt]b))');
 
@@ -53,6 +54,9 @@ class _SizeUnit implements SizeUnit {
   static SizeUnit parse(String formattedString) {
     formattedString = formattedString.trim();
     Match match = _SIZE_UNIT_MATCHER.matchAsPrefix(formattedString);
+    if (match == null) {
+      throw SizeUnitParseException(formattedString: formattedString);
+    }
     String value = match.group(1);
     String type = match.group(2);
     switch (SizeUnitHelper.toType(type)) {

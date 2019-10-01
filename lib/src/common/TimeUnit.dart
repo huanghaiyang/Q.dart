@@ -1,7 +1,8 @@
 import 'package:Q/src/common/TimeUnitType.dart';
 import 'package:Q/src/common/TimeUnitTypeHelper.dart';
+import 'package:Q/src/exception/TimeUnitParseException.dart';
 
-final Pattern _TIME_UNIT_MATCHER = RegExp('^([0-9]+)((us|ms|s|m|d))');
+final Pattern _TIME_UNIT_MATCHER = RegExp('^([0-9]+)((us|ms|s|m|d|h))');
 
 abstract class TimeUnit {
   factory TimeUnit(int value, TimeUnitType type) => _TimeUnit(value, type);
@@ -17,6 +18,8 @@ abstract class TimeUnit {
   static TimeUnit Microseconds(int value) => _TimeUnit.Microseconds(value);
 
   static TimeUnit Seconds(int value) => _TimeUnit.Seconds(value);
+
+  static TimeUnit Hours(int value) => _TimeUnit.Hours(value);
 
   Duration get duration;
 
@@ -46,9 +49,16 @@ class _TimeUnit implements TimeUnit {
     return TimeUnit(value, TimeUnitType.SECONDS);
   }
 
+  static TimeUnit Hours(int value) {
+    return TimeUnit(value, TimeUnitType.HOURS);
+  }
+
   static TimeUnit parse(String formattedString) {
     formattedString = formattedString.trim();
     Match match = _TIME_UNIT_MATCHER.matchAsPrefix(formattedString);
+    if (match == null) {
+      throw TimeUnitParseException(formattedString: formattedString);
+    }
     String value = match.group(1);
     String type = match.group(2);
     switch (TimeUnitTypeHelper.toType(type)) {
@@ -62,6 +72,8 @@ class _TimeUnit implements TimeUnit {
         return TimeUnit.Microseconds(int.parse(value));
       case TimeUnitType.MILLISECONDS:
         return TimeUnit.Milliseconds(int.parse(value));
+      case TimeUnitType.HOURS:
+        return TimeUnit.Hours(int.parse(value));
       default:
         return null;
     }
@@ -86,6 +98,9 @@ class _TimeUnit implements TimeUnit {
         break;
       case TimeUnitType.MICROSECONDS:
         this.duration_ = Duration(microseconds: this.value_);
+        break;
+      case TimeUnitType.HOURS:
+        this.duration_ = Duration(hours: this.value_);
         break;
       default:
         break;

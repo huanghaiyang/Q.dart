@@ -1,5 +1,5 @@
 import 'package:Q/src/Router.dart';
-import 'package:Q/src/exception/RouterNotFoundOfRouterChain.dart';
+import 'package:Q/src/exception/RouterNotFoundOfRouterChainException.dart';
 import 'package:Q/src/request/RouterState.dart';
 
 abstract class RouterChain {
@@ -51,7 +51,7 @@ class _RouterChain implements RouterChain {
       return null;
     }
     if (index > this.length - 1) {
-      throw RouterNotFoundOfRouterChain(index: index);
+      throw RouterNotFoundOfRouterChainException(index: index);
     }
     return this.routers[index].state;
   }
