@@ -1,5 +1,8 @@
+import 'dart:io';
+
 import 'package:Q/src/common/SizeUnit.dart';
 import 'package:Q/src/common/TimeUnit.dart';
+import 'package:Q/src/configure/ApplicationContextVariableNames.dart';
 import 'package:Q/src/configure/CustomYamlNode.dart';
 import 'package:Q/src/configure/CustomYamlNodeConverter.dart';
 import 'package:Q/src/configure/CustomYamlNodeValueType.dart';
@@ -7,6 +10,7 @@ import 'package:Q/src/configure/CustomYamlNodeValueType.dart';
 final String COLLECTION_WTF = 'array';
 final String BASE_TYPE_REG = 'string|datetime|timeunit|sizeunit|bool|int|double';
 final Pattern TYPE_MATCHER = RegExp('<(((${COLLECTION_WTF})<(${BASE_TYPE_REG})>)|(${BASE_TYPE_REG}))>', caseSensitive: false);
+final Pattern GLOBAL_CONFIGURATION_VARIABLE_MATCHER = RegExp('\\\$');
 
 class CustomYamlPaserHelper {
   static List<String> parseDefaultValues(String value) {
@@ -14,7 +18,11 @@ class CustomYamlPaserHelper {
     int index = value.indexOf(RegExp('<'));
     String valueStr = value.substring(0, index);
     valueStr.trim().split(RegExp(',')).forEach((str) {
-      defaultValues.add(str.trim());
+      String value = str.trim();
+      if (value.startsWith(GLOBAL_CONFIGURATION_VARIABLE_MATCHER)) {
+        value = convertToVariable(value.replaceFirst(GLOBAL_CONFIGURATION_VARIABLE_MATCHER, ''));
+      }
+      defaultValues.add(value);
     });
     return defaultValues;
   }
@@ -76,5 +84,13 @@ class CustomYamlPaserHelper {
       case CustomYamlNodeValueType.ARRAY:
         return null;
     }
+  }
+
+  static String convertToVariable(String value) {
+    switch (value) {
+      case ApplicationContextVariableNames.SYSTEM_TEMP_DIR_PATH:
+        return Directory.current.path;
+    }
+    return value;
   }
 }

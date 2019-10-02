@@ -14,6 +14,6 @@ application:
       multipart:
         maxFileUploadSize: 10mb<sizeunit>
         fixNameSuffixIfArray: true<bool>
-        defaultUploadTempDirPath: Directory.systemTemp.path<string>
+        defaultUploadTempDirPath: $system_temp_dir_path<string>
     response:
       defaultProducedType: application/json<string>

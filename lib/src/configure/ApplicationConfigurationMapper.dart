@@ -5,7 +5,7 @@ import 'package:Q/src/aware/ApplicationConfigurationMapperAware.dart';
 import 'package:Q/src/configure/CustomYamlNode.dart';
 import 'package:Q/src/configure/CustomYamlPaser.dart';
 import 'package:Q/src/exception/ApplicationConfigurationResourceNotFoundException.dart';
-import 'package:Q/src/helpers/CustomYamlPaserHelper.dart';
+import 'package:Q/src/configure/CustomYamlPaserHelper.dart';
 
 final String _DEFAULT_CONFIGURATION_FILE_NAME = 'configure.yml';
 
