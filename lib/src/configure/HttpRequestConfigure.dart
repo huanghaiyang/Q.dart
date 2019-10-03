@@ -1,7 +1,10 @@
 import 'dart:io';
 
+import 'package:Q/src/ApplicationConfiguration.dart';
 import 'package:Q/src/Method.dart';
 import 'package:Q/src/configure/AbstractConfigure.dart';
+import 'package:Q/src/configure/ApplicationConfigurationNames.dart';
+import 'package:Q/src/helpers/HttpMethodHelper.dart';
 
 abstract class HttpRequestConfigure extends AbstractConfigure {
   factory HttpRequestConfigure() => _HttpRequestConfigure();
@@ -20,14 +23,21 @@ class _HttpRequestConfigure implements HttpRequestConfigure {
 
   @override
   List<ContentType> get unSupportedContentTypes {
-    return this.unSupportedContentTypes_;
+    return List.unmodifiable(this.unSupportedContentTypes_);
   }
 
   @override
   List<HttpMethod> get unSupportedMethods {
-    return this.unSupportedMethods_;
+    return List.unmodifiable(this.unSupportedMethods_);
   }
 
   @override
-  Future<dynamic> init() async {}
+  Future<dynamic> init(ApplicationConfiguration applicationConfiguration) async {
+    unSupportedContentTypes_.addAll(List.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_SUPPORTED_CONTENT_TYPES)).map((value) {
+      return ContentType.parse(value.toString());
+    }));
+    unSupportedMethods_.addAll(List.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_SUPPORTED_METHODS)).map((value) {
+      return HttpMethodHelper.fromMethod(value.toString().toUpperCase());
+    }));
+  }
 }

@@ -15,8 +15,8 @@ class _InterceptorTimeout implements InterceptorTimeout {
   final InterceptorTimeoutResult timeoutResult_;
 
   _InterceptorTimeout(this.timeoutValue_, this.timeoutResult_) {
-    assert(this.timeoutValue == null, 'timeoutValue must not be null, it should be an integer value.');
-    assert(this.timeoutResult == null, 'timeoutResult must not be null, it should be an Function.');
+    assert(this.timeoutValue != null, 'timeoutValue must not be null, it should be an [Duration].');
+    assert(this.timeoutResult != null, 'timeoutResult must not be null, it should be an [Function].');
   }
 
   @override

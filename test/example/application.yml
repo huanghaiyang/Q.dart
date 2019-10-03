@@ -1,5 +1,5 @@
 application:
   environment: dev
   configuration:
-      interceptor:
-        timeout: 20ms
+    interceptor:
+      timeout: 20ms

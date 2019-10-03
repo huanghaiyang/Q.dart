@@ -4,6 +4,8 @@ abstract class ApplicationConfiguration {
   Map<String, dynamic> get values;
 
   int get priority;
+
+  dynamic get(String key);
 }
 
 class _ApplicationConfiguration implements ApplicationConfiguration {
@@ -21,5 +23,10 @@ class _ApplicationConfiguration implements ApplicationConfiguration {
   @override
   int get priority {
     return priority_;
+  }
+
+  @override
+  dynamic get(String key) {
+    return values_[key];
   }
 }

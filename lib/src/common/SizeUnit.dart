@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:Q/src/common/SizeUnitHelper.dart';
 import 'package:Q/src/common/SizeUnitType.dart';
 import 'package:Q/src/exception/SizeUnitParseException.dart';
@@ -36,19 +38,19 @@ class _SizeUnit implements SizeUnit {
   }
 
   static SizeUnit KB(double value) {
-    return SizeUnit((value * (2 ^ 10)).round(), SizeUnitType.KB);
+    return SizeUnit((value * (pow(2, 10))).round(), SizeUnitType.KB);
   }
 
   static SizeUnit MB(double value) {
-    return SizeUnit((value * (2 ^ 20)).round(), SizeUnitType.MB);
+    return SizeUnit((value * (pow(2, 20))).round(), SizeUnitType.MB);
   }
 
   static SizeUnit GB(double value) {
-    return SizeUnit((value * (2 ^ 30)).round(), SizeUnitType.GB);
+    return SizeUnit((value * (pow(2, 30))).round(), SizeUnitType.GB);
   }
 
   static SizeUnit TB(double value) {
-    return SizeUnit((value * (2 ^ 40)).round(), SizeUnitType.TB);
+    return SizeUnit((value * (pow(2, 40))).round(), SizeUnitType.TB);
   }
 
   static SizeUnit parse(String formattedString) {
@@ -90,13 +92,13 @@ class _SizeUnit implements SizeUnit {
     String suffix = SizeUnitHelper.toStr(this.type_);
     switch (type_) {
       case SizeUnitType.KB:
-        return '${bytes_ / (2 ^ 10)}${suffix}';
+        return '${bytes_ / (pow(2, 10))}${suffix}';
       case SizeUnitType.MB:
-        return '${bytes_ / (2 ^ 20)}${suffix}';
+        return '${bytes_ / (pow(2, 20))}${suffix}';
       case SizeUnitType.GB:
-        return '${bytes_ / (2 ^ 30)}${suffix}';
+        return '${bytes_ / (pow(2, 30))}${suffix}';
       case SizeUnitType.TB:
-        return '${bytes_ / (2 ^ 40)}${suffix}';
+        return '${bytes_ / (pow(2, 40))}${suffix}';
       case SizeUnitType.BYTES:
         return '${bytes_}${suffix}';
       default:

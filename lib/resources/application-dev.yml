@@ -1,3 +1,5 @@
 application:
-  multipart:
-    maxFileUploadSize: 20mb
+  configuration:
+    request:
+      multipart:
+        maxFileUploadSize: 20mb

@@ -41,7 +41,7 @@ class _ApplicationArgumentsParsedDelegate implements ApplicationArgumentsParsedD
       if (pair.isNotEmpty) {
         String key = pair.first;
         String value = pair.length > 1 ? pair.last : null;
-        key = ApplicationConfigurationMapper.getKey(key);
+        key = ApplicationConfigurationMapper.generateKey(key);
         if (value != null) {
           return '${key}${EQUAL_TOKEN}${value}';
         } else {

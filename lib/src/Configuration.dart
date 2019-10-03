@@ -63,11 +63,11 @@ class _Configuration implements Configuration {
   @override
   Future<dynamic> init(ApplicationConfiguration applicationConfiguration) async {
     await Future.wait([
-      _multipartConfigure.init(),
-      _routerMappingConfigure.init(),
-      _httpResponseConfigure.init(),
-      _httpRequestConfigure.init(),
-      _interceptorConfigure.init()
+      _multipartConfigure.init(applicationConfiguration),
+      _routerMappingConfigure.init(applicationConfiguration),
+      _httpResponseConfigure.init(applicationConfiguration),
+      _httpRequestConfigure.init(applicationConfiguration),
+      _interceptorConfigure.init(applicationConfiguration)
     ]);
   }
 }

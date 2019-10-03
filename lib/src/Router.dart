@@ -123,7 +123,6 @@ class _Router implements Router {
     if (this.handle_ == null) {
       throw IllegalArgumentException(message: 'The handler function of router:${this.path_} should not be null.');
     }
-    this.path_ = RouterHelper.getPath(this.path_);
     RouterHelper.checkoutRouterHandlerParameterAnnotations(this);
     if (!HttpMethodHelper.checkValidMethod(this.method_)) {
       throw UnKnowRouterMethodException(method: this.method_);
@@ -131,6 +130,7 @@ class _Router implements Router {
     if (!RouterHelper.checkPathAvailable(this.path_)) {
       throw InvalidRouterPathException(path: this.path_);
     }
+    this.path_ = RouterHelper.getPath(this.path_);
     if (this.pathVariables_ == null) {
       this.pathVariables_ = Map();
     } else {

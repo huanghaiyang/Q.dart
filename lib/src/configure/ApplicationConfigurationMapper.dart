@@ -4,17 +4,25 @@ import 'package:Q/src/ApplicationConfiguration.dart';
 import 'package:Q/src/aware/ApplicationConfigurationMapperAware.dart';
 import 'package:Q/src/configure/CustomYamlNode.dart';
 import 'package:Q/src/configure/CustomYamlPaser.dart';
-import 'package:Q/src/exception/ApplicationConfigurationResourceNotFoundException.dart';
 import 'package:Q/src/configure/CustomYamlPaserHelper.dart';
+import 'package:Q/src/exception/ApplicationConfigurationResourceNotFoundException.dart';
 
 final String _DEFAULT_CONFIGURATION_FILE_NAME = 'configure.yml';
 
 class ApplicationConfigurationMapper
-    implements ApplicationConfigurationMapperAware<List<CustomYamlNode>, Map<String, dynamic>, ApplicationConfiguration> {
+    implements ApplicationConfigurationMapperAware<List<CustomYamlNode>, Map<String, dynamic>, ApplicationConfiguration, CustomYamlNode> {
   static String DOT_STAND_IN_CHAR = '_';
 
-  static String getKey(String key) {
+  static String generateKey(String key) {
     return key.replaceAll(RegExp("\\."), ApplicationConfigurationMapper.DOT_STAND_IN_CHAR);
+  }
+
+  static dynamic get(String key) {
+    return ApplicationConfigurationMapper.instance().values[key];
+  }
+
+  static dynamic as(String key, String value) {
+    return ApplicationConfigurationMapper.instance().convertAs(key, value).value;
   }
 
   ApplicationConfigurationMapper._();
@@ -41,7 +49,9 @@ class ApplicationConfigurationMapper
       CustomYamlPaser yamlPaser = CustomYamlPaser(await file.readAsString());
       nodes_ = await yamlPaser.parse();
       nodes_.forEach((node) {
-        values_[node.name] = CustomYamlPaserHelper.reflectNodeValue(node);
+        dynamic reflectValue = CustomYamlPaserHelper.reflectNodeValue(node);
+        values_[node.name] = reflectValue;
+        node.value = reflectValue;
       });
       _isParsed = true;
       return ApplicationConfiguration(values_, 0);
@@ -66,7 +76,16 @@ class ApplicationConfigurationMapper
   }
 
   @override
-  dynamic get(String key) {
-    return this.values_[key];
+  CustomYamlNode convertAs(String key, String value) {
+    CustomYamlNode defaultNode = nodes.firstWhere((node) {
+      return node.name == key;
+    });
+    if (defaultNode != null) {
+      List<String> values = CustomYamlPaserHelper.parseDefaultValues(value);
+      CustomYamlNode node = CustomYamlNode(defaultNode.name, defaultNode.type, values, subType: defaultNode.subType);
+      node.value = CustomYamlPaserHelper.reflectNodeValue(node);
+      return node;
+    }
+    return CustomYamlNode(key, 'string', [value], value: value);
   }
 }

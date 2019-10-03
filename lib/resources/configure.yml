@@ -16,4 +16,4 @@ application:
         fixNameSuffixIfArray: true<bool>
         defaultUploadTempDirPath: $system_temp_dir_path<string>
     response:
-      defaultProducedType: application/json<string>
+      defaultProducedType: application/json; charset=utf-8 <string>

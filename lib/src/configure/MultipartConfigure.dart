@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:Q/src/ApplicationConfiguration.dart';
+import 'package:Q/src/common/SizeUnit.dart';
 import 'package:Q/src/configure/AbstractConfigure.dart';
+import 'package:Q/src/configure/ApplicationConfigurationNames.dart';
 
 abstract class MultipartConfigure extends AbstractConfigure {
   factory MultipartConfigure() => _MultipartConfigure();
@@ -69,5 +72,9 @@ class _MultipartConfigure implements MultipartConfigure {
   }
 
   @override
-  Future<dynamic> init() async {}
+  Future<dynamic> init(ApplicationConfiguration applicationConfiguration) async {
+    _maxUploadSize = (applicationConfiguration.get(APPLICATION_MULTIPART_MAX_FILE_UPLOAD_SIZE) as SizeUnit).bytes;
+    _defaultUploadTempDirPath = applicationConfiguration.get(APPLICATION_MULTIPART_DEFAULT_UPLOAD_TEMP_DIR_PATH);
+    _fixNameSuffixIfArray = applicationConfiguration.get(APPLICATION_MULTIPART_FIX_NAME_SUFFIX_IF_ARRAY);
+  }
 }

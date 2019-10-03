@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:Q/src/ApplicationConfiguration.dart';
 import 'package:Q/src/configure/AbstractConfigure.dart';
+import 'package:Q/src/configure/ApplicationConfigurationNames.dart';
+import 'package:Q/src/utils/ContentTypeUtil.dart';
 
 abstract class HttpResponseConfigure extends AbstractConfigure {
   factory HttpResponseConfigure() => _HttpResponseConfigure();
@@ -20,5 +23,8 @@ class _HttpResponseConfigure implements HttpResponseConfigure {
   }
 
   @override
-  Future<dynamic> init() async {}
+  Future<dynamic> init(ApplicationConfiguration applicationConfiguration) async {
+    defaultProducedType_ =
+        ContentTypeUtil.reflect(ContentType.parse(applicationConfiguration.get(APPLICATION_RESPONSE_DEFAULT_PRODUCED_TYPE)));
+  }
 }

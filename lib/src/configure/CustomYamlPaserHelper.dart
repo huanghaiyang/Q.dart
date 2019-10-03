@@ -14,15 +14,20 @@ final Pattern GLOBAL_CONFIGURATION_VARIABLE_MATCHER = RegExp('\\\$');
 
 class CustomYamlPaserHelper {
   static List<String> parseDefaultValues(String value) {
+    value = value.trim();
     List<String> defaultValues = List();
     int index = value.indexOf(RegExp('<'));
-    String valueStr = value.substring(0, index);
-    valueStr.trim().split(RegExp(',')).forEach((str) {
-      String value = str.trim();
-      if (value.startsWith(GLOBAL_CONFIGURATION_VARIABLE_MATCHER)) {
-        value = convertToVariable(value.replaceFirst(GLOBAL_CONFIGURATION_VARIABLE_MATCHER, ''));
+    if (index >= 0) {
+      value = value.substring(0, index);
+    }
+    value.trim().split(RegExp(',')).forEach((str) {
+      String val = str.trim();
+      if (val.isNotEmpty) {
+        if (val.startsWith(GLOBAL_CONFIGURATION_VARIABLE_MATCHER)) {
+          val = convertToVariable(val.replaceFirst(GLOBAL_CONFIGURATION_VARIABLE_MATCHER, ''));
+        }
+        defaultValues.add(val);
       }
-      defaultValues.add(value);
     });
     return defaultValues;
   }
@@ -55,9 +60,12 @@ class CustomYamlPaserHelper {
 
   static dynamic convertStringListTo(List<String> values, CustomYamlNodeValueType type, CustomYamlNodeValueType subType) {
     if (type != CustomYamlNodeValueType.ARRAY) {
+      if (values.isEmpty) return null;
       return convertStringTo(values.first, type);
     } else {
-      return List.from(values.map((value) {
+      return List.from(values.where((value) {
+        return value.trim().isNotEmpty;
+      }).map((value) {
         return convertStringTo(value, subType);
       }));
     }
@@ -89,7 +97,7 @@ class CustomYamlPaserHelper {
   static String convertToVariable(String value) {
     switch (value) {
       case ApplicationContextVariableNames.SYSTEM_TEMP_DIR_PATH:
-        return Directory.current.path;
+        return Directory.systemTemp.path;
     }
     return value;
   }

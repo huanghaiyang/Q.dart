@@ -1,4 +1,4 @@
-abstract class ApplicationConfigurationMapperAware<R, S, T> {
+abstract class ApplicationConfigurationMapperAware<R, S, T, W> {
   Future<T> init();
 
   R get nodes;
@@ -7,5 +7,5 @@ abstract class ApplicationConfigurationMapperAware<R, S, T> {
 
   bool get isParsed;
 
-  dynamic get(String key);
+  W convertAs(String key, String value);
 }

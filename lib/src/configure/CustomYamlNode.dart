@@ -13,8 +13,8 @@ abstract class CustomYamlNode {
 
   set value(dynamic value);
 
-  factory CustomYamlNode(String name, String type, List<String> defaultValues, {String subType}) =>
-      _CustomYamlNode(name, type, defaultValues, subType_: subType);
+  factory CustomYamlNode(String name, String type, List<String> defaultValues, {String subType, dynamic value}) =>
+      _CustomYamlNode(name, type, defaultValues, subType_: subType, value_: value);
 }
 
 class _CustomYamlNode implements CustomYamlNode {
@@ -28,7 +28,7 @@ class _CustomYamlNode implements CustomYamlNode {
 
   dynamic value_;
 
-  _CustomYamlNode(this.name_, this.type_, this.defaultValues_, {this.subType_}) {
+  _CustomYamlNode(this.name_, this.type_, this.defaultValues_, {this.subType_, this.value_}) {
     if (this.name_ == null) {
       throw IllegalArgumentException(message: 'CustomYamlNode property [name] must not be null.');
     }

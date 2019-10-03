@@ -43,7 +43,7 @@ class ApplicationBootstrapArgsResolver
   Future<ArgParser> define(ArgParser argParser, ApplicationConfigurationMapper configurationMapper) async {
     for (MapEntry entry in configurationMapper.values.entries) {
       String originalKey = entry.key;
-      String key = ApplicationConfigurationMapper.getKey(originalKey);
+      String key = ApplicationConfigurationMapper.generateKey(originalKey);
       keyMap[key] = originalKey;
       keys.add(key);
       argParser.addOption(key, defaultsTo: ValueConvertHelper.convertValueToString(entry.value));

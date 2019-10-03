@@ -1,5 +1,6 @@
 import 'package:Q/src/ApplicationConfiguration.dart';
 import 'package:Q/src/aware/ApplicationConfigurationMixerAware.dart';
+import 'package:Q/src/configure/ApplicationConfigurationMapper.dart';
 
 const _FINAL_CONFIGURATION_PRIORITY = 99;
 
@@ -25,7 +26,9 @@ class ApplicationConfigurationMixer
       values.addAll(defaultBootstrapConfiguration.values);
     }
     for (ApplicationConfiguration configuration in configurations) {
-      values.addAll(configuration.values);
+      configuration.values.forEach((key, value) {
+        values[key] = ApplicationConfigurationMapper.as(key, value);
+      });
     }
     return ApplicationConfiguration(values, _FINAL_CONFIGURATION_PRIORITY);
   }
