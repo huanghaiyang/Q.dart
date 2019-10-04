@@ -77,14 +77,17 @@ class ApplicationConfigurationMapper
 
   @override
   CustomYamlNode convertAs(String key, String value) {
-    CustomYamlNode defaultNode = nodes.firstWhere((node) {
+    Iterable<CustomYamlNode> iterable = nodes.where((node) {
       return node.name == key;
     });
-    if (defaultNode != null) {
-      List<String> values = CustomYamlPaserHelper.parseDefaultValues(value);
-      CustomYamlNode node = CustomYamlNode(defaultNode.name, defaultNode.type, values, subType: defaultNode.subType);
-      node.value = CustomYamlPaserHelper.reflectNodeValue(node);
-      return node;
+    if (iterable.isNotEmpty) {
+      CustomYamlNode defaultNode = iterable.first;
+      if (defaultNode != null) {
+        List<String> values = CustomYamlPaserHelper.parseDefaultValues(value);
+        CustomYamlNode node = CustomYamlNode(defaultNode.name, defaultNode.type, values, subType: defaultNode.subType);
+        node.value = CustomYamlPaserHelper.reflectNodeValue(node);
+        return node;
+      }
     }
     return CustomYamlNode(key, 'string', [value], value: value);
   }
