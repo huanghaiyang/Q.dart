@@ -5,6 +5,7 @@ import 'package:Q/src/Application.dart';
 import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/Router.dart';
 import 'package:Q/src/annotation/AttributeValue.dart';
+import 'package:Q/src/annotation/Config.dart';
 import 'package:Q/src/annotation/CookieValue.dart';
 import 'package:Q/src/annotation/PathVariable.dart';
 import 'package:Q/src/annotation/RequestHeader.dart';
@@ -15,6 +16,7 @@ import 'package:Q/src/exception/UnSupportRouterHandlerParameterAnnotationExcepti
 import 'package:Q/src/helpers/AnnotationHelpers.dart';
 import 'package:Q/src/helpers/RedirectHelper.dart';
 import 'package:Q/src/helpers/reflect/AttributeValueHelper.dart';
+import 'package:Q/src/helpers/reflect/ConfigValueHelper.dart';
 import 'package:Q/src/helpers/reflect/CookieValueHelper.dart';
 import 'package:Q/src/helpers/reflect/PathVariableHelper.dart';
 import 'package:Q/src/helpers/reflect/RequestHeaderHelper.dart';
@@ -111,6 +113,10 @@ class RouterHelper {
           }
           if (type == reflectClass(RequestParam)) {
             futures.add(Function.apply(RequestParamHelper.reflectRequestParam, params));
+            break;
+          }
+          if (type == reflectClass(Config)) {
+            futures.add(Function.apply(ConfigValueHelper.reflectConfigValue, params));
             break;
           }
         }
