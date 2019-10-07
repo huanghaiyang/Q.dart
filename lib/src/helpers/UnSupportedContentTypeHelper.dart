@@ -4,9 +4,9 @@ import 'package:Q/src/Application.dart';
 
 class UnSupportedContentTypeHelper {
   static bool checkSupported(HttpRequest req) {
-    List<ContentType> unSupportedContentTypes =
-        Application.getApplicationContext().configuration.httpRequestConfigure.unSupportedContentTypes;
-    if (unSupportedContentTypes.isEmpty) return true;
-    return unSupportedContentTypes.indexWhere((contentType) => contentType.mimeType == req.headers.contentType.mimeType) == -1;
+    List<ContentType> unAllowedContentTypes =
+        Application.getApplicationContext().configuration.httpRequestConfigure.unAllowedContentTypes;
+    if (unAllowedContentTypes.isEmpty) return true;
+    return unAllowedContentTypes.indexWhere((contentType) => contentType.mimeType == req.headers.contentType.mimeType) == -1;
   }
 }
