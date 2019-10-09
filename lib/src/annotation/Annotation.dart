@@ -9,3 +9,4 @@ export 'package:Q/src/annotation/RequestParam.dart';
 export 'package:Q/src/annotation/SessionValue.dart';
 export 'package:Q/src/annotation/Timeout.dart';
 export 'package:Q/src/annotation/UrlParam.dart';
+export 'package:Q/src/annotation/Controller.dart';
