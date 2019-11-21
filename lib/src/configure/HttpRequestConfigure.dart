@@ -120,9 +120,9 @@ class _HttpRequestConfigure implements HttpRequestConfigure {
     unAllowedMethods_.addAll(List.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_METHODS)).map((value) {
       return HttpMethodHelper.fromMethod(value.toString().toUpperCase());
     }));
-    unAllowedHeaders_.addAll(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_HEADERS));
-    unAllowedOrigins_.addAll(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_ORIGINS));
-    unAllowedCredentials_.addAll(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_CREDENTIALS));
+    unAllowedHeaders_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_HEADERS)));
+    unAllowedOrigins_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_ORIGINS)));
+    unAllowedCredentials_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_CREDENTIALS)));
 
     allowedContentTypes_.addAll(List.from(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_CONTENT_TYPES)).map((value) {
       return ContentType.parse(value.toString());
@@ -130,9 +130,9 @@ class _HttpRequestConfigure implements HttpRequestConfigure {
     allowedMethods_.addAll(List.from(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_METHODS)).map((value) {
       return HttpMethodHelper.fromMethod(value.toString().toUpperCase());
     }));
-    allowedHeaders_.addAll(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_HEADERS));
-    allowedOrigins_.addAll(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_ORIGINS));
-    allowedCredentials_.addAll(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_CREDENTIALS));
+    allowedHeaders_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_HEADERS)));
+    allowedOrigins_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_ORIGINS)));
+    allowedCredentials_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_CREDENTIALS)));
 
     maxAge_ = applicationConfiguration.get(APPLICATION_REQUEST_MAX_AGE);
   }
