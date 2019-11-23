@@ -30,7 +30,7 @@ class _ApplicationConfigurationResourceFinder implements ApplicationConfiguratio
     String typename =
         type == null ? ResourceFileTypeHelper.toExtension(defaultConfigurationResourceFileType) : ResourceFileTypeHelper.toExtension(type);
     Map<String, String> result = Map();
-    String resourcePath = ResourceHelper.findResourceDirectory();
+    String resourcePath = await ResourceHelper.findResourceDirectory();
     Directory resourceDirectory = Directory(resourcePath);
     if (await resourceDirectory.exists()) {
       Pattern matcher = RegExp('^${APPLICATION_CONFIGURATION_RESOURCE_PREFIX}(((\\-?)[a-z]+)?)(\\.)${typename}');

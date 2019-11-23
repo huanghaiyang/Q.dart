@@ -3,6 +3,7 @@ application:
   author: <array<string>>
   createTime: <datetime>
   environment: prod<string>
+  resourceDir: /lib/resources<string>
   configuration:
     interceptor:
       timeout: 10ms<timeunit>

@@ -1,7 +1,11 @@
 # Q.dart - A service framework written by dart
 ### 开发中
 
-## 使用方式
+## How to use
+```cli
+--application.environment=dev --application.resourceDir=/example/resources/
+```
+
 ```dart
 import 'dart:io';
 
