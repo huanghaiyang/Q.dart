@@ -1,11 +1,12 @@
 import 'dart:io';
 
+import 'package:Q/Q.dart';
 import 'package:Q/src/ApplicationConfiguration.dart';
 import 'package:Q/src/aware/ApplicationConfigurationMapperAware.dart';
 import 'package:Q/src/configure/CustomYamlNode.dart';
-import 'package:Q/src/configure/CustomYamlPaser.dart';
-import 'package:Q/src/configure/CustomYamlPaserHelper.dart';
-import 'package:Q/src/exception/ApplicationConfigurationResourceNotFoundException.dart';
+import 'package:Q/src/configure/CustomYamlParser.dart';
+import 'package:Q/src/configure/CustomYamlParserHelper.dart';
+import 'package:Q/src/configure/rules/ApplicationConfigureIfYamlNotExist.dart';
 
 final String _DEFAULT_CONFIGURATION_FILE_NAME = 'configure.yml';
 
@@ -44,20 +45,23 @@ class ApplicationConfigurationMapper
 
   @override
   Future<ApplicationConfiguration> init() async {
+    /**
+     * Q.dart作为lib使用时是访问不到lib/resources下的文件的，因为lib不允许包含任何静态文件
+     */
     File file = File('${Directory.current.path}/lib/resources/${_DEFAULT_CONFIGURATION_FILE_NAME}');
     if (await file.exists()) {
-      CustomYamlPaser yamlPaser = CustomYamlPaser(await file.readAsString());
-      nodes_ = await yamlPaser.parse();
-      nodes_.forEach((node) {
-        dynamic reflectValue = CustomYamlPaserHelper.reflectNodeValue(node);
-        values_[node.name] = reflectValue;
-        node.value = reflectValue;
-      });
-      _isParsed = true;
-      return ApplicationConfiguration(values_, 0);
+      CustomYamlParser yamlParser = CustomYamlParser(await file.readAsString());
+      nodes_ = await yamlParser.parse();
     } else {
-      throw ApplicationConfigurationResourceNotFoundException(filename: _DEFAULT_CONFIGURATION_FILE_NAME);
+      nodes_ = await CustomYamlParserHelper.parseMap(MapUtil.flatten(ApplicationConfigureIfYamlNotExist.rule, {}));
     }
+    nodes_.forEach((node) {
+      dynamic reflectValue = CustomYamlParserHelper.reflectNodeValue(node);
+      values_[node.name] = reflectValue;
+      node.value = reflectValue;
+    });
+    _isParsed = true;
+    return ApplicationConfiguration(values_, 0);
   }
 
   @override
@@ -83,9 +87,9 @@ class ApplicationConfigurationMapper
     if (iterable.isNotEmpty) {
       CustomYamlNode defaultNode = iterable.first;
       if (defaultNode != null) {
-        List<String> values = CustomYamlPaserHelper.parseDefaultValues(value);
+        List<String> values = CustomYamlParserHelper.parseDefaultValues(value);
         CustomYamlNode node = CustomYamlNode(defaultNode.name, defaultNode.type, values, subType: defaultNode.subType);
-        node.value = CustomYamlPaserHelper.reflectNodeValue(node);
+        node.value = CustomYamlParserHelper.reflectNodeValue(node);
         return node;
       }
     }

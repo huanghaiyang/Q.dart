@@ -1,6 +1,6 @@
 library Q_helpers;
 
-export 'package:Q/src/configure/CustomYamlPaserHelper.dart';
+export 'package:Q/src/configure/CustomYamlParserHelper.dart';
 export 'package:Q/src/helpers/AnnotationHelpers.dart';
 export 'package:Q/src/helpers/ApplicationHelper.dart';
 export 'package:Q/src/helpers/ApplicationReflectHelper.dart';

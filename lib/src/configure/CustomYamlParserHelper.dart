@@ -12,7 +12,7 @@ final String BASE_TYPE_REG = 'string|datetime|timeunit|sizeunit|bool|int|double'
 final Pattern TYPE_MATCHER = RegExp('<(((${COLLECTION_WTF})<(${BASE_TYPE_REG})>)|(${BASE_TYPE_REG}))>', caseSensitive: false);
 final Pattern GLOBAL_CONFIGURATION_VARIABLE_MATCHER = RegExp('\\\$');
 
-class CustomYamlPaserHelper {
+class CustomYamlParserHelper {
   static List<String> parseDefaultValues(String value) {
     value = value.trim();
     List<String> defaultValues = List();
@@ -100,5 +100,16 @@ class CustomYamlPaserHelper {
         return Directory.systemTemp.path;
     }
     return value;
+  }
+
+  static Future<List<CustomYamlNode>> parseMap(Map map) {
+    List<CustomYamlNode> result = List();
+    for (MapEntry entry in map.entries) {
+      String name = entry.key;
+      List<String> defaultValues = CustomYamlParserHelper.parseDefaultValues(entry.value);
+      MapEntry<String, String> typeEntry = CustomYamlParserHelper.parseValueTypes(entry.value);
+      result.add(CustomYamlNode(name, typeEntry.key, defaultValues, subType: typeEntry.value));
+    }
+    return Future.value(result);
   }
 }
