@@ -10,7 +10,7 @@ import 'package:Q/src/configure/CustomYamlNodeValueType.dart';
 final String COLLECTION_WTF = 'array';
 final String BASE_TYPE_REG = 'string|datetime|timeunit|sizeunit|bool|int|double';
 final Pattern TYPE_MATCHER = RegExp('<(((${COLLECTION_WTF})<(${BASE_TYPE_REG})>)|(${BASE_TYPE_REG}))>', caseSensitive: false);
-final Pattern GLOBAL_CONFIGURATION_VARIABLE_MATCHER = RegExp('\\\$');
+final Pattern GLOBAL_CONFIGURATION_VARIABLE_MATCHER = RegExp('\\\~');
 
 class CustomYamlParserHelper {
   static List<String> parseDefaultValues(String value) {
