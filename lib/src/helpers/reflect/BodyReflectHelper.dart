@@ -21,7 +21,9 @@ class BodyReflectHelper {
       Type parameterType = parameterMirror.type.reflectedType;
       // multipart/form-data类型
       if (data is MultipartValueMap) {
-        // TODO 
+        // TODO
+      } else {
+        
       }
     }
   }
