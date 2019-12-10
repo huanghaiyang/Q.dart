@@ -1,14 +1,14 @@
+import 'package:Q/Q.dart';
 import 'package:Q/src/helpers/reflect/ClassTransformer.dart';
 import 'package:test/test.dart';
 
+@Model({'name': String, 'int': int, 'age': num, 'friends': List, 'alias': List})
 class Person {
+  int id;
   String name;
-
-  Person();
-
-  Person._model(String name) {
-    this.name = name;
-  }
+  num age;
+  List<Person> friends;
+  List<String> alias;
 }
 
 void main() {

@@ -2,8 +2,8 @@ String MODEL_NAME = "model";
 
 @pragma('vm:entry-point')
 class Model {
-  final String name;
+  final Map<String, Type> rules;
 
   @pragma('vm:entry-point')
-  const Model(this.name);
+  const Model(this.rules);
 }
