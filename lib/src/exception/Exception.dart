@@ -9,6 +9,7 @@ export 'package:Q/src/exception/MaxUploadSizeExceededException.dart';
 export 'package:Q/src/exception/NoMatchRequestResolverException.dart';
 export 'package:Q/src/exception/RedirectNotFoundException.dart';
 export 'package:Q/src/exception/RequestParamRequiredException.dart';
+export 'package:Q/src/exception/RequiredFieldNotFoundException.dart';
 export 'package:Q/src/exception/RequiredMethodNotFoundException.dart';
 export 'package:Q/src/exception/RouterNotFoundException.dart';
 export 'package:Q/src/exception/RouterNotFoundOfRouterChainException.dart';

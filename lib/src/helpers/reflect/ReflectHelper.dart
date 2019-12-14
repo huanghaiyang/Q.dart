@@ -54,6 +54,14 @@ class ReflectHelper {
     return subType;
   }
 
+  static Type getSubType(Type type) {
+    Type subType;
+    reflectType(type).typeArguments.forEach((TypeMirror typeMirror) {
+      subType = typeMirror.reflectedType;
+    });
+    return subType;
+  }
+
   static dynamic reflectParameterValues(Type type, List<dynamic> values) {
     List result = List();
     bool isCollection = false;
@@ -93,6 +101,27 @@ class ReflectHelper {
           return List<num>.from(values);
         case Symbol:
           return List<Symbol>.from(values);
+        default:
+          return values;
+      }
+    } else if (classMirror == reflectClass(Set)) {
+      switch (argType) {
+        case int:
+          return Set<int>.from(values);
+        case String:
+          return Set<String>.from(values);
+        case bool:
+          return Set<bool>.from(values);
+        case BigInt:
+          return Set<BigInt>.from(values);
+        case DateTime:
+          return Set<DateTime>.from(values);
+        case double:
+          return Set<double>.from(values);
+        case num:
+          return Set<num>.from(values);
+        case Symbol:
+          return Set<Symbol>.from(values);
         default:
           return values;
       }
