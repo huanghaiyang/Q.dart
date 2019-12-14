@@ -1,7 +1,3 @@
-abstract class ResourceLoader {
-  
-}
+abstract class ResourceLoader {}
 
-class _ResourceLoader implements ResourceLoader {
-
-}
+class _ResourceLoader implements ResourceLoader {}

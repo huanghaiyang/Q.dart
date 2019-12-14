@@ -40,7 +40,6 @@ class _ApplicationConfigurationResourceFinder implements ApplicationConfiguratio
         if (path.contains(matcher)) {
           allPaths_[getFileName(filePath)] = filePath;
         }
-        
       }
     }
     String defaultConfigurationFilename = APPLICATION_CONFIGURATION_RESOURCE_PREFIX;
