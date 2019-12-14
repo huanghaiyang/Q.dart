@@ -1,5 +1,7 @@
 import 'dart:mirrors';
 
+import 'package:Q/src/utils/SymbolUtil.dart';
+
 typedef ParameterAnnotationCallback = void Function(ParameterMirror parameterMirror, InstanceMirror instanceMirror);
 
 class ReflectHelper {
@@ -143,5 +145,16 @@ class ReflectHelper {
         }
       }
     });
+  }
+
+  static DeclarationMirror getDeclaration(Type clazz, String name) {
+    Map<Symbol, DeclarationMirror> mirrors = reflectClass(clazz).declarations;
+    Symbol symbol = mirrors.keys.firstWhere((Symbol symbol) {
+      return SymbolUtil.toChars(symbol) == name;
+    });
+    if (symbol != null) {
+      return mirrors[symbol];
+    }
+    return null;
   }
 }

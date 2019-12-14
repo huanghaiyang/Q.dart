@@ -13,6 +13,7 @@ export 'package:Q/src/exception/RequiredFieldNotFoundException.dart';
 export 'package:Q/src/exception/RequiredMethodNotFoundException.dart';
 export 'package:Q/src/exception/RouterNotFoundException.dart';
 export 'package:Q/src/exception/RouterNotFoundOfRouterChainException.dart';
+export 'package:Q/src/exception/SideEffectModelReflectFunctionParameterNotMatchClassFieldException.dart';
 export 'package:Q/src/exception/SizeUnitParseException.dart';
 export 'package:Q/src/exception/TimeUnitParseException.dart';
 export 'package:Q/src/exception/UnExpectedRequestApplicationJsonException.dart';

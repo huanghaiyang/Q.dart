@@ -2,6 +2,7 @@ import 'dart:mirrors';
 
 import 'package:Q/Q.dart';
 import 'package:Q/src/exception/RequiredAnnotationNotFoundException.dart';
+import 'package:Q/src/exception/RequiredInitialValueMustBeProvidedException.dart';
 import 'package:Q/src/utils/SymbolUtil.dart';
 
 class ClassTransformer {
@@ -9,6 +10,7 @@ class ClassTransformer {
 
   static dynamic fromMap(Map data, Type clazz) {
     ClassMirror classMirror = reflectClass(clazz);
+    InstanceMirror instanceMirror = classMirror.newInstance(Symbol.empty, []);
     InstanceMirror sideEffectModelMirror = classMirror.metadata.firstWhere((InstanceMirror instanceMirror) {
       return instanceMirror.type == reflectClass(SideEffectModel);
     });
@@ -16,20 +18,9 @@ class ClassTransformer {
       InstanceMirror func = sideEffectModelMirror.getField(Symbol(FUNC_FIELD));
       if (func != null) {
         FunctionTypeMirror functionTypeMirror = func.type;
-        List<ParameterMirror> positionalParameters = List.from(functionTypeMirror.parameters.where((ParameterMirror parameterMirror) {
-          return !parameterMirror.isOptional && !parameterMirror.isNamed;
-        }));
-        List<ParameterMirror> namedParameters = List.from(functionTypeMirror.parameters.where((ParameterMirror parameterMirror) {
-          return parameterMirror.isNamed;
-        }));
-        List positionalArguments = List.from(positionalParameters.map((ParameterMirror parameterMirror) {
-          return reflectParameterValue(data, parameterMirror);
-        }));
-        Map namedArguments = Map();
-        namedParameters.forEach((ParameterMirror parameterMirror) {
-          namedArguments[parameterMirror.simpleName] = reflectParameterValue(data, parameterMirror);
+        functionTypeMirror.parameters.forEach((ParameterMirror parameterMirror) {
+          instanceMirror.setField(parameterMirror.simpleName, reflectParameterValue(data, parameterMirror, instanceMirror));
         });
-        return Function.apply(func.reflectee, positionalArguments, Map<Symbol, dynamic>.from(namedArguments));
       } else {
         throw RequiredFieldNotFoundException(name: FUNC_FIELD);
       }
@@ -42,7 +33,6 @@ class ClassTransformer {
       }
       Model model = modelAnnotationMirror.reflectee;
       Map<String, Type> rules = model.rules;
-      InstanceMirror instanceMirror = classMirror.newInstance(Symbol.empty, []);
       for (var key in data.keys) {
         if (rules.containsKey(key)) {
           dynamic value = data[key];
@@ -51,11 +41,14 @@ class ClassTransformer {
           instanceMirror.setField(Symbol(key), value);
         }
       }
-      return instanceMirror.reflectee;
     }
+    return instanceMirror.reflectee;
   }
 
-  static dynamic reflectParameterValue(Map data, ParameterMirror parameterMirror) {
+  static dynamic reflectParameterValue(Map data, ParameterMirror parameterMirror, InstanceMirror instanceMirror) {
+    if (!instanceMirror.type.declarations.containsKey(parameterMirror.simpleName)) {
+      throw SideEffectModelReflectFunctionParameterNotMatchClassFieldException(name: SymbolUtil.toChars(parameterMirror.simpleName));
+    }
     for (String key in data.keys) {
       if (SymbolUtil.toChars(parameterMirror.simpleName) == key) {
         dynamic value = data[key];
@@ -64,21 +57,20 @@ class ClassTransformer {
         if (parameterClassMirror == reflectClass(List) || parameterClassMirror == reflectClass(Set)) {
           Type subType = ReflectHelper.getSubType(parameterType);
           if (hasModel(subType)) {
-            /**
-             * TODO type 'List<dynamic>' is not a subtype of type 'List<Person>'
-             *
-             * fuck
-             */
+            dynamic initialValue = instanceMirror.getField(Symbol(key)).reflectee;
+            if (initialValue == null) {
+              throw RequiredInitialValueMustBeProvidedException(name: key);
+            }
             if (parameterClassMirror == reflectClass(List)) {
-              List collection = parameterClassMirror.newInstance(Symbol.empty, []).reflectee;
               List.from(value).forEach((dynamic val) {
-                collection.add(fromMap(val, subType));
+                initialValue.add(fromMap(val, subType));
               });
-              return collection;
+              return initialValue;
             } else if (parameterClassMirror == reflectClass(Set)) {
-              return Set.from(Set.from(value).map((dynamic val) {
-                return fromMap(val, subType);
-              }));
+              Set.from(value).forEach((dynamic val) {
+                initialValue.add(fromMap(val, subType));
+              });
+              return initialValue;
             }
           } else {
             return ReflectHelper.reflectCollection(parameterMirror.type.reflectedType, subType, value);
