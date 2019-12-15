@@ -23,6 +23,8 @@ class OKHandler implements HandlerAdapter {
     httpResponse.headers.contentType = context?.router?.produceType != null
         ? context.router.produceType
         : Application.getApplicationContext().configuration.httpResponseConfigure.defaultProducedType;
+    httpResponse.headers.add('Access-Control-Allow-Origin', '*');
+    httpResponse.headers.add('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     httpResponse.write(context.response.responseEntry.convertedResult);
     return context;
   }

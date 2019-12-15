@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:mirrors';
 
+import 'package:Q/Q.dart';
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/Router.dart';
@@ -21,6 +22,7 @@ import 'package:Q/src/helpers/reflect/BodyReflectHelper.dart';
 import 'package:Q/src/helpers/reflect/ConfigValueHelper.dart';
 import 'package:Q/src/helpers/reflect/CookieValueHelper.dart';
 import 'package:Q/src/helpers/reflect/PathVariableHelper.dart';
+import 'package:Q/src/helpers/reflect/RawBodyHelper.dart';
 import 'package:Q/src/helpers/reflect/RequestHeaderHelper.dart';
 import 'package:Q/src/helpers/reflect/RequestParamHelper.dart';
 import 'package:Q/src/helpers/reflect/SessionValueHelper.dart';
@@ -123,6 +125,10 @@ class RouterHelper {
           }
           if (type == reflectClass(Body)) {
             futures.add(Function.apply(BodyReflectHelper.reflectBody, params));
+            break;
+          }
+          if (type == reflectClass(RawBody)) {
+            futures.add(Function.apply(RawBodyHelper.reflect, params));
             break;
           }
         }

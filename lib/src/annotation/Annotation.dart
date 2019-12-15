@@ -7,6 +7,7 @@ export 'package:Q/src/annotation/Controller.dart';
 export 'package:Q/src/annotation/CookieValue.dart';
 export 'package:Q/src/annotation/Model.dart';
 export 'package:Q/src/annotation/PathVariable.dart';
+export 'package:Q/src/annotation/RawBody.dart';
 export 'package:Q/src/annotation/RequestHeader.dart';
 export 'package:Q/src/annotation/RequestParam.dart';
 export 'package:Q/src/annotation/SessionValue.dart';

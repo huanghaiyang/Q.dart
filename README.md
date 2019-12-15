@@ -1,6 +1,9 @@
 # Q.dart - A service framework written by dart
 ### 开发中
 
+## TODO
++ `http request options method`
+
 ## How to use
 ```cli
 --application.environment=dev --application.resourceDir=/example/resources/
