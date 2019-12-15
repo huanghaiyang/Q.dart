@@ -16,6 +16,8 @@ export 'package:Q/src/helpers/UnSupportedMethodHelper.dart';
 export 'package:Q/src/helpers/ValueConvertHelper.dart';
 export 'package:Q/src/helpers/interceptor/InterceptorHelper.dart';
 export 'package:Q/src/helpers/reflect/AttributeValueHelper.dart';
+export 'package:Q/src/helpers/reflect/BodyReflectHelper.dart';
+export 'package:Q/src/helpers/reflect/ClassTransformer.dart';
 export 'package:Q/src/helpers/reflect/CookieValueHelper.dart';
 export 'package:Q/src/helpers/reflect/PathVariableHelper.dart';
 export 'package:Q/src/helpers/reflect/ReflectHelper.dart';

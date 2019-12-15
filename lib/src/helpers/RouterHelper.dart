@@ -5,6 +5,7 @@ import 'package:Q/src/Application.dart';
 import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/Router.dart';
 import 'package:Q/src/annotation/AttributeValue.dart';
+import 'package:Q/src/annotation/Body.dart';
 import 'package:Q/src/annotation/Config.dart';
 import 'package:Q/src/annotation/CookieValue.dart';
 import 'package:Q/src/annotation/PathVariable.dart';
@@ -16,6 +17,7 @@ import 'package:Q/src/exception/UnSupportRouterHandlerParameterAnnotationExcepti
 import 'package:Q/src/helpers/AnnotationHelpers.dart';
 import 'package:Q/src/helpers/RedirectHelper.dart';
 import 'package:Q/src/helpers/reflect/AttributeValueHelper.dart';
+import 'package:Q/src/helpers/reflect/BodyReflectHelper.dart';
 import 'package:Q/src/helpers/reflect/ConfigValueHelper.dart';
 import 'package:Q/src/helpers/reflect/CookieValueHelper.dart';
 import 'package:Q/src/helpers/reflect/PathVariableHelper.dart';
@@ -119,6 +121,10 @@ class RouterHelper {
             futures.add(Function.apply(ConfigValueHelper.reflectConfigValue, params));
             break;
           }
+          if (type == reflectClass(Body)) {
+            futures.add(Function.apply(BodyReflectHelper.reflectBody, params));
+            break;
+          }
         }
       }
     });
@@ -141,6 +147,7 @@ class RouterHelper {
     }
   }
 
+  // 默认路由根路径
   static String getPath(String path) {
     String defaultMapping = Application.getApplicationContext().configuration.routerMappingConfigure.defaultMapping;
     if (!path.startsWith(RegExp('^${defaultMapping}'))) {

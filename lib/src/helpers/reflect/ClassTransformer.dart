@@ -36,8 +36,6 @@ class ClassTransformer {
       for (var key in data.keys) {
         if (rules.containsKey(key)) {
           dynamic value = data[key];
-          ClassMirror valueMirror = reflect(value).type;
-          Type ruleType = rules[key];
           instanceMirror.setField(Symbol(key), value);
         }
       }

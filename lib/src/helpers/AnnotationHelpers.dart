@@ -10,7 +10,8 @@ List<Type> SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATIONS = [
   RequestParam,
   UrlParam,
   SessionValue,
-  Config
+  Config,
+  Body
 ];
 
 List<ClassMirror> SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATION_CLASSES =

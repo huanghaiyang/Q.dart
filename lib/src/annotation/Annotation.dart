@@ -1,6 +1,7 @@
 library q_annotation;
 
 export 'package:Q/src/annotation/AttributeValue.dart';
+export 'package:Q/src/annotation/Body.dart';
 export 'package:Q/src/annotation/Config.dart';
 export 'package:Q/src/annotation/Controller.dart';
 export 'package:Q/src/annotation/CookieValue.dart';
