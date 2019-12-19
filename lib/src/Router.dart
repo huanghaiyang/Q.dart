@@ -149,7 +149,7 @@ class _Router implements Router {
 
   @override
   Future<bool> matchPath(String path) async {
-    assert(path != null && path.isNotEmpty, "'path' can not be null or empry string.");
+    assert(path != null && path.isNotEmpty, "'path' can not be null or empty string.");
     return pathToRegExp(this.path).hasMatch(path);
   }
 

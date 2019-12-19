@@ -15,6 +15,7 @@ final String APPLICATION_REQUEST_ALLOWED_ORIGINS = 'application.configuration.re
 final String APPLICATION_REQUEST_ALLOWED_HEADERS = 'application.configuration.request.allowedHeaders';
 final String APPLICATION_REQUEST_ALLOWED_CREDENTIALS = 'application.configuration.request.allowedCredentials';
 final String APPLICATION_REQUEST_MAX_AGE = 'application.configuration.request.maxAge';
+final String APPLIATION_REQUEST_PREFETCH_STRATEGY = 'application.configuration.request.prefetchStrategy';
 final String APPLICATION_MULTIPART_MAX_FILE_UPLOAD_SIZE = 'application.configuration.request.multipart.maxFileUploadSize';
 final String APPLICATION_MULTIPART_FIX_NAME_SUFFIX_IF_ARRAY = 'application.configuration.request.multipart.fixNameSuffixIfArray';
 final String APPLICATION_MULTIPART_DEFAULT_UPLOAD_TEMP_DIR_PATH = 'application.configuration.request.multipart.defaultUploadTempDirPath';

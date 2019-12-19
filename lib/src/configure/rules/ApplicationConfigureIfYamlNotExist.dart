@@ -25,7 +25,8 @@ class ApplicationConfigureIfYamlNotExist {
             'maxFileUploadSize': '10mb<sizeunit>',
             'fixNameSuffixIfArray': 'true<bool>',
             'defaultUploadTempDirPath': '~system_temp_dir_path<string>'
-          }
+          },
+          'prefetchStrategy': 'allow<string>'
         },
         'response': {'defaultProducedType': 'application/json; charset=utf-8 <string>'}
       }

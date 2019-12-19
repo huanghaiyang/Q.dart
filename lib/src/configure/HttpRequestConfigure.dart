@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:Q/Q.dart';
 import 'package:Q/src/ApplicationConfiguration.dart';
 import 'package:Q/src/Method.dart';
 import 'package:Q/src/configure/AbstractConfigure.dart';
@@ -32,6 +33,8 @@ abstract class HttpRequestConfigure extends AbstractConfigure {
   List<String> get allowedCredentials;
 
   int get maxAge;
+
+  PrefetchStrategy get prefetchStrategy;
 }
 
 class _HttpRequestConfigure implements HttpRequestConfigure {
@@ -56,6 +59,8 @@ class _HttpRequestConfigure implements HttpRequestConfigure {
   List<String> allowedCredentials_ = List();
 
   int maxAge_;
+
+  PrefetchStrategy _prefetchStrategy;
 
   @override
   List<ContentType> get unAllowedContentTypes {
@@ -135,5 +140,9 @@ class _HttpRequestConfigure implements HttpRequestConfigure {
     allowedCredentials_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_CREDENTIALS)));
 
     maxAge_ = applicationConfiguration.get(APPLICATION_REQUEST_MAX_AGE);
+    _prefetchStrategy = PrefetchStrategyHelper.transform(applicationConfiguration.get(APPLIATION_REQUEST_PREFETCH_STRATEGY));
   }
+
+  @override
+  PrefetchStrategy get prefetchStrategy => _prefetchStrategy;
 }
