@@ -29,15 +29,15 @@ class _HttpRequestInterceptorChain implements HttpRequestInterceptorChain {
     for (int i = 0; i < this.interceptors_.length; i++) {
       functions.add(() async {
         interceptorState.preProcessIndex = i;
-        bool suspend;
+        bool result;
         try {
-          suspend = await this.interceptors_[i].preHandle(httpRequest, httpResponse, interceptorState);
+          result = await this.interceptors_[i].preHandle(httpRequest, httpResponse, interceptorState);
         } catch (error, stackTrace) {
           // 如果拦截器执行preHandler时抛出异常，则终止请求
-          suspend = true;
+          result = false;
           this.onError(error, stackTrace: stackTrace);
         }
-        return suspend;
+        return result;
       });
     }
     bool suspend = await everySeries(functions);

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:Q/Q.dart';
 import 'package:Q/src/Application.dart';
 import 'package:Q/src/ApplicationBootstrapArgsResolver.dart';
 import 'package:Q/src/ApplicationConfiguration.dart';
@@ -97,8 +98,12 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
   // 内置拦截器初始化
   initInterceptors() {
-    this.application.httpRequestInterceptorChain = HttpRequestInterceptorChain(
-        [I18nInterceptor.instance(), UnSupportedContentTypeInterceptor.instance(), UnSupportedMethodInterceptor.instance()]);
+    this.application.httpRequestInterceptorChain = HttpRequestInterceptorChain([
+      I18nInterceptor.instance(),
+      UnSupportedContentTypeInterceptor.instance(),
+      UnSupportedMethodInterceptor.instance(),
+      HttpPrefetchInterceptor.instance()
+    ]);
   }
 
   // 初始化内置解析器
