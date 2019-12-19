@@ -140,7 +140,7 @@ class _HttpRequestConfigure implements HttpRequestConfigure {
     allowedCredentials_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_CREDENTIALS)));
 
     maxAge_ = applicationConfiguration.get(APPLICATION_REQUEST_MAX_AGE);
-    _prefetchStrategy = PrefetchStrategyHelper.transform(applicationConfiguration.get(APPLIATION_REQUEST_PREFETCH_STRATEGY));
+    _prefetchStrategy = PrefetchStrategyHelper.transform(applicationConfiguration.get(APPLICATION_REQUEST_PREFETCH_STRATEGY));
   }
 
   @override

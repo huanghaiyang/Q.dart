@@ -9,6 +9,6 @@ class MultipartFileUploadHelper {
   static Future<String> createTempFileUploadPath(String extension) async {
     Directory tempDir = await Directory(Application.getApplicationContext().configuration.multipartConfigure.defaultUploadTempDirPath)
         .createTemp(TEMP_DIR_PATH);
-    return '${tempDir.path}/${uuid5}.${extension}';
+    return '${tempDir.path}/${uuid4()}.${extension}';
   }
 }

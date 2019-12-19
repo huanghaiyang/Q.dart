@@ -54,7 +54,7 @@ class _Context implements Context {
   int routeCount_ = 0;
 
   _Context(this.request_, this.response_, this.app_, {this.interceptorState_}) {
-    this.id_ = uuid5();
+    this.id_ = uuid4();
   }
 
   @override
