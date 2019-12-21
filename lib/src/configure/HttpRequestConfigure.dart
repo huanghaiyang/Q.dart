@@ -7,20 +7,26 @@ import 'package:Q/src/configure/AbstractConfigure.dart';
 import 'package:Q/src/configure/ApplicationConfigurationNames.dart';
 import 'package:Q/src/helpers/HttpMethodHelper.dart';
 
+List<HttpMethod> DEFAULT_ALLOWED_METHODS = [
+  HttpMethod.GET,
+  HttpMethod.POST,
+  HttpMethod.PUT,
+  HttpMethod.DELETE,
+  HttpMethod.PATCH,
+  HttpMethod.OPTIONS,
+  HttpMethod.COPY,
+  HttpMethod.HEAD,
+  HttpMethod.LINK,
+  HttpMethod.UNLINK,
+  HttpMethod.PURGE,
+  HttpMethod.LOCK,
+  HttpMethod.UNLOCK,
+  HttpMethod.PROPFIND,
+  HttpMethod.VIEW
+];
+
 abstract class HttpRequestConfigure extends AbstractConfigure {
   factory HttpRequestConfigure() => _HttpRequestConfigure();
-
-  // 当前不支持的请求类型
-  List<ContentType> get unAllowedContentTypes;
-
-  // 当前支持的请求类型
-  List<HttpMethod> get unAllowedMethods;
-
-  List<String> get unAllowedOrigins;
-
-  List<String> get unAllowedHeaders;
-
-  List<String> get unAllowedCredentials;
 
   List<ContentType> get allowedContentTypes;
 
@@ -38,16 +44,6 @@ abstract class HttpRequestConfigure extends AbstractConfigure {
 }
 
 class _HttpRequestConfigure implements HttpRequestConfigure {
-  List<ContentType> unAllowedContentTypes_ = List();
-
-  List<HttpMethod> unAllowedMethods_ = List();
-
-  List<String> unAllowedOrigins_ = List();
-
-  List<String> unAllowedHeaders_ = List();
-
-  List<String> unAllowedCredentials_ = List();
-
   List<ContentType> allowedContentTypes_ = List();
 
   List<HttpMethod> allowedMethods_ = List();
@@ -61,31 +57,6 @@ class _HttpRequestConfigure implements HttpRequestConfigure {
   int maxAge_;
 
   PrefetchStrategy _prefetchStrategy;
-
-  @override
-  List<ContentType> get unAllowedContentTypes {
-    return List.unmodifiable(this.unAllowedContentTypes_);
-  }
-
-  @override
-  List<HttpMethod> get unAllowedMethods {
-    return List.unmodifiable(this.unAllowedMethods_);
-  }
-
-  @override
-  List<String> get unAllowedOrigins {
-    return unAllowedOrigins_;
-  }
-
-  @override
-  List<String> get unAllowedHeaders {
-    return unAllowedHeaders_;
-  }
-
-  @override
-  List<String> get unAllowedCredentials {
-    return unAllowedCredentials_;
-  }
 
   @override
   List<ContentType> get allowedContentTypes {
@@ -119,16 +90,6 @@ class _HttpRequestConfigure implements HttpRequestConfigure {
 
   @override
   Future<dynamic> init(ApplicationConfiguration applicationConfiguration) async {
-    unAllowedContentTypes_.addAll(List.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_CONTENT_TYPES)).map((value) {
-      return ContentType.parse(value.toString());
-    }));
-    unAllowedMethods_.addAll(List.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_METHODS)).map((value) {
-      return HttpMethodHelper.fromMethod(value.toString().toUpperCase());
-    }));
-    unAllowedHeaders_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_HEADERS)));
-    unAllowedOrigins_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_ORIGINS)));
-    unAllowedCredentials_.addAll(List<String>.from(applicationConfiguration.get(APPLICATION_REQUEST_UN_ALLOWED_CREDENTIALS)));
-
     allowedContentTypes_.addAll(List.from(applicationConfiguration.get(APPLICATION_REQUEST_ALLOWED_CONTENT_TYPES)).map((value) {
       return ContentType.parse(value.toString());
     }));

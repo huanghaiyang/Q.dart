@@ -10,11 +10,6 @@ class ApplicationConfigureIfYamlNotExist {
         'interceptor': {'timeout': '10ms<timeunit>'},
         'router': {'defaultMapping': '/<string>'},
         'request': {
-          'unAllowedContentTypes': '<array<string>>',
-          'unAllowedMethods': '<array<string>>',
-          'unAllowedOrigins': '<array<string>>',
-          'unAllowedHeaders': '<array<string>>',
-          'unAllowedCredentials': '<array<string>>',
           'allowedContentTypes': '<array<string>>',
           'allowedMethods': '<array<string>>',
           'allowedOrigins': '<array<string>>',
