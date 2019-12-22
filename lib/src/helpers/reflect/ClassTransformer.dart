@@ -4,11 +4,14 @@ import 'package:Q/Q.dart';
 import 'package:Q/src/exception/RequiredAnnotationNotFoundException.dart';
 import 'package:Q/src/exception/RequiredInitialValueMustBeProvidedException.dart';
 import 'package:Q/src/utils/SymbolUtil.dart';
+import 'package:curie/curie.dart';
 
 class ClassTransformer {
   static final String FUNC_FIELD = 'func';
 
-  static dynamic fromMap(Map data, Type clazz) {
+  static final String EFFECT_FIELDS = 'effects';
+
+  static dynamic fromMap(Map data, Type clazz) async {
     ClassMirror classMirror = reflectClass(clazz);
     InstanceMirror instanceMirror = classMirror.newInstance(Symbol.empty, []);
     InstanceMirror sideEffectModelMirror = classMirror.metadata.firstWhere((InstanceMirror instanceMirror) {
@@ -18,11 +21,34 @@ class ClassTransformer {
       InstanceMirror func = sideEffectModelMirror.getField(Symbol(FUNC_FIELD));
       if (func != null) {
         FunctionTypeMirror functionTypeMirror = func.type;
+        List<Future> futures = List();
         functionTypeMirror.parameters.forEach((ParameterMirror parameterMirror) {
-          instanceMirror.setField(parameterMirror.simpleName, reflectParameterValue(data, parameterMirror, instanceMirror));
+          futures.add(() async {
+            instanceMirror.setField(parameterMirror.simpleName, await reflectParameterValue(data, parameterMirror, instanceMirror));
+            return true;
+          }());
         });
+        await Future.wait(futures);
       } else {
         throw RequiredFieldNotFoundException(name: FUNC_FIELD);
+      }
+      InstanceMirror effectsMirror = sideEffectModelMirror.getField(Symbol(EFFECT_FIELDS));
+      if (effectsMirror != null) {
+        List<EffectFunction> effects = effectsMirror.reflectee;
+        if (effects != null) {
+          effects = List.from(effects);
+          if (effects != null) {
+            if (effects.isNotEmpty) {
+              EffectFunction firstEffect = effects[0];
+              effects[0] = (dynamic value) {
+                InstanceMirror effectResult = Function.apply(firstEffect, [instanceMirror]);
+                return effectResult;
+              };
+              InstanceMirror result = await waterfall(effects);
+              return result.reflectee;
+            }
+          }
+        }
       }
     } else {
       InstanceMirror modelAnnotationMirror = classMirror.metadata.firstWhere((InstanceMirror instanceMirror) {
@@ -40,14 +66,15 @@ class ClassTransformer {
         }
       }
     }
+
     return instanceMirror.reflectee;
   }
 
-  static dynamic reflectParameterValue(Map data, ParameterMirror parameterMirror, InstanceMirror instanceMirror) {
+  static dynamic reflectParameterValue(Map data, ParameterMirror parameterMirror, InstanceMirror instanceMirror) async {
     if (!instanceMirror.type.declarations.containsKey(parameterMirror.simpleName)) {
       throw SideEffectModelReflectFunctionParameterNotMatchClassFieldException(name: SymbolUtil.toChars(parameterMirror.simpleName));
     }
-    for (String key in data.keys) {
+    await for (String key in Stream.fromIterable(List.from(data.keys))) {
       if (SymbolUtil.toChars(parameterMirror.simpleName) == key) {
         dynamic value = data[key];
         Type parameterType = parameterMirror.type.reflectedType;
@@ -60,22 +87,29 @@ class ClassTransformer {
               throw RequiredInitialValueMustBeProvidedException(name: key);
             }
             if (parameterClassMirror == reflectClass(List)) {
-              List.from(value).forEach((dynamic val) {
-                initialValue.add(fromMap(val, subType));
+              List<Future> futures = List();
+              List.from(value).forEach((dynamic val) async {
+                futures.add(() async {
+                  return await fromMap(val, subType);
+                }());
               });
+              initialValue.addAll(await Future.wait(futures));
               return initialValue;
             } else if (parameterClassMirror == reflectClass(Set)) {
-              Set.from(value).forEach((dynamic val) {
-                initialValue.add(fromMap(val, subType));
+              List<Future> futures = List();
+              Set.from(value).forEach((dynamic val) async {
+                futures.add(() async {
+                  return await fromMap(val, subType);
+                }());
               });
-              return initialValue;
+              initialValue.addAll(await Future.wait(futures));
             }
           } else {
             return ReflectHelper.reflectCollection(parameterMirror.type.reflectedType, subType, value);
           }
         }
         if (hasModel(parameterMirror.type.reflectedType)) {
-          return fromMap(value, reflectClass(SideEffectModel).reflectedType);
+          return await fromMap(value, reflectClass(SideEffectModel).reflectedType);
         }
         return ReflectHelper.reflectParameterValue(parameterType, value.toString());
       }

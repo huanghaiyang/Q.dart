@@ -14,6 +14,7 @@ import 'package:Q/src/delegate/ApplicationLifecycleDelegate.dart';
 import 'package:Q/src/delegate/HttpRequestLifecycleDelegate.dart';
 import 'package:Q/src/helpers/ApplicationHelper.dart';
 import 'package:Q/src/helpers/AsyncHelper.dart';
+import 'package:Q/src/helpers/ResponseHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
 import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
 import 'package:Q/src/request/RequestTimeout.dart';

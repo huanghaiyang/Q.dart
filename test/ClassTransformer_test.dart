@@ -1,18 +1,24 @@
+import 'dart:mirrors';
+
 import 'package:Q/Q.dart';
 import 'package:Q/src/helpers/reflect/ClassTransformer.dart';
 import 'package:test/test.dart';
 
 void createPerson(String name, int id, int age, List<Person> friends, {List<String> nicknames, List<Person> girlFriends}) {}
 
+InstanceMirror delegatePerson(InstanceMirror value) {
+  return value;
+}
+
 //@Model({'name': String, 'int': int, 'age': num, 'friends': List, 'nicknames': List})
-@SideEffectModel(createPerson)
+@SideEffectModel(createPerson, effects: [delegatePerson])
 class Person {
   int id;
   String name;
   num age;
-  List<Person> friends = List();
-  List<String> nicknames = List();
-  List<Person> girlFriends = List();
+  List friends = List();
+  List nicknames = List();
+  List girlFriends = List();
 
   Person();
 
