@@ -61,9 +61,15 @@ class _HttpRequestInterceptorChain implements HttpRequestInterceptorChain {
   @override
   void add(AbstractInterceptor interceptor) {
     if (this.interceptors_.isNotEmpty) {
-      AbstractInterceptor existInterceptor = this.interceptors_.firstWhere((item) {
-        return reflect(item).type.reflectedType == reflect(interceptor).type.reflectedType;
-      });
+      AbstractInterceptor existInterceptor;
+      try {
+        existInterceptor = this.interceptors_.firstWhere((item) {
+          return reflect(item).type.reflectedType == reflect(interceptor).type.reflectedType;
+        });
+      } catch (e) {
+        // 没有找到匹配的拦截器，可以添加
+        existInterceptor = null;
+      }
       if (existInterceptor != null) {
         throw DuplicateInterceptorRegistryException(interceptor: interceptor);
       }
