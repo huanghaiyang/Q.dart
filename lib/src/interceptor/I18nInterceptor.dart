@@ -9,10 +9,7 @@ class I18nInterceptor implements AbstractInterceptor {
   static I18nInterceptor _instance;
 
   static I18nInterceptor instance() {
-    if (_instance == null) {
-      _instance = I18nInterceptor._();
-    }
-    return _instance;
+    return _instance ?? (_instance = I18nInterceptor._());
   }
 
   @override

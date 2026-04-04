@@ -14,10 +14,7 @@ class ApplicationConfigurationResourceResolver
   static ApplicationConfigurationResourceResolver _instance;
 
   static ApplicationConfigurationResourceResolver instance() {
-    if (_instance == null) {
-      _instance = ApplicationConfigurationResourceResolver._();
-    }
-    return _instance;
+    return _instance ?? (_instance = ApplicationConfigurationResourceResolver._());
   }
 
   final ApplicationConfigurationResourceFinder applicationConfigurationResourceFinder = ApplicationConfigurationResourceFinder();

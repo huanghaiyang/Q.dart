@@ -9,10 +9,7 @@ class NotFoundHandler implements HandlerAdapter {
   static NotFoundHandler _instance;
 
   static NotFoundHandler instance() {
-    if (_instance == null) {
-      _instance = NotFoundHandler._();
-    }
-    return _instance;
+    return _instance ?? (_instance = NotFoundHandler._());
   }
 
   @override

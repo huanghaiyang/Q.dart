@@ -12,10 +12,7 @@ class UnSupportedContentTypeInterceptor implements AbstractInterceptor {
   static UnSupportedContentTypeInterceptor _instance;
 
   static UnSupportedContentTypeInterceptor instance() {
-    if (_instance == null) {
-      _instance = UnSupportedContentTypeInterceptor._();
-    }
-    return _instance;
+    return _instance ?? (_instance = UnSupportedContentTypeInterceptor._());
   }
 
   @override

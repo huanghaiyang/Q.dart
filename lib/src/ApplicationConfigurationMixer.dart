@@ -11,10 +11,7 @@ class ApplicationConfigurationMixer
   static ApplicationConfigurationMixer _instance;
 
   static ApplicationConfigurationMixer instance() {
-    if (_instance == null) {
-      _instance = ApplicationConfigurationMixer._();
-    }
-    return _instance;
+    return _instance ?? (_instance = ApplicationConfigurationMixer._());
   }
 
   @override

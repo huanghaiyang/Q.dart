@@ -11,10 +11,7 @@ class HttpPrefetchInterceptor implements AbstractInterceptor {
   static HttpPrefetchInterceptor _instance;
 
   static HttpPrefetchInterceptor instance() {
-    if (_instance == null) {
-      _instance = HttpPrefetchInterceptor._();
-    }
-    return _instance;
+    return _instance ?? (_instance = HttpPrefetchInterceptor._());
   }
 
   @override

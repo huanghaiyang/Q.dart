@@ -31,10 +31,7 @@ class ApplicationConfigurationMapper
   static ApplicationConfigurationMapper _instance;
 
   static ApplicationConfigurationMapper instance() {
-    if (_instance == null) {
-      _instance = ApplicationConfigurationMapper._();
-    }
-    return _instance;
+    return _instance ?? (_instance = ApplicationConfigurationMapper._());
   }
 
   List<CustomYamlNode> nodes_ = List();

@@ -10,10 +10,7 @@ class OKHandler implements HandlerAdapter {
   static OKHandler _instance;
 
   static OKHandler instance() {
-    if (_instance == null) {
-      _instance = OKHandler._();
-    }
-    return _instance;
+    return _instance ?? (_instance = OKHandler._());
   }
 
   @override

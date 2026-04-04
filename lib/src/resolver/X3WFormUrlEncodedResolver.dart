@@ -12,10 +12,7 @@ class X3WFormUrlEncodedResolver implements AbstractResolver {
   static X3WFormUrlEncodedResolver _instance;
 
   static X3WFormUrlEncodedResolver instance() {
-    if (_instance == null) {
-      _instance = X3WFormUrlEncodedResolver._();
-    }
-    return _instance;
+    return _instance ?? (_instance = X3WFormUrlEncodedResolver._());
   }
 
   @override

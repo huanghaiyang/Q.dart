@@ -11,10 +11,7 @@ class ApplicationBootstrapArgsResolver
   static ApplicationBootstrapArgsResolver _instance;
 
   static ApplicationBootstrapArgsResolver instance() {
-    if (_instance == null) {
-      _instance = ApplicationBootstrapArgsResolver._();
-    }
-    return _instance;
+    return _instance ?? (_instance = ApplicationBootstrapArgsResolver._());
   }
 
   ArgParser _parser;

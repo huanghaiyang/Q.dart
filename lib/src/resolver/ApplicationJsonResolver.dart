@@ -13,10 +13,7 @@ class JsonResolver implements AbstractResolver {
   static JsonResolver _instance;
 
   static JsonResolver instance() {
-    if (_instance == null) {
-      _instance = JsonResolver._();
-    }
-    return _instance;
+    return _instance ?? (_instance = JsonResolver._());
   }
 
   @override

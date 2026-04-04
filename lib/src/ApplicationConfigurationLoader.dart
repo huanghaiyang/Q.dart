@@ -15,10 +15,7 @@ class ApplicationConfigurationLoader
   static ApplicationConfigurationLoader _instance;
 
   static ApplicationConfigurationLoader instance() {
-    if (_instance == null) {
-      _instance = ApplicationConfigurationLoader._();
-    }
-    return _instance;
+    return _instance ?? (_instance = ApplicationConfigurationLoader._());
   }
 
   @override

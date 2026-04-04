@@ -8,10 +8,7 @@ class ApplicationConfigurationResourceValidator
   static ApplicationConfigurationResourceValidator _instance;
 
   static ApplicationConfigurationResourceValidator instance() {
-    if (_instance == null) {
-      _instance = ApplicationConfigurationResourceValidator._();
-    }
-    return _instance;
+    return _instance ?? (_instance = ApplicationConfigurationResourceValidator._());
   }
 
   @override

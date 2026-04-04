@@ -8,10 +8,7 @@ class ApplicationEnvironmentResolver implements ApplicationEnvironmentResolverAw
   static ApplicationEnvironmentResolver _instance;
 
   static ApplicationEnvironmentResolver instance() {
-    if (_instance == null) {
-      _instance = ApplicationEnvironmentResolver._();
-    }
-    return _instance;
+    return _instance ?? (_instance = ApplicationEnvironmentResolver._());
   }
 
   ApplicationEnvironment _environment;
