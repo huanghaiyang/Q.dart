@@ -2,14 +2,14 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:test/test.dart';
-import 'package:todash/todash.dart';
+import 'package:Q/src/utils/AsyncUtil.dart';
 
 const server = 'http://localhost:8081';
 
 void main() {
   group('Pressure tests', () {
     test('1000 * 100 multipart request ', () async {
-      List times = List<int>.from(range(0, 1000 * 100));
+      List times = List<int>.from(AsyncUtil.range(0, 1000 * 100));
       times.forEach((index) async {
         print('pressure task ${index}');
         File file = File(Directory.current.path + "/test/example/20180902193200.jpg");

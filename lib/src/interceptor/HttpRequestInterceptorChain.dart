@@ -5,7 +5,7 @@ import 'package:Q/src/aware/HttpRequestInterceptorChainAware.dart';
 import 'package:Q/src/exception/DuplicateInterceptorRegistryException.dart';
 import 'package:Q/src/interceptor/AbstractInterceptor.dart';
 import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
-import 'package:curie/curie.dart';
+import 'package:Q/src/utils/AsyncUtil.dart';
 
 abstract class HttpRequestInterceptorChain extends HttpRequestInterceptorChainAware<HttpRequestInterceptorState> {
   Future<dynamic> applyPreHandle(HttpRequest httpRequest, HttpResponse httpResponse, HttpRequestInterceptorState interceptorState);
@@ -40,7 +40,7 @@ class _HttpRequestInterceptorChain implements HttpRequestInterceptorChain {
         return result;
       });
     }
-    bool suspend = await everySeries(functions);
+    bool suspend = await AsyncUtil.everySeries(functions);
     interceptorState.preProcessSuspend = suspend;
     return suspend;
   }
@@ -55,7 +55,7 @@ class _HttpRequestInterceptorChain implements HttpRequestInterceptorChain {
       });
     }
     // 处理每一个拦截器的后置处理方法
-    await eachSeries(functions);
+    await AsyncUtil.eachSeries(functions);
   }
 
   @override

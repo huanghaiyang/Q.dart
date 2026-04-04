@@ -62,10 +62,7 @@ class _Application implements Application {
   static _Application _instance;
 
   static _Application instance() {
-    if (_instance == null) {
-      _instance = _Application._();
-    }
-    return _instance;
+    return _instance ??= _Application._();
   }
 
   ApplicationContext applicationContext_;

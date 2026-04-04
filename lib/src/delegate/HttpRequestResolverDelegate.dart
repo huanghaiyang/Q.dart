@@ -8,7 +8,7 @@ import 'package:Q/src/delegate/AbstractDelegate.dart';
 import 'package:Q/src/exception/NoMatchRequestResolverException.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 import 'package:Q/src/resolver/ResolverType.dart';
-import 'package:curie/curie.dart';
+import 'package:Q/src/utils/AsyncUtil.dart';
 
 abstract class HttpRequestResolverDelegate extends HttpRequestResolverAware<AbstractResolver, Request, ResolverType> with AbstractDelegate {
   factory HttpRequestResolverDelegate(Application application) => _HttpRequestResolverDelegate(application);
@@ -43,7 +43,7 @@ class _HttpRequestResolverDelegate implements HttpRequestResolverDelegate {
       });
     }
     Completer<AbstractResolver> completer = Completer();
-    await someLimit(functions, 5, (Map<int, bool> result) {
+    await AsyncUtil.someLimit(functions, 5, (Map<int, bool> result) {
       if (result.values.every((v) => !v)) {
         completer.complete(null);
       } else {

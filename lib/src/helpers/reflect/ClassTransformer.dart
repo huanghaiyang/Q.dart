@@ -3,8 +3,10 @@ import 'dart:mirrors';
 import 'package:Q/Q.dart';
 import 'package:Q/src/exception/RequiredAnnotationNotFoundException.dart';
 import 'package:Q/src/exception/RequiredInitialValueMustBeProvidedException.dart';
+import 'package:Q/src/utils/AsyncUtil.dart';
 import 'package:Q/src/utils/SymbolUtil.dart';
-import 'package:curie/curie.dart';
+
+
 
 class ClassTransformer {
   static final String FUNC_FIELD = 'func';
@@ -44,7 +46,7 @@ class ClassTransformer {
                 InstanceMirror effectResult = Function.apply(firstEffect, [instanceMirror]);
                 return effectResult;
               };
-              InstanceMirror result = await waterfall(effects);
+              InstanceMirror result = await AsyncUtil.waterfall(effects);
               return result.reflectee;
             }
           }

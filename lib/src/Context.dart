@@ -73,9 +73,13 @@ class _Context implements Context {
   }
 
   Cookie getCookie(String name) {
-    return this.cookies.singleWhere((cookie) {
-      return cookie.name == name;
-    });
+    try {
+      return this.cookies.singleWhere((cookie) {
+        return cookie.name == name;
+      });
+    } catch (e) {
+      return null;
+    }
   }
 
   @override
@@ -165,7 +169,7 @@ class _Context implements Context {
 
   @override
   Iterable<String> get attributeNames {
-    return this.getAttributeNames();
+    return this.attributes_.keys;
   }
 
   @override
