@@ -50,3 +50,5 @@ export 'src/resource/Resource.dart';
 export 'src/utils/Utils.dart';
 export 'src/utils/Utils.dart';
 export 'src/views/Views.dart';
+export 'src/database/Database.dart';
+export 'src/security/Security.dart';

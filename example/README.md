@@ -36,6 +36,15 @@
 - 中间件
 - 重定向
 
+### 4. 数据库示例 (database_example.dart)
+
+展示数据库功能的示例：
+- 数据库连接池
+- ORM（对象关系映射）
+- 数据库迁移
+- CRUD 操作
+- 事务处理
+
 ## 运行示例
 
 ### 1. 安装依赖
@@ -73,6 +82,15 @@ dart example/comprehensive_example.dart
 ```
 
 服务器将在端口 8081 上启动。
+
+### 5. 运行数据库示例
+
+```bash
+cd /Users/huang/work/Q.dart
+dart example/database_example.dart
+```
+
+服务器将在端口 8082 上启动。
 
 ## 测试示例
 
@@ -124,6 +142,19 @@ dart example/comprehensive_example.dart
   - `GET /admin` - 管理员专用
   - `POST /xss-test` - XSS 防护测试
   - `POST /upload` - 文件上传测试
+
+### 数据库示例
+
+可用端点：
+- `GET /health` - 健康检查
+- `POST /users` - 创建用户
+- `GET /users` - 获取所有用户
+- `GET /users/:id` - 根据 ID 获取用户
+- `PUT /users/:id` - 更新用户
+- `DELETE /users/:id` - 删除用户
+- `POST /migrate` - 运行数据库迁移
+- `POST /migrate/rollback` - 回滚数据库迁移
+- `GET /migrate/status` - 获取迁移状态
 
 ## 认证
 
