@@ -21,17 +21,39 @@ class ApplicationConfigurationResourceResolver
 
   @override
   Future<List<ApplicationConfigurationResource>> resolve(ApplicationEnvironment environment) async {
-    Map<String, String> paths = await applicationConfigurationResourceFinder.search(ResourceFileTypes.YML, environment);
-    List<ApplicationConfigurationResource> resources = List();
-    for (String key in paths.keys) {
-      int priority;
-      if (key == APPLICATION_CONFIGURATION_RESOURCE_PREFIX) {
-        priority = DEFAULT_PRIORITY;
-      } else {
-        priority = DEFAULT_PRIORITY + DEFAULT_PRIORITY_STEP;
-      }
-      resources.add(ApplicationConfigurationResource.fromPath(paths[key], priority: priority));
+    if (environment == null) {
+      return [];
     }
-    return resources;
+    try {
+      Map<String, String> paths = await applicationConfigurationResourceFinder.search(ResourceFileTypes.YML, environment);
+      if (paths == null || paths.isEmpty) {
+        return [];
+      }
+      List<ApplicationConfigurationResource> resources = List();
+      for (String key in paths.keys) {
+        if (key == null || paths[key] == null) {
+          continue;
+        }
+        int priority;
+        if (key == APPLICATION_CONFIGURATION_RESOURCE_PREFIX) {
+          priority = DEFAULT_PRIORITY;
+        } else {
+          priority = DEFAULT_PRIORITY + DEFAULT_PRIORITY_STEP;
+        }
+        try {
+          ApplicationConfigurationResource resource = ApplicationConfigurationResource.fromPath(paths[key], priority: priority);
+          if (resource != null) {
+            resources.add(resource);
+          }
+        } catch (e) {
+          print('Error creating configuration resource for ${paths[key]}: $e');
+          continue;
+        }
+      }
+      return resources;
+    } catch (e) {
+      print('Error resolving configuration resources: $e');
+      return [];
+    }
   }
 }

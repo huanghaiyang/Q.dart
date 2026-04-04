@@ -151,11 +151,17 @@ class _Application implements Application {
   // 加入一个中间件
   @override
   void use(Middleware middleware) {
-    this.middleWares_.add(middleware);
+    if (middleware != null) {
+      this.middleWares_.add(middleware);
+    }
   }
 
   @override
-  void addResolver(ResolverType type, AbstractResolver resolver) => httpRequestResolverDelegate.addResolver(type, resolver);
+  void addResolver(ResolverType type, AbstractResolver resolver) {
+    if (type != null && resolver != null) {
+      httpRequestResolverDelegate.addResolver(type, resolver);
+    }
+  }
 
   // 匹配请求的content-type
   @override
@@ -166,30 +172,50 @@ class _Application implements Application {
   Future<Request> resolveRequest(HttpRequest req) => httpRequestResolverDelegate.resolveRequest(req);
 
   @override
-  void addHandler(int httpStatus, HandlerAdapter handlerAdapter) => httpRequestHandlerDelegate.addHandler(httpStatus, handlerAdapter);
+  void addHandler(int httpStatus, HandlerAdapter handlerAdapter) {
+    if (httpStatus != null && handlerAdapter != null) {
+      httpRequestHandlerDelegate.addHandler(httpStatus, handlerAdapter);
+    }
+  }
 
   // 替换内置默认的handler
   @override
-  void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter) =>
+  void replaceHandler(int httpStatus, HandlerAdapter handlerAdapter) {
+    if (httpStatus != null && handlerAdapter != null) {
       httpRequestHandlerDelegate.replaceHandler(httpStatus, handlerAdapter);
+    }
+  }
 
   // 替换内置转换器
   @override
-  void replaceConverter(ContentType type, AbstractHttpMessageConverter converter) =>
+  void replaceConverter(ContentType type, AbstractHttpMessageConverter converter) {
+    if (type != null && converter != null) {
       httpResponseConverterDelegate.replaceConverter(type, converter);
+    }
+  }
 
   @override
-  void addConverter(ContentType type, AbstractHttpMessageConverter converter) =>
+  void addConverter(ContentType type, AbstractHttpMessageConverter converter) {
+    if (type != null && converter != null) {
       httpResponseConverterDelegate.addConverter(type, converter);
+    }
+  }
 
   // 拦截器注册
   @override
-  void registryInterceptor(AbstractInterceptor interceptor) => applicationInterceptorRegistryDelegate.registryInterceptor(interceptor);
+  void registryInterceptor(AbstractInterceptor interceptor) {
+    if (interceptor != null) {
+      applicationInterceptorRegistryDelegate.registryInterceptor(interceptor);
+    }
+  }
 
   // 注册多个拦截器
   @override
-  void registryInterceptors(Iterable<AbstractInterceptor> interceptors) =>
+  void registryInterceptors(Iterable<AbstractInterceptor> interceptors) {
+    if (interceptors != null) {
       applicationInterceptorRegistryDelegate.registryInterceptors(interceptors);
+    }
+  }
 
   @override
   Map<ResolverType, AbstractResolver> get resolvers {
@@ -245,17 +271,34 @@ class _Application implements Application {
   Future<dynamic> close() => applicationClosableDelegate.close();
 
   @override
-  void route(Router t) => applicationRouteDelegate.route(t);
+  void route(Router t) {
+    if (t != null) {
+      applicationRouteDelegate.route(t);
+    }
+  }
 
   @override
-  void routes(Iterable<Router> t) => applicationRouteDelegate.routes(t);
+  void routes(Iterable<Router> t) {
+    if (t != null) {
+      applicationRouteDelegate.routes(t);
+    }
+  }
 
   // 资源维护
   @override
-  void resource(String pattern, Resource resource) => applicationResourceDelegate.resource(pattern, resource);
+  void resource(String pattern, Resource resource) {
+    if (pattern != null && resource != null) {
+      applicationResourceDelegate.resource(pattern, resource);
+    }
+  }
 
   @override
-  Future<dynamic> flush(String pattern) => applicationResourceDelegate.flush(pattern);
+  Future<dynamic> flush(String pattern) {
+    if (pattern != null) {
+      return applicationResourceDelegate.flush(pattern);
+    }
+    return Future.value(null);
+  }
 
   @override
   Router patch(String path, RouterHandleFunction handle,
@@ -263,9 +306,13 @@ class _Application implements Application {
           ContentType produceType,
           AbstractHttpMessageConverter converter,
           HandlerAdapter handlerAdapter,
-          String name}) =>
-      this.applicationSimplifyRouteDelegate.patch(path, handle,
+          String name}) {
+    if (path != null && handle != null) {
+      return this.applicationSimplifyRouteDelegate.patch(path, handle,
           pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+    }
+    return null;
+  }
 
   @override
   Router delete(String path, RouterHandleFunction handle,
@@ -273,9 +320,13 @@ class _Application implements Application {
           ContentType produceType,
           AbstractHttpMessageConverter converter,
           HandlerAdapter handlerAdapter,
-          String name}) =>
-      this.applicationSimplifyRouteDelegate.delete(path, handle,
+          String name}) {
+    if (path != null && handle != null) {
+      return this.applicationSimplifyRouteDelegate.delete(path, handle,
           pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+    }
+    return null;
+  }
 
   @override
   Router put(String path, RouterHandleFunction handle,
@@ -283,9 +334,13 @@ class _Application implements Application {
           ContentType produceType,
           AbstractHttpMessageConverter converter,
           HandlerAdapter handlerAdapter,
-          String name}) =>
-      this.applicationSimplifyRouteDelegate.put(path, handle,
+          String name}) {
+    if (path != null && handle != null) {
+      return this.applicationSimplifyRouteDelegate.put(path, handle,
           pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+    }
+    return null;
+  }
 
   @override
   Router post(String path, RouterHandleFunction handle,
@@ -293,9 +348,13 @@ class _Application implements Application {
           ContentType produceType,
           AbstractHttpMessageConverter converter,
           HandlerAdapter handlerAdapter,
-          String name}) =>
-      this.applicationSimplifyRouteDelegate.post(path, handle,
+          String name}) {
+    if (path != null && handle != null) {
+      return this.applicationSimplifyRouteDelegate.post(path, handle,
           pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+    }
+    return null;
+  }
 
   @override
   Router get(String path, RouterHandleFunction handle,
@@ -303,12 +362,18 @@ class _Application implements Application {
           ContentType produceType,
           AbstractHttpMessageConverter converter,
           HandlerAdapter handlerAdapter,
-          String name}) =>
-      this.applicationSimplifyRouteDelegate.get(path, handle,
+          String name}) {
+    if (path != null && handle != null) {
+      return this.applicationSimplifyRouteDelegate.get(path, handle,
           pathVariables: pathVariables, produceType: produceType, converter: converter, handlerAdapter: handlerAdapter, name: name);
+    }
+    return null;
+  }
 
   @override
-  dynamic getDelegate(Type delegateType) => ApplicationReflectHelper.getDelegate(delegateType, [
+  dynamic getDelegate(Type delegateType) {
+    if (delegateType != null) {
+      return ApplicationReflectHelper.getDelegate(delegateType, [
         applicationArgumentsParsedDelegate,
         httpRequestLifecycleDelegate,
         applicationLifecycleDelegate,
@@ -324,21 +389,38 @@ class _Application implements Application {
         httpRequestResolverDelegate,
         applicationInterceptorRegistryDelegate
       ]);
+    }
+    return null;
+  }
 
   @override
-  void addListener(AbstractListener listener) => applicationLifecycleListener.addListener(listener);
+  void addListener(AbstractListener listener) {
+    if (listener != null) {
+      applicationLifecycleListener.addListener(listener);
+    }
+  }
 
   @override
-  void trigger(ApplicationListenerType type, List payload) => applicationLifecycleListener.trigger(type, payload);
+  void trigger(ApplicationListenerType type, List payload) {
+    if (type != null) {
+      applicationLifecycleListener.trigger(type, payload);
+    }
+  }
 
   @override
-  Future<Context> createContext(HttpRequest httpRequest, HttpResponse httpResponse, {HttpRequestInterceptorState interceptorState}) =>
-      httpRequestContextDelegate.createContext(httpRequest, httpResponse, interceptorState: interceptorState);
+  Future<Context> createContext(HttpRequest httpRequest, HttpResponse httpResponse, {HttpRequestInterceptorState interceptorState}) {
+    if (httpRequest != null && httpResponse != null) {
+      return httpRequestContextDelegate.createContext(httpRequest, httpResponse, interceptorState: interceptorState);
+    }
+    return Future.value(null);
+  }
 
   @override
   void args(List<String> arguments) {
     applicationArgumentsParsedDelegate = ApplicationArgumentsParsedDelegate(this);
-    applicationArgumentsParsedDelegate.args(arguments);
+    if (arguments != null) {
+      applicationArgumentsParsedDelegate.args(arguments);
+    }
   }
 
   @override

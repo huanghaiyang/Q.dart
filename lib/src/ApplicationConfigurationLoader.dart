@@ -20,15 +20,30 @@ class ApplicationConfigurationLoader
 
   @override
   Future<List<ApplicationConfiguration>> load(List<ApplicationConfigurationResource> resources) async {
+    if (resources == null || resources.isEmpty) {
+      return [];
+    }
     List<ApplicationConfiguration> configurations = List();
     await for (ApplicationConfigurationResource resource in Stream.fromIterable(resources)) {
-      File file = File(resource.filepath);
-      YamlDocument document = loadYamlDocument(await file.readAsString());
-      if (document.toString() != NULL_USELESS) {
-        ApplicationConfiguration configuration = ApplicationConfiguration(convertDocument(document), resource.priority);
-        configurations.add(configuration);
+      if (resource == null || resource.filepath == null) {
+        continue;
       }
-      continue;
+      try {
+        File file = File(resource.filepath);
+        if (!await file.exists()) {
+          continue;
+        }
+        String content = await file.readAsString();
+        YamlDocument document = loadYamlDocument(content);
+        if (document != null && document.toString() != NULL_USELESS) {
+          ApplicationConfiguration configuration = ApplicationConfiguration(convertDocument(document), resource.priority);
+          configurations.add(configuration);
+        }
+      } catch (e) {
+        // 记录异常但继续处理其他配置文件
+        print('Error loading configuration file ${resource.filepath}: $e');
+        continue;
+      }
     }
     return configurations;
   }
