@@ -21,8 +21,11 @@ void main() {
       expect(response.data, {"name": "peter"});
     });
 
-    tearDown(() {
-      application = null;
+    tearDown(() async {
+      if (application != null) {
+        await application.close();
+        application = null;
+      }
     });
   });
 }

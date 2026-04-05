@@ -230,6 +230,8 @@ class _Router implements Router {
     this.query_ = request.uri.queryParametersAll;
     this.requestUri_ = request.uri.path;
     this.pathVariables = RouterHelper.applyPathVariables(request.uri.path, this.path_);
+    // 更新路由状态中的路径参数
+    this.state.pathParameters = this.pathVariables;
   }
 
   @override

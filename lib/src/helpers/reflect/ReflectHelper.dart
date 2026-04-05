@@ -8,38 +8,44 @@ class ReflectHelper {
   static dynamic reflectParameterValue(Type type, String value) {
     if (value == null) return value;
     dynamic result;
-    switch (type) {
-      case int:
-        result = int.parse(value);
-        break;
-      case String:
-        result = value;
-        break;
-      case bool:
-        if (value == 'true') {
-          result = true;
-        } else if (value == 'false') {
-          result = false;
-        }
-        break;
-      case BigInt:
-        result = BigInt.from(num.parse(value));
-        break;
-      case DateTime:
-        result = DateTime.parse(value);
-        break;
-      case double:
-        result = double.parse(value);
-        break;
-      case num:
-        result = num.parse(value);
-        break;
-      case Symbol:
-        result = Symbol(value);
-        break;
-      default:
-        result = value;
-        break;
+    try {
+      switch (type) {
+        case int:
+          result = int.parse(value);
+          break;
+        case String:
+          result = value;
+          break;
+        case bool:
+          if (value == 'true') {
+            result = true;
+          } else if (value == 'false') {
+            result = false;
+          }
+          break;
+        case BigInt:
+          result = BigInt.from(num.parse(value));
+          break;
+        case DateTime:
+          result = DateTime.parse(value);
+          break;
+        case double:
+          result = double.parse(value);
+          break;
+        case num:
+          result = num.parse(value);
+          break;
+        case Symbol:
+          result = Symbol(value);
+          break;
+        default:
+          result = value;
+          break;
+      }
+    } catch (e) {
+      // 安全处理类型转换异常
+      print('Type conversion error: $e');
+      result = value; // 转换失败时返回原始值
     }
     return result;
   }

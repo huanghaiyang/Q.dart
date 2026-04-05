@@ -62,4 +62,16 @@ void main() async {
   print('是否需要客户端证书: ${httpsConfigure.clientCertificateRequired}');
   
   print('\n配置测试完成！');
+  
+  // 销毁应用实例，释放资源
+  try {
+    if (app != null) {
+      await app.close();
+      app = null;
+    }
+  } catch (e) {
+    // 忽略关闭时的错误，确保测试能够正常完成
+    print('Error closing app: $e');
+    app = null;
+  }
 }
