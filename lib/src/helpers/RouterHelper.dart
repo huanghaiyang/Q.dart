@@ -60,6 +60,11 @@ class RouterHelper {
   static Map<String, Router> _routerMatchCache = {};
   // 缓存大小限制
   static const int MAX_CACHE_SIZE = 1000;
+  
+  // 函数参数反射缓存
+  static Map<Function, List<Future<dynamic>>> _parameterReflectionCache = {};
+  // 参数反射缓存大小限制
+  static const int MAX_PARAM_REFLECTION_CACHE_SIZE = 500;
 
   /**
    * 初始化路由Trie树
@@ -224,7 +229,13 @@ class RouterHelper {
 
   // 反射获取路由处理器方法的参数列表
   static Future<List<dynamic>> listParameters(Router router) async {
-    List<Future> futures = [];
+    // 检查缓存
+    if (_parameterReflectionCache.containsKey(router.handle)) {
+      List<Future<dynamic>> cachedFutures = _parameterReflectionCache[router.handle];
+      return await Future.wait(cachedFutures);
+    }
+    
+    List<Future<dynamic>> futures = [];
     try {
       FunctionTypeMirror functionTypeMirror = reflect(router.handle).type;
       functionTypeMirror.parameters.forEach((ParameterMirror parameterMirror) {
@@ -290,6 +301,17 @@ class RouterHelper {
           }
         }
       });
+      
+      // 缓存反射结果
+      if (futures.isNotEmpty) {
+        // 检查缓存大小
+        if (_parameterReflectionCache.length >= MAX_PARAM_REFLECTION_CACHE_SIZE) {
+          // 移除最早的缓存项
+          Function firstKey = _parameterReflectionCache.keys.first;
+          _parameterReflectionCache.remove(firstKey);
+        }
+        _parameterReflectionCache[router.handle] = futures;
+      }
     } catch (e) {
       // 安全处理反射异常
       print('Reflection error: $e');

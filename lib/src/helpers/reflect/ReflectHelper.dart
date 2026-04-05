@@ -5,8 +5,21 @@ import 'package:Q/src/utils/SymbolUtil.dart';
 typedef ParameterAnnotationCallback = void Function(ParameterMirror parameterMirror, InstanceMirror instanceMirror);
 
 class ReflectHelper {
+  // 类型转换缓存
+  static Map<String, dynamic> _typeConversionCache = {};
+  // 类型转换缓存大小限制
+  static const int MAX_TYPE_CONVERSION_CACHE_SIZE = 1000;
   static dynamic reflectParameterValue(Type type, String value) {
     if (value == null) return value;
+    
+    // 生成缓存键
+    String cacheKey = '$type:$value';
+    
+    // 检查缓存
+    if (_typeConversionCache.containsKey(cacheKey)) {
+      return _typeConversionCache[cacheKey];
+    }
+    
     dynamic result;
     try {
       switch (type) {
@@ -41,6 +54,17 @@ class ReflectHelper {
         default:
           result = value;
           break;
+      }
+      
+      // 缓存结果
+      if (result != null) {
+        // 检查缓存大小
+        if (_typeConversionCache.length >= MAX_TYPE_CONVERSION_CACHE_SIZE) {
+          // 移除最早的缓存项
+          String firstKey = _typeConversionCache.keys.first;
+          _typeConversionCache.remove(firstKey);
+        }
+        _typeConversionCache[cacheKey] = result;
       }
     } catch (e) {
       // 安全处理类型转换异常
