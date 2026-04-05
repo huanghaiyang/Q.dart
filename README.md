@@ -351,13 +351,19 @@ https:
 
 ### 环境变量
 
+Q.dart 支持通过环境变量配置应用，使用 `Q_` 前缀的环境变量：
+
 ```bash
 # 设置环境变量
-export APP_ENV=dev
+export Q_ENV=dev
+export Q_SERVER_PORT=8080
+export Q_SECURITY_AUTH_ENABLED=true
 
 # 运行应用
 dart main.dart
 ```
+
+环境变量会覆盖配置文件中的相同配置，优先级更高。
 
 ## 国际化
 
