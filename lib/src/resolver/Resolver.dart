@@ -5,4 +5,6 @@ export 'package:Q/src/resolver/ApplicationJsonResolver.dart';
 export 'package:Q/src/resolver/DefaultRequestResolver.dart';
 export 'package:Q/src/resolver/MultipartFormDataResolver.dart';
 export 'package:Q/src/resolver/ResolverType.dart';
+export 'package:Q/src/resolver/TextResolver.dart';
+export 'package:Q/src/resolver/XmlResolver.dart';
 export 'package:Q/src/resolver/X3WFormUrlEncodedResolver.dart';

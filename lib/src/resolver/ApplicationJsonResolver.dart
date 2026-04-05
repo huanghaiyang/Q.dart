@@ -1,11 +1,10 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:Q/src/Request.dart';
 import 'package:Q/src/exception/UnExpectedRequestApplicationJsonException.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
-import 'package:Q/src/utils/ListUtil.dart';
+import 'package:Q/src/utils/RequestUtil.dart';
 
 class JsonResolver implements AbstractResolver {
   JsonResolver._();
@@ -25,13 +24,13 @@ class JsonResolver implements AbstractResolver {
 
   @override
   Future<Request> resolve(HttpRequest req) async {
-    String json_text = String.fromCharCodes(concat(await req.toList()));
+    String jsonText = await RequestUtil.getRequestBodyString(req);
     try {
-      Map data = await jsonDecode(json_text);
+      Map data = await jsonDecode(jsonText);
       Request request = Request(data: data);
       return request;
     } catch (error) {
-      throw UnExpectedRequestApplicationJsonException(json: json_text, originalException: error);
+      throw UnExpectedRequestApplicationJsonException(json: jsonText, originalException: error);
     }
   }
 }

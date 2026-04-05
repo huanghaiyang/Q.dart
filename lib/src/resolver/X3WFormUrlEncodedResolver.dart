@@ -1,10 +1,9 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:Q/src/Request.dart';
 import 'package:Q/src/helpers/QueryHelper.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
-import 'package:Q/src/utils/ListUtil.dart';
+import 'package:Q/src/utils/RequestUtil.dart';
 
 class X3WFormUrlEncodedResolver implements AbstractResolver {
   X3WFormUrlEncodedResolver._();
@@ -25,7 +24,7 @@ class X3WFormUrlEncodedResolver implements AbstractResolver {
   @override
   Future<Request> resolve(HttpRequest req) async {
     Map data = Map();
-    String query = String.fromCharCodes(concat(await req.toList()));
+    String query = await RequestUtil.getRequestBodyString(req);
     if (query.isNotEmpty) {
       Uri uri = Uri(query: query);
       data = Map.from(uri.queryParametersAll);

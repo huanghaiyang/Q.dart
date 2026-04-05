@@ -115,6 +115,8 @@ class _ApplicationInitializer implements ApplicationInitializer {
     this.application.addResolver(ResolverType.MULTIPART, MultipartResolver.instance());
     this.application.addResolver(ResolverType.JSON, JsonResolver.instance());
     this.application.addResolver(ResolverType.FORM_URLENCODED, X3WFormUrlEncodedResolver.instance());
+    this.application.addResolver(ResolverType.TEXT, TextResolver.instance());
+    this.application.addResolver(ResolverType.XML, XmlResolver.instance());
     this.application.addResolver(ResolverType.DEFAULT, DefaultRequestResolver.instance());
   }
 

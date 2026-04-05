@@ -13,12 +13,13 @@ void main() {
       times.forEach((index) async {
         print('pressure task ${index}');
         File file = File(Directory.current.path + "/test/example/20180902193200.jpg");
-        Response response = await Dio().post('$server/multipart-form-data', data: FormData.from({
-          "name": "peter_${index}",
-          "friends": ["thor", 'iron man'],
-          "file": UploadFileInfo(file, "20180902193200.jpg"),
-          "age": 17
-        }));
+        FormData formData = FormData();
+        formData.fields.add(MapEntry("name", "peter_${index}"));
+        formData.fields.add(MapEntry("friends", "thor"));
+        formData.fields.add(MapEntry("friends", "iron man"));
+        formData.fields.add(MapEntry("age", "17"));
+        formData.files.add(MapEntry("file", await MultipartFile.fromFile(file.path, filename: "20180902193200.jpg")));
+        Response response = await Dio().post('$server/multipart-form-data', data: formData);
         expect(response.data, {
           "name": "peter_${index}",
           "friends": ["thor", 'iron man'],

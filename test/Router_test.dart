@@ -52,7 +52,7 @@ void main() {
           data: {
             'actors': ["Tobey Maguire", "I dont care"]
           },
-          options: Options(contentType: ContentType.parse('application/x-www-form-urlencoded')));
+          options: Options(contentType: 'application/x-www-form-urlencoded'));
       expect(response.data, {
         "age": 16,
         "isHero": true,
@@ -69,11 +69,10 @@ void main() {
 
     setUp(() {
       dio = Dio();
-      dio.interceptors.add(CookieManager(CookieJar()));
     });
 
     test('cookie', () async {
-      Response response = await dio.post("$server/cookie", options: Options(cookies: [Cookie("name", "peter")]));
+      Response response = await dio.post("$server/cookie", options: Options(headers: {"Cookie": "name=peter"}));
       expect(response.data, [
         {"name": "peter"}
       ]);
@@ -88,11 +87,11 @@ void main() {
     Dio dio;
 
     setUp(() {
-      dio = Dio(BaseOptions(contentType: ContentType.json));
+      dio = Dio(BaseOptions(contentType: 'application/json'));
     });
 
     test('users', () async {
-      Response response = await dio.post("$server/header", data: {}, options: Options(contentType: ContentType.json));
+      Response response = await dio.post("$server/header", data: {}, options: Options(contentType: 'application/json'));
       expect(response.data, {"Content-Type": "application/json; charset=utf-8"});
     });
 
@@ -106,7 +105,6 @@ void main() {
 
     setUp(() {
       dio = Dio();
-      dio.interceptors.add(CookieManager(CookieJar()));
     });
 
     test('session', () async {
@@ -115,7 +113,7 @@ void main() {
       expect(setSessionRes.data["name"], "peter");
 
       Response getSessionRes =
-          await dio.post("$server/setSession", options: Options(cookies: [Cookie("set-cookie", setSessionRes.data["jsessionid"])]));
+          await dio.post("$server/setSession", options: Options(headers: {"Cookie": "set-cookie=${setSessionRes.data["jsessionid"]}"}));
       expect(getSessionRes.data["name"], "peter");
     });
 
@@ -127,13 +125,13 @@ void main() {
   group("formdata", () {
     test('multipart-form-data', () async {
       File file = File(Directory.current.path + "/test/example/20180902193200.jpg");
-      Response response = await Dio().post('$server/multipart-form-data',
-          data: FormData.from({
-            "name": "peter",
-            "friends": ["thor", 'iron man'],
-            "file": UploadFileInfo(file, "20180902193200.jpg"),
-            "age": 17,
-          }));
+      FormData formData = FormData();
+      formData.fields.add(MapEntry("name", "peter"));
+      formData.fields.add(MapEntry("friends", "thor"));
+      formData.fields.add(MapEntry("friends", "iron man"));
+      formData.fields.add(MapEntry("age", "17"));
+      formData.files.add(MapEntry("file", await MultipartFile.fromFile(file.path, filename: "20180902193200.jpg")));
+      Response response = await Dio().post('$server/multipart-form-data', data: formData);
       expect(response.data, {
         "name": "peter",
         "friends": ["thor", 'iron man'],
