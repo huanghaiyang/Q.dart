@@ -15,6 +15,8 @@ import 'package:Q/src/annotation/RequestHeader.dart';
 import 'package:Q/src/annotation/RequestParam.dart';
 import 'package:Q/src/annotation/SessionValue.dart';
 import 'package:Q/src/annotation/UrlParam.dart';
+import 'package:Q/src/i18n/annotations/Locale.dart';
+import 'package:Q/src/i18n/LocaleHelper.dart';
 import 'package:Q/src/exception/UnSupportRouterHandlerParameterAnnotationException.dart';
 import 'package:Q/src/exception/RouterNotFoundException.dart';
 import 'package:Q/src/helpers/AnnotationHelpers.dart';
@@ -272,6 +274,11 @@ class RouterHelper {
             }
             if (type == reflectClass(RawBody)) {
               futures.add(Function.apply(RawBodyHelper.reflect, params));
+              break;
+            }
+            if (type == reflectClass(Locale)) {
+              List localeParams = [router.context, parameterMirror, instanceMirror];
+              futures.add(Function.apply(LocaleHelper.reflectLocaleParameter, localeParams));
               break;
             }
           }
