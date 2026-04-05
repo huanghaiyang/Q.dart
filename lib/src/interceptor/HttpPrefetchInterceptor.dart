@@ -18,7 +18,7 @@ class HttpPrefetchInterceptor implements AbstractInterceptor {
   Future<bool> preHandle(HttpRequest req, HttpResponse res, InterceptorContext interceptorContext) async {
     if (req.method.toUpperCase() == 'OPTIONS' &&
         Application.getApplicationContext().configuration.httpRequestConfigure.prefetchStrategy == PrefetchStrategy.ALLOW) {
-      await ResponseHelper.addCorsHeaders(res);
+      await ResponseHelper.addCorsHeaders(req, res);
       res.write('');
       return false;
     }

@@ -20,6 +20,8 @@ import 'package:Q/src/interceptor/HttpRequestInterceptorChain.dart';
 import 'package:Q/src/interceptor/I18nInterceptor.dart';
 import 'package:Q/src/interceptor/UnSupportedContentTypeInterceptor.dart';
 import 'package:Q/src/interceptor/UnSupportedMethodInterceptor.dart';
+import 'package:Q/src/interceptor/CorsInterceptor.dart';
+import 'package:Q/src/interceptor/HttpPrefetchInterceptor.dart';
 import 'package:Q/src/security/csrf/CsrfInterceptor.dart';
 import 'package:Q/src/security/xss/XssInterceptor.dart';
 import 'package:Q/src/resolver/ApplicationJsonResolver.dart';
@@ -101,6 +103,7 @@ class _ApplicationInitializer implements ApplicationInitializer {
   // 内置拦截器初始化
   initInterceptors() {
     this.application.httpRequestInterceptorChain = HttpRequestInterceptorChain([
+      CorsInterceptor.instance(),
       I18nInterceptor.instance(),
       XssInterceptor.instance(),
       CsrfInterceptor.instance(),
