@@ -1,71 +1,135 @@
 import 'dart:io';
+import 'package:Q/src/ApplicationConfiguration.dart';
+import 'package:Q/src/configure/AbstractConfigure.dart';
+import 'package:Q/src/configure/ApplicationConfigurationNames.dart';
+import 'package:Q/src/utils/ConfigureUtil.dart';
 
-/// HTTPS 配置类
-class HttpsConfigure {
-  /// 是否启用 HTTPS
-  final bool enabled;
+abstract class HttpsConfigure extends AbstractConfigure {
+  factory HttpsConfigure() => _HttpsConfigure();
 
-  /// 证书文件路径
-  final String certificatePath;
+  bool get enabled;
+  set enabled(bool enabled);
 
-  /// 私钥文件路径
-  final String privateKeyPath;
+  String get certificatePath;
+  set certificatePath(String certificatePath);
 
-  /// 证书密码（如果有）
-  final String certificatePassword;
+  String get privateKeyPath;
+  set privateKeyPath(String privateKeyPath);
 
-  /// 是否启用 HTTP/2
-  final bool enableHttp2;
+  String get certificatePassword;
+  set certificatePassword(String certificatePassword);
 
-  /// 是否启用 TLS 1.3
-  final bool enableTls13;
+  bool get enableHttp2;
+  set enableHttp2(bool enableHttp2);
 
-  /// 允许的 TLS 版本
-  final List<String> tlsVersions;
+  bool get enableTls13;
+  set enableTls13(bool enableTls13);
 
-  /// 允许的加密套件
-  final List<String> cipherSuites;
+  List<String> get tlsVersions;
+  set tlsVersions(List<String> tlsVersions);
 
-  /// 是否验证客户端证书
-  final bool clientCertificateRequired;
+  List<String> get cipherSuites;
+  set cipherSuites(List<String> cipherSuites);
 
-  /// 受信任的 CA 证书路径（用于客户端证书验证）
-  final String trustedCaCertificatePath;
+  bool get clientCertificateRequired;
+  set clientCertificateRequired(bool clientCertificateRequired);
 
-  HttpsConfigure({
-    this.enabled = false,
-    this.certificatePath,
-    this.privateKeyPath,
-    this.certificatePassword,
-    this.enableHttp2 = true,
-    this.enableTls13 = true,
-    this.tlsVersions = const ['TLSv1.2', 'TLSv1.3'],
-    this.cipherSuites,
-    this.clientCertificateRequired = false,
-    this.trustedCaCertificatePath,
-  });
+  String get trustedCaCertificatePath;
+  set trustedCaCertificatePath(String trustedCaCertificatePath);
 
-  /// 从配置映射创建 HTTPS 配置
-  factory HttpsConfigure.fromMap(Map<String, dynamic> map) {
-    return HttpsConfigure(
-      enabled: map['enabled'] ?? false,
-      certificatePath: map['certificatePath'],
-      privateKeyPath: map['privateKeyPath'],
-      certificatePassword: map['certificatePassword'],
-      enableHttp2: map['enableHttp2'] ?? true,
-      enableTls13: map['enableTls13'] ?? true,
-      tlsVersions: map['tlsVersions'] != null
-          ? List<String>.from(map['tlsVersions'])
-          : const ['TLSv1.2', 'TLSv1.3'],
-      cipherSuites: map['cipherSuites'] != null
-          ? List<String>.from(map['cipherSuites'])
-          : null,
-      clientCertificateRequired: map['clientCertificateRequired'] ?? false,
-      trustedCaCertificatePath: map['trustedCaCertificatePath'],
-    );
+  bool isValid();
+  Future<String> getCertificate();
+  Future<String> getPrivateKey();
+}
+
+class _HttpsConfigure implements HttpsConfigure {
+  bool _enabled;
+  String _certificatePath;
+  String _privateKeyPath;
+  String _certificatePassword;
+  bool _enableHttp2;
+  bool _enableTls13;
+  List<String> _tlsVersions;
+  List<String> _cipherSuites;
+  bool _clientCertificateRequired;
+  String _trustedCaCertificatePath;
+
+  _HttpsConfigure();
+
+  @override
+  bool get enabled => _enabled;
+
+  @override
+  set enabled(bool enabled) => _enabled = enabled;
+
+  @override
+  String get certificatePath => _certificatePath;
+
+  @override
+  set certificatePath(String certificatePath) => _certificatePath = certificatePath;
+
+  @override
+  String get privateKeyPath => _privateKeyPath;
+
+  @override
+  set privateKeyPath(String privateKeyPath) => _privateKeyPath = privateKeyPath;
+
+  @override
+  String get certificatePassword => _certificatePassword;
+
+  @override
+  set certificatePassword(String certificatePassword) => _certificatePassword = certificatePassword;
+
+  @override
+  bool get enableHttp2 => _enableHttp2;
+
+  @override
+  set enableHttp2(bool enableHttp2) => _enableHttp2 = enableHttp2;
+
+  @override
+  bool get enableTls13 => _enableTls13;
+
+  @override
+  set enableTls13(bool enableTls13) => _enableTls13 = enableTls13;
+
+  @override
+  List<String> get tlsVersions => _tlsVersions;
+
+  @override
+  set tlsVersions(List<String> tlsVersions) => _tlsVersions = tlsVersions;
+
+  @override
+  List<String> get cipherSuites => _cipherSuites;
+
+  @override
+  set cipherSuites(List<String> cipherSuites) => _cipherSuites = cipherSuites;
+
+  @override
+  bool get clientCertificateRequired => _clientCertificateRequired;
+
+  @override
+  set clientCertificateRequired(bool clientCertificateRequired) => _clientCertificateRequired = clientCertificateRequired;
+
+  @override
+  String get trustedCaCertificatePath => _trustedCaCertificatePath;
+
+  @override
+  set trustedCaCertificatePath(String trustedCaCertificatePath) => _trustedCaCertificatePath = trustedCaCertificatePath;
+
+  @override
+  Future<dynamic> init(ApplicationConfiguration applicationConfiguration) async {
+    _enabled = applicationConfiguration.get(HTTPS_ENABLED);
+    _certificatePath = applicationConfiguration.get(HTTPS_CERTIFICATE_PATH);
+    _privateKeyPath = applicationConfiguration.get(HTTPS_PRIVATE_KEY_PATH);
+    _certificatePassword = applicationConfiguration.get(HTTPS_CERTIFICATE_PASSWORD);
+    _enableHttp2 = applicationConfiguration.get(HTTPS_ENABLE_HTTP2);
+    _enableTls13 = applicationConfiguration.get(HTTPS_ENABLE_TLS13);
+    _tlsVersions = ConfigureUtil.convertToListString(applicationConfiguration.get(HTTPS_TLS_VERSIONS));
+    _clientCertificateRequired = applicationConfiguration.get(HTTPS_CLIENT_CERTIFICATE_REQUIRED);
+    _trustedCaCertificatePath = applicationConfiguration.get(HTTPS_TRUSTED_CA_CERTIFICATE_PATH);
   }
 
-  /// 验证配置是否有效
+  @override
   bool isValid() {
     if (!enabled) return true;
 
@@ -92,7 +156,7 @@ class HttpsConfigure {
     return true;
   }
 
-  /// 获取证书文件内容
+  @override
   Future<String> getCertificate() async {
     if (certificatePath == null) return null;
     File file = File(certificatePath);
@@ -100,7 +164,7 @@ class HttpsConfigure {
     return await file.readAsString();
   }
 
-  /// 获取私钥文件内容
+  @override
   Future<String> getPrivateKey() async {
     if (privateKeyPath == null) return null;
     File file = File(privateKeyPath);
@@ -108,3 +172,4 @@ class HttpsConfigure {
     return await file.readAsString();
   }
 }
+

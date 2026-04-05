@@ -4,6 +4,9 @@ import 'package:Q/src/configure/HttpResponseConfigure.dart';
 import 'package:Q/src/configure/InterceptorConfigure.dart';
 import 'package:Q/src/configure/MultipartConfigure.dart';
 import 'package:Q/src/configure/RouterMappingConfigure.dart';
+import 'package:Q/src/configure/DatabaseConfigure.dart';
+import 'package:Q/src/configure/CacheConfigure.dart';
+import 'package:Q/src/configure/SecurityConfigure.dart';
 
 // 应用程序配置
 abstract class Configuration {
@@ -16,6 +19,12 @@ abstract class Configuration {
   HttpRequestConfigure get httpRequestConfigure;
 
   HttpResponseConfigure get httpResponseConfigure;
+
+  DatabaseConfigure get databaseConfigure;
+
+  CacheConfigure get cacheConfigure;
+
+  SecurityConfigure get securityConfigure;
 
   Future<dynamic> init(ApplicationConfiguration applicationConfiguration);
 
@@ -34,6 +43,12 @@ class _Configuration implements Configuration {
   HttpRequestConfigure _httpRequestConfigure = HttpRequestConfigure();
 
   HttpResponseConfigure _httpResponseConfigure = HttpResponseConfigure();
+
+  DatabaseConfigure _databaseConfigure = DatabaseConfigure();
+
+  CacheConfigure _cacheConfigure = CacheConfigure();
+
+  SecurityConfigure _securityConfigure = SecurityConfigure();
 
   @override
   MultipartConfigure get multipartConfigure {
@@ -61,13 +76,31 @@ class _Configuration implements Configuration {
   }
 
   @override
+  DatabaseConfigure get databaseConfigure {
+    return this._databaseConfigure;
+  }
+
+  @override
+  CacheConfigure get cacheConfigure {
+    return this._cacheConfigure;
+  }
+
+  @override
+  SecurityConfigure get securityConfigure {
+    return this._securityConfigure;
+  }
+
+  @override
   Future<dynamic> init(ApplicationConfiguration applicationConfiguration) async {
     await Future.wait([
       _multipartConfigure.init(applicationConfiguration),
       _routerMappingConfigure.init(applicationConfiguration),
       _httpResponseConfigure.init(applicationConfiguration),
       _httpRequestConfigure.init(applicationConfiguration),
-      _interceptorConfigure.init(applicationConfiguration)
+      _interceptorConfigure.init(applicationConfiguration),
+      _databaseConfigure.init(applicationConfiguration),
+      _cacheConfigure.init(applicationConfiguration),
+      _securityConfigure.init(applicationConfiguration),
     ]);
   }
 }

@@ -24,7 +24,9 @@ class ApplicationConfigurationMixer
     }
     for (ApplicationConfiguration configuration in configurations) {
       configuration.values.forEach((key, value) {
-        values[key] = ApplicationConfigurationMapper.as(key, value);
+        // 确保value是字符串类型
+        String stringValue = value.toString();
+        values[key] = ApplicationConfigurationMapper.as(key, stringValue);
       });
     }
     return ApplicationConfiguration(values, _FINAL_CONFIGURATION_PRIORITY);

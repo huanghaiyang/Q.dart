@@ -12,3 +12,5 @@ export 'package:Q/src/configure/HttpResponseConfigure.dart';
 export 'package:Q/src/configure/InterceptorConfigure.dart';
 export 'package:Q/src/configure/MultipartConfigure.dart';
 export 'package:Q/src/configure/RouterMappingConfigure.dart';
+export 'package:Q/src/configure/DatabaseConfigure.dart';
+export 'package:Q/src/configure/CacheConfigure.dart';

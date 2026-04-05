@@ -1,5 +1,5 @@
 application:
-  name: <string>
+  name: Q.dart Application<string>
   author: <array<string>>
   createTime: <datetime>
   environment: prod<string>
@@ -23,3 +23,88 @@ application:
         defaultUploadTempDirPath: ~system_temp_dir_path<string>
     response:
       defaultProducedType: application/json; charset=utf-8 <string>
+
+database:
+  type: sqlite<string>
+  connection:
+    path: database.db<string>
+    host: localhost<string>
+    port: 3306<int>
+    database: <string>
+    username: <string>
+    password: <string>
+  pool:
+    maxConnections: 10<int>
+    minConnections: 2<int>
+    connectionTimeout: 30000<int>
+    idleTimeout: 600000<int>
+    maxLifetime: 1800000<int>
+  migrations:
+    enabled: true<bool>
+    table: schema_migrations<string>
+    autoRun: true<bool>
+
+cache:
+  enabled: true<bool>
+  defaultTtl: 300<int>
+  security:
+    enabled: true<bool>
+    encryptionKey: default-encryption-key-change-in-production<string>
+  rateLimit:
+    enabled: true<bool>
+    maxRequests: 100<int>
+    window: 60<int>
+  redis:
+    enabled: false<bool>
+    host: localhost<string>
+    port: 6379<int>
+    password: <string>
+    db: 0<int>
+
+security:
+  csrf:
+    enabled: true<bool>
+    protectedMethods: POST,PUT,DELETE,PATCH<array<string>>
+    tokenMaxAge: 3600000<int>
+    tokenHeader: X-CSRF-Token<string>
+    tokenCookie: csrf_token<string>
+  xss:
+    enabled: true<bool>
+    blockRequest: true<bool>
+    protectedContentTypes: application/x-www-form-urlencoded,application/json,multipart/form-data<array<string>>
+  auth:
+    enabled: true<bool>
+    publicPaths: <array<string>>
+    pathRoles: <map<string,array<string>>>
+    tokenHeader: Authorization<string>
+    tokenExpiration: 3600<int>
+  securityHeaders:
+    enabled: true<bool>
+    xssProtection: true<bool>
+    contentTypeOptions: true<bool>
+    frameOptions: true<bool>
+    contentSecurityPolicy: true<bool>
+    contentSecurityPolicyValue: default-src 'self'<string>
+
+https:
+  enabled: false<bool>
+  certificatePath: <string>
+  privateKeyPath: <string>
+  certificatePassword: <string>
+  enableHttp2: true<bool>
+  enableTls13: true<bool>
+  tlsVersions: TLSv1.2,TLSv1.3<array<string>>
+  clientCertificateRequired: false<bool>
+  trustedCaCertificatePath: <string>
+
+i18n:
+  enabled: true<bool>
+  defaultLocale: en<string>
+  supportedLocales: <array<string>>
+  resourcePath: resource/i18n<string>
+
+logging:
+  level: info<string>
+  format: json<string>
+  output: console<string>
+  file: logs/app.log<string>

@@ -8,8 +8,9 @@ import 'package:Q/src/configure/CustomYamlNodeConverter.dart';
 import 'package:Q/src/configure/CustomYamlNodeValueType.dart';
 
 final String COLLECTION_WTF = 'array';
+final String MAP_WTF = 'map';
 final String BASE_TYPE_REG = 'string|datetime|timeunit|sizeunit|bool|int|double';
-final Pattern TYPE_MATCHER = RegExp('<(((${COLLECTION_WTF})<(${BASE_TYPE_REG})>)|(${BASE_TYPE_REG}))>', caseSensitive: false);
+final Pattern TYPE_MATCHER = RegExp('<(((${COLLECTION_WTF})<(${BASE_TYPE_REG})>)|((${MAP_WTF})<(${BASE_TYPE_REG}),(${COLLECTION_WTF})<(${BASE_TYPE_REG})>>)|(${BASE_TYPE_REG}))>', caseSensitive: false);
 final Pattern GLOBAL_CONFIGURATION_VARIABLE_MATCHER = RegExp('\\\~');
 
 class CustomYamlParserHelper {
@@ -42,9 +43,14 @@ class CustomYamlParserHelper {
         list.add(match.group(i));
       }
     }
-    if (list.contains(COLLECTION_WTF)) {
+    if (list.contains(COLLECTION_WTF) && !list.contains(MAP_WTF)) {
       type = COLLECTION_WTF;
       subType = list[4];
+    } else if (list.contains(MAP_WTF)) {
+      type = MAP_WTF;
+      // MAP类型格式: map<string,array<string>>
+      // 返回的subType是value的类型，这里简化处理，返回array
+      subType = COLLECTION_WTF;
     } else {
       type = list[1];
     }
@@ -59,16 +65,20 @@ class CustomYamlParserHelper {
   }
 
   static dynamic convertStringListTo(List<String> values, CustomYamlNodeValueType type, CustomYamlNodeValueType subType) {
-    if (type != CustomYamlNodeValueType.ARRAY) {
+    if (type != CustomYamlNodeValueType.ARRAY && type != CustomYamlNodeValueType.MAP) {
       if (values.isEmpty) return null;
       return convertStringTo(values.first, type);
-    } else {
+    } else if (type == CustomYamlNodeValueType.ARRAY) {
       return List.from(values.where((value) {
         return value.trim().isNotEmpty;
       }).map((value) {
         return convertStringTo(value, subType);
       }));
+    } else if (type == CustomYamlNodeValueType.MAP) {
+      // MAP类型返回空Map，实际值需要在运行时从配置文件读取
+      return Map<String, List<String>>();
     }
+    return null;
   }
 
   static dynamic convertStringTo(String value, CustomYamlNodeValueType type) {
@@ -90,6 +100,8 @@ class CustomYamlParserHelper {
       case CustomYamlNodeValueType.TIMEUNIT:
         return TimeUnit.parse(value);
       case CustomYamlNodeValueType.ARRAY:
+        return null;
+      case CustomYamlNodeValueType.MAP:
         return null;
     }
   }

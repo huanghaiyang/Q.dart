@@ -1,3 +1,11 @@
+/**
+ * 配置资源查找器，用于查找和定位应用配置文件
+ * 
+ * 支持查找的配置文件类型：
+ * - application.yml (默认配置文件)
+ * - configure.yml (备用配置文件)
+ * - application-{environment}.yml (环境特定配置文件)
+ */
 import 'dart:io';
 
 import 'package:Q/src/ApplicationEnvironment.dart';
@@ -38,7 +46,7 @@ class _ApplicationConfigurationResourceFinder implements ApplicationConfiguratio
         }
         Directory resourceDirectory = Directory(resourcePath);
         if (await resourceDirectory.exists()) {
-          Pattern matcher = RegExp('^${APPLICATION_CONFIGURATION_RESOURCE_PREFIX}(((\\-?)[a-z]+)?)(\\.)${typename}');
+          RegExp matcher = RegExp('^(${APPLICATION_CONFIGURATION_RESOURCE_PREFIX}|${CONFIGURE_CONFIGURATION_RESOURCE})(((\-?)[a-z]+)?)(\.)${typename}');
           await for (FileSystemEntity file in resourceDirectory.list(followLinks: false)) {
             if (file is File) {
               String filePath = file.path;
@@ -56,11 +64,16 @@ class _ApplicationConfigurationResourceFinder implements ApplicationConfiguratio
       } catch (e) {
         print('Error searching for configuration files: $e');
       }
+      // 先检查application.yml
       String defaultConfigurationFilename = APPLICATION_CONFIGURATION_RESOURCE_PREFIX;
-      if (allPaths_[defaultConfigurationFilename] == null) {
-        throw ApplicationConfigurationResourceNotFoundException(filename: APPLICATION_CONFIGURATION_RESOURCE_PREFIX);
-      } else {
+      if (allPaths_[defaultConfigurationFilename] != null) {
         result[defaultConfigurationFilename] = allPaths_[defaultConfigurationFilename];
+      } 
+      // 如果没有application.yml，检查configure.yml
+      else if (allPaths_[CONFIGURE_CONFIGURATION_RESOURCE] != null) {
+        result[CONFIGURE_CONFIGURATION_RESOURCE] = allPaths_[CONFIGURE_CONFIGURATION_RESOURCE];
+      } else {
+        throw ApplicationConfigurationResourceNotFoundException(filename: '$APPLICATION_CONFIGURATION_RESOURCE_PREFIX or $CONFIGURE_CONFIGURATION_RESOURCE');
       }
       if (environment != null && environment.value != null) {
         String environmentFilename = '${APPLICATION_CONFIGURATION_RESOURCE_PREFIX}-${environment.value}';

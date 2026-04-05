@@ -778,6 +778,189 @@ database:
     autoRun: true
 ```
 
+## 缓存系统
+
+Q.dart 提供了完整的缓存系统，支持内存缓存和分布式缓存，具有安全保护措施和灵活的缓存失效策略。
+
+### 1. 内存缓存
+
+**基本使用**：
+
+```dart
+import 'package:Q/Q.dart';
+
+void main() async {
+  // 创建应用实例
+  Application app = Application();
+  
+  // 初始化应用（会自动初始化配置）
+  app.init();
+  
+  // 从配置初始化缓存管理器
+  CacheUtils.initializeFromConfigure(app.applicationContext.configuration.cacheConfigure);
+  
+  // 获取全局缓存
+  final cache = await CacheUtils.globalCache;
+  
+  // 设置缓存
+  await cache.set('key1', 'value1');
+  await cache.set('key2', 'value2', ttl: Duration(seconds: 30));
+  
+  // 获取缓存
+  final value1 = await cache.get('key1');
+  final value2 = await cache.get('key2');
+  
+  // 检查缓存是否存在
+  bool exists = await cache.contains('key1');
+  
+  // 删除缓存
+  await cache.remove('key1');
+  
+  // 清空缓存
+  await cache.clear();
+  
+  // 获取缓存大小
+  int size = await cache.size();
+}
+```
+
+### 2. 缓存失效策略
+
+Q.dart 支持多种缓存失效策略：
+
+#### TTL (Time-To-Live) 策略
+
+为缓存项设置过期时间，过期后自动失效：
+
+```dart
+// 设置 30 秒过期
+await cache.set('key', 'value', ttl: Duration(seconds: 30));
+
+// 设置 1 小时过期
+await cache.set('key', 'value', ttl: Duration(hours: 1));
+```
+
+#### 手动失效
+
+通过代码手动删除缓存项：
+
+```dart
+// 删除单个缓存项
+await cache.remove('key');
+
+// 清空整个缓存
+await cache.clear();
+```
+
+#### 惰性删除
+
+当获取缓存时，会自动检查缓存项是否过期，过期则返回 null 并删除该缓存项：
+
+```dart
+// 获取缓存时自动检查过期
+final value = await cache.get('key');
+if (value == null) {
+  // 缓存不存在或已过期
+  // 从数据源获取数据并重新缓存
+  final data = await fetchData();
+  await cache.set('key', data, ttl: Duration(minutes: 5));
+}
+```
+
+### 3. 命名缓存
+
+```dart
+// 获取用户缓存
+final userCache = await CacheUtils.getCache('user');
+await userCache.set('user1', {'id': 1, 'name': 'John'});
+
+// 获取产品缓存
+final productCache = await CacheUtils.getCache('product');
+await productCache.set('product1', {'id': 1, 'name': 'Product 1'});
+```
+
+### 4. 分布式缓存
+
+**Redis 缓存**：
+
+```dart
+import 'package:Q/Q.dart';
+
+// 实现 RedisClient 接口
+class RedisClientImpl implements RedisClient {
+  // 实现 Redis 客户端方法
+  @override
+  Future<String> get(String key) async {
+    // 实现 Redis GET 命令
+  }
+  
+  @override
+  Future<void> set(String key, String value) async {
+    // 实现 Redis SET 命令
+  }
+  
+  // 其他方法实现...
+}
+
+void main() async {
+  // 创建 Redis 客户端
+  final redisClient = RedisClientImpl();
+  
+  // 初始化缓存管理器
+  final cacheManager = CacheManagerImpl(redisClient: redisClient);
+  CacheUtils.initialize(cacheManager);
+  
+  // 使用 Redis 缓存
+  final cache = await CacheUtils.globalCache;
+  // ...
+}
+```
+
+### 5. 缓存安全
+
+Q.dart 的缓存系统内置了安全措施：
+
+- **缓存键安全**：自动清理不安全的键字符，防止缓存键注入
+- **敏感数据保护**：自动检测和加密敏感数据（邮箱、手机号、信用卡号等）
+- **速率限制**：防止缓存洪水攻击
+- **超时处理**：防止缓存操作阻塞系统
+
+**安全配置**：
+
+```dart
+final cacheManager = CacheManagerImpl(
+  encryptionKey: 'your-secure-encryption-key',
+  enableSecurity: true,
+  rateLimiter: RateLimiter(
+    maxRequests: 100, // 每分钟最大请求数
+    window: Duration(minutes: 1), // 时间窗口
+  )
+);
+```
+
+### 6. 缓存配置
+
+在 `configure.yml` 中配置缓存：
+
+```yaml
+cache:
+  enabled: true
+  defaultTtl: 300 # 默认过期时间（秒）
+  security:
+    enabled: true
+    encryptionKey: your-secure-encryption-key
+  rateLimit:
+    enabled: true
+    maxRequests: 100
+    window: 60 # 秒
+  redis:
+    enabled: false
+    host: localhost
+    port: 6379
+    password: your-redis-password
+    db: 0
+```
+
 ## 部署
 
 ### 1. 构建应用
@@ -902,6 +1085,98 @@ void main() {
   // 受保护的路由
   app.get('/admin', (Context context) async {
     return {'message': 'Welcome, admin!'};
+  });
+  
+  // 启动服务器
+  app.listen(8080);
+  print('Server started on port 8080');
+}
+```
+
+### 数据库应用
+
+```dart
+import 'dart:io';
+import 'package:Q/Q.dart';
+import 'package:Q/src/database/Database.dart';
+
+void main() async {
+  Application app = Application();
+  app.init();
+  
+  // 创建数据库连接池
+  DatabaseConnectionPool pool = DatabaseConnectionPoolImpl(
+    config: DatabasePoolConfig(),
+    connectionFactory: () async {
+      return SqliteConnection(databasePath: 'database.db');
+    },
+  );
+  
+  // 初始化数据库
+  await pool.execute('''
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL UNIQUE
+    )
+  ''');
+  
+  // API 路由
+  app.get('/api/users', (Context context) async {
+    final users = await pool.query('SELECT * FROM users');
+    return {'users': users};
+  });
+  
+  app.post('/api/users', (Context context) async {
+    var data = context.request.data;
+    final id = await pool.insert(
+      'INSERT INTO users (name, email) VALUES (?, ?)',
+      params: [data['name'], data['email']],
+    );
+    return {'id': id, 'name': data['name'], 'email': data['email']};
+  });
+  
+  // 启动服务器
+  app.listen(8080);
+  print('Server started on port 8080');
+}
+```
+
+### 缓存应用
+
+```dart
+import 'dart:io';
+import 'package:Q/Q.dart';
+
+void main() async {
+  Application app = Application();
+  app.init();
+  
+  // 初始化缓存管理器
+  final cacheManager = CacheManagerImpl(
+    encryptionKey: 'your-secure-key',
+    enableSecurity: true,
+  );
+  CacheUtils.initialize(cacheManager);
+  
+  // API 路由
+  app.get('/api/users', (Context context) async {
+    // 尝试从缓存获取
+    final cachedUsers = await CacheUtils.get('users');
+    if (cachedUsers != null) {
+      return cachedUsers;
+    }
+    
+    // 从数据库获取（模拟）
+    final users = [
+      {'id': 1, 'name': 'User 1'},
+      {'id': 2, 'name': 'User 2'},
+    ];
+    
+    // 缓存结果
+    await CacheUtils.set('users', users, ttl: Duration(minutes: 5));
+    
+    return users;
   });
   
   // 启动服务器

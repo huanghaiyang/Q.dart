@@ -32,7 +32,7 @@ import 'package:Q/src/resource/ApplicationConfigurationResource.dart';
 abstract class ApplicationInitializer {
   Application get application;
 
-  void init();
+  Future<void> init();
 
   ApplicationContext createApplicationContext();
 
@@ -66,7 +66,7 @@ class _ApplicationInitializer implements ApplicationInitializer {
   }
 
   @override
-  void init() async {
+  Future<void> init() async {
     this.createApplicationContext();
 
     ApplicationConfiguration defaultBootstrapConfiguration = await applicationConfigurationMapper.init();
@@ -75,7 +75,7 @@ class _ApplicationInitializer implements ApplicationInitializer {
     List<ApplicationConfigurationResource> resources = await this.applicationConfigurationResourceResolver.resolve(environment);
     await this.applicationConfigurationResourceValidator.check(resources);
     List<ApplicationConfiguration> configurations = await this.applicationConfigurationLoader.load(resources);
-    ApplicationConfiguration configuration =
+    ApplicationConfiguration configuration = 
         await this.applicationConfigurationMixer.mix(configurations, defaultBootstrapConfiguration: defaultBootstrapConfiguration);
     await this.initConfiguration(configuration);
 

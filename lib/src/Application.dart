@@ -118,7 +118,7 @@ class _Application implements Application {
   ApplicationArgumentsParsedDelegate applicationArgumentsParsedDelegate;
 
   @override
-  void init() async {
+  Future<void> init() async {
     this.middleWares_ = List();
     this.routers_ = List();
     this.handlers_ = Map();
