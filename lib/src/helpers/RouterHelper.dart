@@ -13,6 +13,7 @@ import 'package:Q/src/annotation/CookieValue.dart';
 import 'package:Q/src/annotation/PathVariable.dart';
 import 'package:Q/src/annotation/RequestHeader.dart';
 import 'package:Q/src/annotation/RequestParam.dart';
+import 'package:Q/src/annotation/Request.dart' as RequestAnnotation;
 import 'package:Q/src/annotation/SessionValue.dart';
 import 'package:Q/src/annotation/UrlParam.dart';
 import 'package:Q/src/i18n/annotations/Locale.dart';
@@ -29,6 +30,7 @@ import 'package:Q/src/helpers/reflect/PathVariableHelper.dart';
 import 'package:Q/src/helpers/reflect/RawBodyHelper.dart';
 import 'package:Q/src/helpers/reflect/RequestHeaderHelper.dart';
 import 'package:Q/src/helpers/reflect/RequestParamHelper.dart';
+import 'package:Q/src/helpers/reflect/RequestHelper.dart';
 import 'package:Q/src/helpers/reflect/SessionValueHelper.dart';
 import 'package:Q/src/helpers/reflect/UrlParamHelper.dart';
 import 'package:Q/src/utils/RouterTrie.dart';
@@ -279,6 +281,10 @@ class RouterHelper {
             if (type == reflectClass(Locale)) {
               List localeParams = [router.context, parameterMirror, instanceMirror];
               futures.add(Function.apply(LocaleHelper.reflectLocaleParameter, localeParams));
+              break;
+            }
+            if (type == reflectClass(RequestAnnotation.Request)) {
+              futures.add(Function.apply(RequestHelper.reflectRequest, params));
               break;
             }
           }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:Q/Q.dart';
 import 'package:Q/src/Context.dart';
+import 'package:Q/src/annotation/Request.dart' as RequestAnnotation;
 import 'package:Q/src/i18n/annotations/Locale.dart';
 import 'package:Q/src/i18n/I18nManager.dart';
 import 'package:Q/src/i18n/I18nResourceBundle.dart';
@@ -28,6 +29,10 @@ void main() async {
       app.get('/message', (Context context, [HttpRequest request, HttpResponse response]) async {
         String message = I18nManager().getMessage('welcome', locale: I18nManager().getLocaleFromRequest(request));
         return {'message': message};
+      });
+
+      app.get('/request-test', (Context context, [HttpRequest request, HttpResponse response, @RequestAnnotation.Request() req]) async {
+        return {'message': 'Request object received', 'hasRequest': req != null};
       });
     });
 

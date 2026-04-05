@@ -1,6 +1,7 @@
 import 'dart:mirrors';
 
 import 'package:Q/src/annotation/Annotation.dart';
+import 'package:Q/src/annotation/Request.dart' as RequestAnnotation;
 import 'package:Q/src/i18n/annotations/Locale.dart';
 
 List<Type> SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATIONS = [
@@ -15,6 +16,7 @@ List<Type> SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATIONS = [
   Body,
   RawBody,
   Locale,
+  RequestAnnotation.Request,
 ];
 
 List<ClassMirror> SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATION_CLASSES =
