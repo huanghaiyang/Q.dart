@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:Q/src/Request.dart';
 import 'package:Q/src/resolver/AbstractResolver.dart';
 import 'package:Q/src/resolver/ApplicationJsonResolver.dart';
+import 'package:Q/src/resolver/FormDataResolver.dart';
 import 'package:Q/src/resolver/TextResolver.dart';
 import 'package:Q/src/resolver/XmlResolver.dart';
 import 'package:Q/src/resolver/X3WFormUrlEncodedResolver.dart';
@@ -151,6 +152,22 @@ void main() {
       AbstractResolver resolver = X3WFormUrlEncodedResolver.instance();
       String formData = 'name=test&value=123';
       HttpRequest req = MockHttpRequest(ContentType('application', 'x-www-form-urlencoded'), [formData.codeUnits]);
+      Request request = await resolver.resolve(req);
+      expect(request.data['name'], ['test']);
+      expect(request.data['value'], ['123']);
+    });
+    
+    test('FormDataResolver should match application/form-data content type', () async {
+      AbstractResolver resolver = FormDataResolver.instance();
+      HttpRequest req = MockHttpRequest(ContentType('application', 'form-data'), []);
+      bool matched = await resolver.match(req);
+      expect(matched, true);
+    });
+    
+    test('FormDataResolver should resolve form data', () async {
+      AbstractResolver resolver = FormDataResolver.instance();
+      String formData = 'name=test&value=123';
+      HttpRequest req = MockHttpRequest(ContentType('application', 'form-data'), [formData.codeUnits]);
       Request request = await resolver.resolve(req);
       expect(request.data['name'], ['test']);
       expect(request.data['value'], ['123']);

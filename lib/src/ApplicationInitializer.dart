@@ -26,6 +26,7 @@ import 'package:Q/src/security/csrf/CsrfInterceptor.dart';
 import 'package:Q/src/security/xss/XssInterceptor.dart';
 import 'package:Q/src/resolver/ApplicationJsonResolver.dart';
 import 'package:Q/src/resolver/DefaultRequestResolver.dart';
+import 'package:Q/src/resolver/FormDataResolver.dart';
 import 'package:Q/src/resolver/MultipartFormDataResolver.dart';
 import 'package:Q/src/resolver/ResolverType.dart';
 import 'package:Q/src/resolver/X3WFormUrlEncodedResolver.dart';
@@ -118,6 +119,7 @@ class _ApplicationInitializer implements ApplicationInitializer {
     this.application.addResolver(ResolverType.MULTIPART, MultipartResolver.instance());
     this.application.addResolver(ResolverType.JSON, JsonResolver.instance());
     this.application.addResolver(ResolverType.FORM_URLENCODED, X3WFormUrlEncodedResolver.instance());
+    this.application.addResolver(ResolverType.FORM_DATA, FormDataResolver.instance());
     this.application.addResolver(ResolverType.TEXT, TextResolver.instance());
     this.application.addResolver(ResolverType.XML, XmlResolver.instance());
     this.application.addResolver(ResolverType.DEFAULT, DefaultRequestResolver.instance());
