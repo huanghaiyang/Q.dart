@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:Q/Q.dart';
+import 'package:Q/src/Middleware.dart';
+import 'package:Q/src/aware/MiddlewareAware.dart';
 
 abstract class Application extends CloseableAware
     with
@@ -16,7 +18,8 @@ abstract class Application extends CloseableAware
         ApplicationListenerAware<AbstractListener, ApplicationListenerType, List>,
         HttpRequestContextAware<Context>,
         ApplicationHttpServerAware,
-        ApplicationArgumentsParsedAware<List<String>, List<String>> {
+        ApplicationArgumentsParsedAware<List<String>, List<String>>,
+        MiddlewareAware<Middleware> {
   factory Application() => _Application.instance();
 
   factory Application.instance() => _Application.instance();
@@ -49,8 +52,6 @@ abstract class Application extends CloseableAware
 
   set httpRequestInterceptorChain(HttpRequestInterceptorChain httpRequestInterceptorChain);
 
-  void use(Middleware middleware);
-
   dynamic getDelegate(Type delegateType);
 
   void init();
@@ -58,7 +59,7 @@ abstract class Application extends CloseableAware
   void registerBlueprint(Blueprint blueprint);
 }
 
-class _Application implements Application {
+class _Application implements Application, MiddlewareAware<Middleware> {
   _Application._();
 
   static _Application _instance;
@@ -156,6 +157,76 @@ class _Application implements Application {
     if (middleware != null) {
       this.middleWares_.add(middleware);
     }
+  }
+
+  // 使用中间件配置添加中间件
+  @override
+  void useWithConfig(Middleware middleware, {
+    int priority,
+    String name,
+    String group,
+    MiddlewareType type,
+  }) {
+    if (middleware != null) {
+      // 覆盖中间件的属性
+      if (priority != null) {
+        middleware.priority = priority;
+      }
+      if (name != null) {
+        middleware.name = name;
+      }
+      if (group != null) {
+        middleware.group = group;
+      }
+      if (type != null) {
+        middleware.type = type;
+      }
+      this.middleWares_.add(middleware);
+    }
+  }
+
+  // 批量添加中间件
+  @override
+  void useAll(Iterable<Middleware> middlewares) {
+    if (middlewares != null) {
+      this.middleWares_.addAll(middlewares);
+    }
+  }
+
+  // 按分组获取中间件
+  @override
+  List<Middleware> getMiddlewaresByGroup(String group) {
+    return this.middleWares_.where((middleware) => middleware.group == group).toList();
+  }
+
+  // 按分组移除中间件
+  @override
+  void removeMiddlewaresByGroup(String group) {
+    this.middleWares_.removeWhere((middleware) => middleware.group == group);
+  }
+
+  // 按名称获取中间件
+  @override
+  Middleware getMiddlewareByName(String name) {
+    return this.middleWares_.firstWhere((middleware) => middleware.name == name, orElse: () => null);
+  }
+
+  // 按名称移除中间件
+  @override
+  void removeMiddlewareByName(String name) {
+    this.middleWares_.removeWhere((middleware) => middleware.name == name);
+  }
+
+  // 按类型获取中间件
+  @override
+  List<Middleware> getMiddlewaresByType(MiddlewareType type) {
+    return this.middleWares_.where((middleware) => middleware.type == type).toList();
+  }
+
+  // 移除所有中间件
+  @override
+  void clearMiddlewares() {
+    this.middleWares_.clear();
   }
 
   @override

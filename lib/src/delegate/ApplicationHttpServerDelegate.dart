@@ -100,9 +100,31 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
 
   // response中间件
   Future<Context> handleWithMiddleware(Context context, MiddlewareType type, Function onFinished, Function onError) async {
-    await for (Middleware middleware
-        in Stream.fromIterable(this.application.middleWares.where((Middleware middleware) => middleware.type == type))) {
-      await middleware.handle(context, onFinished, onError);
+    // 按优先级排序，值越大优先级越高
+    List<Middleware> sortedMiddlewares = this.application.middleWares
+        .where((Middleware middleware) => middleware.type == type)
+        .toList()
+        ..sort((a, b) => b.priority.compareTo(a.priority));
+    
+    for (Middleware middleware in sortedMiddlewares) {
+      try {
+        await middleware.handle(context, onFinished, onError);
+      } catch (e, stackTrace) {
+        print('Middleware error (${middleware.name ?? middleware.runtimeType}): $e');
+        print('Stack trace: $stackTrace');
+        
+        // 调用错误处理函数
+        if (onError != null) {
+          try {
+            await onError(e, stackTrace, context);
+          } catch (errorHandlingError) {
+            print('Error handling error: $errorHandlingError');
+          }
+        }
+        
+        // 可以选择是否继续执行其他中间件
+        // 这里选择继续执行，因为一个中间件的错误不应该影响其他中间件
+      }
     }
     return context;
   }
