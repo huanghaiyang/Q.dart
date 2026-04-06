@@ -24,3 +24,4 @@ export 'package:Q/src/helpers/reflect/ReflectHelper.dart';
 export 'package:Q/src/helpers/reflect/RequestParamHelper.dart';
 export 'package:Q/src/helpers/reflect/SessionValueHelper.dart';
 export 'package:Q/src/helpers/reflect/UrlParamHelper.dart';
+export 'package:Q/src/helpers/RouteScanner.dart';

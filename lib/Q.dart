@@ -1,6 +1,7 @@
 library Q;
 
 export 'src/Application.dart';
+export 'src/Blueprint.dart';
 export 'src/ApplicationBootstrapArgsResolver.dart';
 export 'src/ApplicationConfiguration.dart';
 export 'src/ApplicationConfigurationLoader.dart';
@@ -31,6 +32,7 @@ export 'src/ResponseEntry.dart';
 export 'src/Router.dart';
 export 'src/Sign.dart';
 export 'src/annotation/Annotation.dart';
+export 'src/annotation/Route.dart';
 export 'src/aware/Aware.dart';
 export 'src/cache/Cache.dart';
 export 'src/cache/InMemoryCache.dart';

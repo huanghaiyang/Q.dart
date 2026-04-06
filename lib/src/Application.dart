@@ -54,6 +54,8 @@ abstract class Application extends CloseableAware
   dynamic getDelegate(Type delegateType);
 
   void init();
+  
+  void registerBlueprint(Blueprint blueprint);
 }
 
 class _Application implements Application {
@@ -245,6 +247,23 @@ class _Application implements Application {
   @override
   List<Middleware> get middleWares {
     return this.middleWares_;
+  }
+  
+  /// 注册Blueprint
+  void registerBlueprint(Blueprint blueprint) {
+    if (blueprint != null) {
+      // 注册Blueprint中的所有路由
+      routes(blueprint.routers);
+    }
+  }
+  
+  /// 注册多个Blueprint
+  void registerBlueprints(Iterable<Blueprint> blueprints) {
+    if (blueprints != null) {
+      for (var blueprint in blueprints) {
+        registerBlueprint(blueprint);
+      }
+    }
   }
 
   @override

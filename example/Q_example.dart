@@ -26,6 +26,155 @@ class LoggerMiddleware implements Middleware {
   }
 }
 
+// 注解式路由示例 - UserController
+class UserController {
+  @Get('/api/annotated/users')
+  Future<dynamic> getUsers(Context context) async {
+    return {
+      'message': 'Get all users (annotated)',
+      'controller': 'UserController',
+      'method': 'getUsers'
+    };
+  }
+  
+  @Get('/api/annotated/users/:id')
+  Future<dynamic> getUserById(Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Get user by id (annotated)',
+      'id': id,
+      'controller': 'UserController',
+      'method': 'getUserById'
+    };
+  }
+  
+  @Post('/api/annotated/users')
+  Future<dynamic> createUser(Context context) async {
+    return {
+      'message': 'Create user (annotated)',
+      'controller': 'UserController',
+      'method': 'createUser'
+    };
+  }
+  
+  @Put('/api/annotated/users/:id')
+  Future<dynamic> updateUser(Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Update user (annotated)',
+      'id': id,
+      'controller': 'UserController',
+      'method': 'updateUser'
+    };
+  }
+  
+  @Delete('/api/annotated/users/:id')
+  Future<dynamic> deleteUser(Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Delete user (annotated)',
+      'id': id,
+      'controller': 'UserController',
+      'method': 'deleteUser'
+    };
+  }
+}
+
+// 注解式路由示例 - ProductController
+class ProductController {
+  @Get('/api/annotated/products')
+  Future<dynamic> getProducts(Context context) async {
+    return {
+      'message': 'Get all products (annotated)',
+      'controller': 'ProductController',
+      'method': 'getProducts'
+    };
+  }
+  
+  @Get('/api/annotated/products/:id')
+  Future<dynamic> getProductById(Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Get product by id (annotated)',
+      'id': id,
+      'controller': 'ProductController',
+      'method': 'getProductById'
+    };
+  }
+  
+  @Post('/api/annotated/products')
+  Future<dynamic> createProduct(Context context) async {
+    return {
+      'message': 'Create product (annotated)',
+      'controller': 'ProductController',
+      'method': 'createProduct'
+    };
+  }
+}
+
+// @BlueprintRoute注解示例 - AnnotatedBlueprintController
+@BlueprintRoute('annotated_blueprint', prefix: '/api/annotated_blueprint')
+class AnnotatedBlueprintController {
+  @Get('/users')
+  Future<dynamic> getUsers(Context context) async {
+    return {
+      'message': 'Get all users (@BlueprintRoute annotated)',
+      'controller': 'AnnotatedBlueprintController',
+      'method': 'getUsers',
+      'blueprint': 'annotated_blueprint'
+    };
+  }
+  
+  @Get('/users/:id')
+  Future<dynamic> getUserById(Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Get user by id (@BlueprintRoute annotated)',
+      'id': id,
+      'controller': 'AnnotatedBlueprintController',
+      'method': 'getUserById',
+      'blueprint': 'annotated_blueprint'
+    };
+  }
+  
+  @Post('/users')
+  Future<dynamic> createUser(Context context) async {
+    return {
+      'message': 'Create user (@BlueprintRoute annotated)',
+      'controller': 'AnnotatedBlueprintController',
+      'method': 'createUser',
+      'blueprint': 'annotated_blueprint'
+    };
+  }
+  
+  @Put('/users/:id')
+  Future<dynamic> updateUser(Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Update user (@BlueprintRoute annotated)',
+      'id': id,
+      'controller': 'AnnotatedBlueprintController',
+      'method': 'updateUser',
+      'blueprint': 'annotated_blueprint'
+    };
+  }
+  
+  @Delete('/users/:id')
+  Future<dynamic> deleteUser(Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Delete user (@BlueprintRoute annotated)',
+      'id': id,
+      'controller': 'AnnotatedBlueprintController',
+      'method': 'deleteUser',
+      'blueprint': 'annotated_blueprint'
+    };
+  }
+  
+  @Get('/products')
+  Future<dynamic> getProducts(Context context) async {
+    return {
+      'message': 'Get all products (@BlueprintRoute annotated)',
+      'controller': 'AnnotatedBlueprintController',
+      'method': 'getProducts',
+      'blueprint': 'annotated_blueprint'
+    };
+  }
+}
+
 Application app;
 
 void main(List<String> arguments) async {
@@ -441,6 +590,80 @@ void start(List<String> arguments) async {
     throw Exception('Test error');
   });
 
+  // Blueprint示例
+  // 创建用户相关的Blueprint
+  Blueprint userBlueprint = Blueprint('user', prefix: '/api/users');
+  
+  // 注册用户相关路由
+  userBlueprint.get('', (Context context, [HttpRequest req, HttpResponse res]) async {
+    return {
+      'message': 'Get all users',
+      'endpoint': 'userBlueprint'
+    };
+  });
+  
+  userBlueprint.get('/:id', (Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Get user by id',
+      'id': id,
+      'endpoint': 'userBlueprint'
+    };
+  });
+  
+  userBlueprint.post('', (Context context, [HttpRequest req, HttpResponse res]) async {
+    return {
+      'message': 'Create user',
+      'endpoint': 'userBlueprint'
+    };
+  });
+  
+  userBlueprint.put('/:id', (Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Update user',
+      'id': id,
+      'endpoint': 'userBlueprint'
+    };
+  });
+  
+  userBlueprint.delete('/:id', (Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Delete user',
+      'id': id,
+      'endpoint': 'userBlueprint'
+    };
+  });
+  
+  // 创建产品相关的Blueprint
+  Blueprint productBlueprint = Blueprint('product', prefix: '/api/products');
+  
+  // 注册产品相关路由
+  productBlueprint.get('', (Context context, [HttpRequest req, HttpResponse res]) async {
+    return {
+      'message': 'Get all products',
+      'endpoint': 'productBlueprint'
+    };
+  });
+  
+  productBlueprint.get('/:id', (Context context, [HttpRequest req, HttpResponse res, @PathVariable('id') String id]) async {
+    return {
+      'message': 'Get product by id',
+      'id': id,
+      'endpoint': 'productBlueprint'
+    };
+  });
+  
+  // 注册Blueprint到应用
+  app.registerBlueprint(userBlueprint);
+  app.registerBlueprint(productBlueprint);
+
+  // 注解式路由示例
+  // 扫描带有路由注解的类
+  RouteScanner.scanClass(app, UserController);
+  RouteScanner.scanClass(app, ProductController);
+  
+  // 扫描带有@BlueprintRoute注解的类
+  RouteScanner.scanClass(app, AnnotatedBlueprintController);
+
   await app.listen(8081);
   print('Q.dart Comprehensive Example Server started on port 8081');
   print('\n=== Available Endpoints ===');
@@ -483,6 +706,30 @@ void start(List<String> arguments) async {
   print('- POST /setSession      - Set session example (requires auth)');
   print('- POST /getSession      - Get session example (requires auth)');
   print('- POST /request_no_content_type - No content type example (requires auth)');
+  print('\nBlueprint Endpoints:');
+  print('- GET  /api/users        - Get all users (userBlueprint)');
+  print('- GET  /api/users/:id    - Get user by id (userBlueprint)');
+  print('- POST /api/users        - Create user (userBlueprint)');
+  print('- PUT  /api/users/:id    - Update user (userBlueprint)');
+  print('- DELETE /api/users/:id  - Delete user (userBlueprint)');
+  print('- GET  /api/products     - Get all products (productBlueprint)');
+  print('- GET  /api/products/:id - Get product by id (productBlueprint)');
+  print('\nAnnotated Routes:');
+  print('- GET  /api/annotated/users        - Get all users (UserController)');
+  print('- GET  /api/annotated/users/:id    - Get user by id (UserController)');
+  print('- POST /api/annotated/users        - Create user (UserController)');
+  print('- PUT  /api/annotated/users/:id    - Update user (UserController)');
+  print('- DELETE /api/annotated/users/:id  - Delete user (UserController)');
+  print('- GET  /api/annotated/products     - Get all products (ProductController)');
+  print('- GET  /api/annotated/products/:id - Get product by id (ProductController)');
+  print('- POST /api/annotated/products     - Create product (ProductController)');
+  print('\n@BlueprintRoute Annotated Routes:');
+  print('- GET  /api/annotated_blueprint/users        - Get all users (AnnotatedBlueprintController)');
+  print('- GET  /api/annotated_blueprint/users/:id    - Get user by id (AnnotatedBlueprintController)');
+  print('- POST /api/annotated_blueprint/users        - Create user (AnnotatedBlueprintController)');
+  print('- PUT  /api/annotated_blueprint/users/:id    - Update user (AnnotatedBlueprintController)');
+  print('- DELETE /api/annotated_blueprint/users/:id  - Delete user (AnnotatedBlueprintController)');
+  print('- GET  /api/annotated_blueprint/products     - Get all products (AnnotatedBlueprintController)');
   print('\n=== Testing Guide ===');
   print('\n1. Authentication:');
   print('   - POST /login with {"username": "admin", "password": "any"}');
