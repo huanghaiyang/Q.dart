@@ -65,3 +65,4 @@ export 'src/utils/Utils.dart';
 export 'src/views/Views.dart';
 export 'src/database/Database.dart';
 export 'src/security/Security.dart';
+export 'src/graphql/GraphQL.dart';
