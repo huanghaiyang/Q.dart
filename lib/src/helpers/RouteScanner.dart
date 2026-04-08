@@ -3,6 +3,8 @@ import 'dart:mirrors';
 
 import 'package:Q/Q.dart';
 import 'package:Q/src/annotation/Route.dart';
+import 'package:Q/src/annotation/Timeout.dart';
+import 'package:Q/src/request/RequestTimeout.dart';
 
 /// 路由扫描器，用于扫描带有路由注解的类和方法
 class RouteScanner {
@@ -63,8 +65,12 @@ class RouteScanner {
             return result;
           };
           
+          // 获取Timeout注解
+          Timeout timeoutAnnotation = _getTimeoutAnnotation(declaration);
+          RequestTimeout requestTimeout = _convertToRequestTimeout(timeoutAnnotation);
+          
           // 根据注解类型创建相应的路由到Blueprint中
-          _createRouteInBlueprint(blueprint, route, declaration, handle);
+          _createRouteInBlueprint(blueprint, route, declaration, handle, requestTimeout);
         }
       }
     }
@@ -97,8 +103,12 @@ class RouteScanner {
             return result;
           };
           
+          // 获取Timeout注解
+          Timeout timeoutAnnotation = _getTimeoutAnnotation(declaration);
+          RequestTimeout requestTimeout = _convertToRequestTimeout(timeoutAnnotation);
+          
           // 根据注解类型创建相应的路由
-          _createRoute(app, route, declaration, handle);
+          _createRoute(app, route, declaration, handle, requestTimeout);
         }
       }
     }
@@ -137,34 +147,73 @@ class RouteScanner {
     
     return annotations.isNotEmpty ? annotations[0] : null;
   }
-  
-  /// 根据注解类型创建相应的路由到Application中
-  static void _createRoute(Application app, Route route, MethodMirror methodMirror, RouterHandleFunction handle) {
-    if (route is Get) {
-      app.get(route.path, handle, name: route.name);
-    } else if (route is Post) {
-      app.post(route.path, handle, name: route.name);
-    } else if (route is Put) {
-      app.put(route.path, handle, name: route.name);
-    } else if (route is Delete) {
-      app.delete(route.path, handle, name: route.name);
-    } else if (route is Patch) {
-      app.patch(route.path, handle, name: route.name);
+
+  /// 获取方法上的Timeout注解
+  static Timeout _getTimeoutAnnotation(MethodMirror methodMirror) {
+    List<Timeout> annotations = [];
+    for (var metadata in methodMirror.metadata) {
+      var annotation = metadata.reflectee;
+      if (annotation is Timeout) {
+        annotations.add(annotation);
+      }
     }
+    
+    if (annotations.length > 1) {
+      throw ArgumentError('A method can only have one @Timeout annotation. Found ${annotations.length} annotations.');
+    }
+    
+    return annotations.isNotEmpty ? annotations[0] : null;
+  }
+
+  /// 将Timeout注解转换为RequestTimeout
+  static RequestTimeout _convertToRequestTimeout(Timeout timeout) {
+    if (timeout == null) return null;
+    
+    return RequestTimeout(
+      Duration(milliseconds: timeout.timeoutValue),
+      timeout.timeoutResult ?? () async => 'Request timeout',
+    );
   }
   
-  /// 根据注解类型创建相应的路由到Blueprint中
-  static void _createRouteInBlueprint(Blueprint blueprint, Route route, MethodMirror methodMirror, RouterHandleFunction handle) {
+  /// 根据注解类型创建相应的路由到Application中
+  static void _createRoute(Application app, Route route, MethodMirror methodMirror, RouterHandleFunction handle, RequestTimeout timeout) {
+    Router router;
     if (route is Get) {
-      blueprint.get(route.path, handle, name: route.name);
+      router = app.get(route.path, handle, name: route.name);
     } else if (route is Post) {
-      blueprint.post(route.path, handle, name: route.name);
+      router = app.post(route.path, handle, name: route.name);
     } else if (route is Put) {
-      blueprint.put(route.path, handle, name: route.name);
+      router = app.put(route.path, handle, name: route.name);
     } else if (route is Delete) {
-      blueprint.delete(route.path, handle, name: route.name);
+      router = app.delete(route.path, handle, name: route.name);
     } else if (route is Patch) {
-      blueprint.patch(route.path, handle, name: route.name);
+      router = app.patch(route.path, handle, name: route.name);
+    }
+    
+    // 设置超时
+    if (router != null && timeout != null) {
+      router.setTimeout(timeout);
+    }
+  }
+
+  /// 根据注解类型创建相应的路由到Blueprint中
+  static void _createRouteInBlueprint(Blueprint blueprint, Route route, MethodMirror methodMirror, RouterHandleFunction handle, RequestTimeout timeout) {
+    Router router;
+    if (route is Get) {
+      router = blueprint.get(route.path, handle, name: route.name);
+    } else if (route is Post) {
+      router = blueprint.post(route.path, handle, name: route.name);
+    } else if (route is Put) {
+      router = blueprint.put(route.path, handle, name: route.name);
+    } else if (route is Delete) {
+      router = blueprint.delete(route.path, handle, name: route.name);
+    } else if (route is Patch) {
+      router = blueprint.patch(route.path, handle, name: route.name);
+    }
+    
+    // 设置超时
+    if (router != null && timeout != null) {
+      router.setTimeout(timeout);
     }
   }
 }
