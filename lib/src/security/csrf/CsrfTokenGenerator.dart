@@ -45,7 +45,11 @@ class CsrfTokenGenerator {
       final decoded = utf8.decode(base64Url.decode(token));
       final payload = jsonDecode(decoded);
       final expiry = payload['expiry'];
-      return expiry < DateTime.now().millisecondsSinceEpoch;
+      // 检查 expiry 是否为数字
+      if (expiry is num) {
+        return expiry < DateTime.now().millisecondsSinceEpoch;
+      }
+      return true;
     } catch (e) {
       return true;
     }

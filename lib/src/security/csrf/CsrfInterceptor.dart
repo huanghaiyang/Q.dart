@@ -13,11 +13,13 @@ class CsrfInterceptor implements AbstractInterceptor {
   final List<String> protectedMethods;
   final bool enabled;
   final int tokenMaxAge;
+  final bool cookieSecure;
 
   CsrfInterceptor._({
     this.protectedMethods = const ['POST', 'PUT', 'DELETE', 'PATCH'],
     this.enabled = true,
     this.tokenMaxAge = 3600000,
+    this.cookieSecure = true,
   });
 
   static CsrfInterceptor _instance;
@@ -26,11 +28,13 @@ class CsrfInterceptor implements AbstractInterceptor {
     List<String> protectedMethods = const ['POST', 'PUT', 'DELETE', 'PATCH'],
     bool enabled = true,
     int tokenMaxAge = 3600000,
+    bool cookieSecure = true,
   }) {
     return _instance ?? (_instance = CsrfInterceptor._(
       protectedMethods: protectedMethods,
       enabled: enabled,
       tokenMaxAge: tokenMaxAge,
+      cookieSecure: cookieSecure,
     ));
   }
 
@@ -92,7 +96,7 @@ class CsrfInterceptor implements AbstractInterceptor {
       String newToken = CsrfTokenGenerator.generateWithTimestamp();
       Cookie cookie = Cookie(CSRF_TOKEN_COOKIE, newToken);
       cookie.httpOnly = true;
-      cookie.secure = true;
+      cookie.secure = cookieSecure;
       res.cookies.add(cookie);
     }
   }

@@ -62,7 +62,7 @@ security:
     
     test('配置文件和环境变量加载测试', () async {
       // 创建测试配置文件
-      String testConfigPath = 'test/test_config.yml';
+      String testConfigPath = 'test/test_config2.yml';
       File testConfigFile = File(testConfigPath);
       await testConfigFile.writeAsString('''
 server:

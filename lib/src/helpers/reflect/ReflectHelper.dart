@@ -1,4 +1,5 @@
 import 'dart:mirrors';
+import 'dart:convert';
 
 import 'package:Q/src/utils/SymbolUtil.dart';
 
@@ -9,69 +10,129 @@ class ReflectHelper {
   static Map<String, dynamic> _typeConversionCache = {};
   // 类型转换缓存大小限制
   static const int MAX_TYPE_CONVERSION_CACHE_SIZE = 1000;
-  static dynamic reflectParameterValue(Type type, String value) {
+  static dynamic reflectParameterValue(Type type, dynamic value) {
     if (value == null) return value;
     
-    // 生成缓存键
-    String cacheKey = '$type:$value';
-    
-    // 检查缓存
-    if (_typeConversionCache.containsKey(cacheKey)) {
-      return _typeConversionCache[cacheKey];
-    }
-    
-    dynamic result;
-    try {
-      switch (type) {
-        case int:
-          result = int.parse(value);
-          break;
-        case String:
-          result = value;
-          break;
-        case bool:
-          if (value == 'true') {
-            result = true;
-          } else if (value == 'false') {
-            result = false;
-          }
-          break;
-        case BigInt:
-          result = BigInt.from(num.parse(value));
-          break;
-        case DateTime:
-          result = DateTime.parse(value);
-          break;
-        case double:
-          result = double.parse(value);
-          break;
-        case num:
-          result = num.parse(value);
-          break;
-        case Symbol:
-          result = Symbol(value);
-          break;
-        default:
-          result = value;
-          break;
+    // 处理基本类型
+    if (value is String) {
+      // 生成缓存键
+      String cacheKey = '$type:$value';
+      
+      // 检查缓存
+      if (_typeConversionCache.containsKey(cacheKey)) {
+        return _typeConversionCache[cacheKey];
       }
       
-      // 缓存结果
-      if (result != null) {
-        // 检查缓存大小
-        if (_typeConversionCache.length >= MAX_TYPE_CONVERSION_CACHE_SIZE) {
-          // 移除最早的缓存项
-          String firstKey = _typeConversionCache.keys.first;
-          _typeConversionCache.remove(firstKey);
+      dynamic result;
+      try {
+        switch (type) {
+          case int:
+            result = int.parse(value);
+            break;
+          case String:
+            result = value;
+            break;
+          case bool:
+            if (value == 'true') {
+              result = true;
+            } else if (value == 'false') {
+              result = false;
+            }
+            break;
+          case BigInt:
+            result = BigInt.from(num.parse(value));
+            break;
+          case DateTime:
+            result = DateTime.parse(value);
+            break;
+          case double:
+            result = double.parse(value);
+            break;
+          case num:
+            result = num.parse(value);
+            break;
+          case Symbol:
+            result = Symbol(value);
+            break;
+          default:
+            // 尝试处理复杂对象类型
+            result = _reflectObjectType(type, value);
+            break;
         }
-        _typeConversionCache[cacheKey] = result;
+        
+        // 缓存结果
+        if (result != null) {
+          // 检查缓存大小
+          if (_typeConversionCache.length >= MAX_TYPE_CONVERSION_CACHE_SIZE) {
+            // 移除最早的缓存项
+            String firstKey = _typeConversionCache.keys.first;
+            _typeConversionCache.remove(firstKey);
+          }
+          _typeConversionCache[cacheKey] = result;
+        }
+      } catch (e) {
+        // 安全处理类型转换异常
+        print('Type conversion error: $e');
+        result = value; // 转换失败时返回原始值
+      }
+      return result;
+    } else if (value is Map) {
+      // 处理 Map 类型，尝试转换为复杂对象
+      return _reflectObjectType(type, value);
+    } else if (value is List) {
+      // 处理 List 类型，尝试转换为泛型集合
+      Type subType = getSubType(type);
+      if (subType != null) {
+        List<dynamic> result = [];
+        for (var item in value) {
+          result.add(reflectParameterValue(subType, item));
+        }
+        return result;
+      }
+    }
+    
+    // 默认返回原始值
+    return value;
+  }
+  
+  // 反射处理对象类型
+  static dynamic _reflectObjectType(Type type, dynamic value) {
+    try {
+      ClassMirror classMirror = reflectClass(type);
+      InstanceMirror instanceMirror = classMirror.newInstance(Symbol.empty, []);
+      
+      // 处理 Map 类型的 value
+      if (value is Map) {
+        // 遍历对象的所有字段
+        for (var declaration in classMirror.declarations.values) {
+          if (declaration is VariableMirror && !declaration.isStatic && !declaration.isPrivate) {
+            String fieldName = MirrorSystem.getName(declaration.simpleName);
+            if (value.containsKey(fieldName)) {
+              // 获取字段类型
+              Type fieldType = declaration.type.reflectedType;
+              // 递归处理字段值
+              dynamic fieldValue = reflectParameterValue(fieldType, value[fieldName]);
+              // 设置字段值
+              instanceMirror.setField(declaration.simpleName, fieldValue);
+            }
+          }
+        }
+        return instanceMirror.reflectee;
+      } else if (value is String) {
+        // 尝试将字符串解析为 JSON
+        try {
+          Map<String, dynamic> jsonMap = json.decode(value);
+          return _reflectObjectType(type, jsonMap);
+        } catch (e) {
+          // 解析失败，返回原始值
+          return value;
+        }
       }
     } catch (e) {
-      // 安全处理类型转换异常
-      print('Type conversion error: $e');
-      result = value; // 转换失败时返回原始值
+      // 处理异常，返回原始值
+      print('Object type conversion error: $e');
     }
-    return result;
+    return value;
   }
 
   // 获取list或者set的子元素类型
@@ -94,7 +155,12 @@ class ReflectHelper {
     return subType;
   }
 
-  static dynamic reflectParameterValues(Type type, List<dynamic> values) {
+  static dynamic reflectParameterValues(Type type, dynamic values) {
+    // 处理单个值的情况
+    if (values is! List) {
+      return reflectParameterValue(type, values);
+    }
+    
     List result = List();
     bool isCollection = false;
     Type subType = reflectSubType(type);
@@ -103,11 +169,13 @@ class ReflectHelper {
     } else {
       subType = type;
     }
+    
     for (var value in values) {
       result.add(reflectParameterValue(subType, value));
     }
+    
     if (isCollection) {
-      return reflectCollection(type, subType, values);
+      return reflectCollection(type, subType, result);
     } else {
       return result.first;
     }

@@ -9,7 +9,7 @@ class GraphQLExecutor {
   final GraphQLSchema schema;
   
   /// 解析器
-  final _GraphQLResolver resolver;
+  final GraphQLResolver resolver;
 
   /// 构造函数
   GraphQLExecutor({this.schema, this.resolver});
@@ -317,7 +317,7 @@ class GraphQLExecutor {
     }
     
     // 处理变量
-    if (valueString.startsWith('$')) {
+    if (valueString.startsWith('\$')) {
       return valueString.substring(1);
     }
     
@@ -332,7 +332,7 @@ class GraphQLExecutor {
       String key = entry.key;
       dynamic value = entry.value;
       
-      if (value is String && value.startsWith('$')) {
+      if (value is String && value.startsWith('\$')) {
         String varName = value.substring(1);
         if (variables != null && variables.containsKey(varName)) {
           resolvedArgs[key] = variables[varName];

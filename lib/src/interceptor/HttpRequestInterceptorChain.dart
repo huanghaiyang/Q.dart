@@ -78,7 +78,7 @@ class _HttpRequestInterceptorChain implements HttpRequestInterceptorChain {
   }
 
   @override
-  void onError(Error error, {StackTrace stackTrace}) {
+  void onError(dynamic error, {StackTrace stackTrace}) {
     print('Exception details:\n $error');
     print('Stack trace:\n $stackTrace');
   }

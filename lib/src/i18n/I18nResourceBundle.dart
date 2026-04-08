@@ -13,14 +13,32 @@ class I18nResourceBundle {
 
   static void _loadResource(String locale) {
     try {
-      String path = 'lib/resources/i18n/messages_$locale.json';
-      File file = File(path);
-      if (file.existsSync()) {
+      final fileName = 'messages_$locale.json';
+      final relativePath = 'lib/resources/i18n/$fileName';
+      
+      // 尝试多个路径加载
+      final paths = [
+        relativePath,
+        '${Directory.current.path}/$relativePath',
+        '${Directory.current.parent.path}/$relativePath',
+      ];
+      
+      File file;
+      String foundPath;
+      for (var path in paths) {
+        file = File(path);
+        if (file.existsSync()) {
+          foundPath = path;
+          break;
+        }
+      }
+      
+      if (foundPath != null) {
         String content = file.readAsStringSync();
         Map<String, dynamic> data = json.decode(content);
         _resources[locale] = data.cast<String, String>();
       } else {
-        print('I18n resource file not found: $path');
+        print('I18n resource file not found: $relativePath');
       }
     } catch (e) {
       print('Error loading i18n resource for $locale: $e');

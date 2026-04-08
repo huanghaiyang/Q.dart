@@ -15,7 +15,7 @@ class GraphQLArgument {
     this.type,
     this.defaultValue,
   }) : name = _sanitizeName(name) {
-    _validateName(name);
+    _validateName(this.name);
   }
 
   /// 转换为 SDL 字符串

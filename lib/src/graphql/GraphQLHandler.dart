@@ -16,16 +16,16 @@ class GraphQLHandler implements HandlerAdapter {
   final GraphQLExecutor executor;
   
   /// 解析器
-  final _GraphQLResolver _resolver;
+  final GraphQLResolver _resolver;
 
   /// 私有构造函数
-  GraphQLHandler._({GraphQLSchema schema, _GraphQLResolver resolver}) : 
+  GraphQLHandler._({GraphQLSchema schema, GraphQLResolver resolver}) : 
     _resolver = resolver,
     executor = GraphQLExecutor(schema: schema, resolver: resolver);
 
   /// 工厂构造函数
   factory GraphQLHandler({GraphQLSchema schema}) {
-    _GraphQLResolver resolver = _GraphQLResolver();
+    GraphQLResolver resolver = GraphQLResolver();
     return GraphQLHandler._(schema: schema, resolver: resolver);
   }
 
@@ -113,7 +113,7 @@ class GraphQLHandler implements HandlerAdapter {
   }
 
   @override
-  Future<dynamic> handle(Context context) async {
+  Future<Context> handle(Context context) async {
     try {
       // 解析请求体
       String body = await _readRequestBody(context, maxSize: 10 * 1024 * 1024); // 10MB 限制
@@ -130,19 +130,23 @@ class GraphQLHandler implements HandlerAdapter {
       );
       
       // 返回结果
-      context.response.headers.contentType = ContentType.json;
-      return jsonEncode(result);
+      context.response.res.headers.contentType = ContentType.json;
+      context.response.res.write(jsonEncode(result));
+      await context.response.res.close();
+      return context;
     } catch (e) {
       // 处理错误
       context.response.status = HttpStatus.badRequest;
-      context.response.headers.contentType = ContentType.json;
-      return jsonEncode({
+      context.response.res.headers.contentType = ContentType.json;
+      context.response.res.write(jsonEncode({
         'errors': [
           {
             'message': e.toString()
           }
         ]
-      });
+      }));
+      await context.response.res.close();
+      return context;
     }
   }
   

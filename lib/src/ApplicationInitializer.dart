@@ -103,11 +103,52 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
   // 内置拦截器初始化
   initInterceptors() {
+    final config = this.application.applicationContext.configuration.securityConfigure;
+    final csrf = config.csrfConfigure;
+    final xss = config.xssConfigure;
+    final headers = config.securityHeadersConfigure;
+
+    // 打印调试信息
+    print('CSRF enabled: ${csrf.enabled}');
+    print('CSRF protected methods: ${csrf.protectedMethods}');
+    print('CSRF token max age: ${csrf.tokenMaxAge}');
+    print('Cookie secure: ${config.httpsConfigure.enabled}');
+    print('XSS enabled: ${xss.enabled}');
+    print('XSS block request: ${xss.blockRequest}');
+    print('XSS protected content types: ${xss.protectedContentTypes}');
+
+    // 构建安全头部配置
+    final securityHeaders = <String, String>{};
+    if (headers.enabled) {
+      if (headers.xssProtection) {
+        securityHeaders['X-XSS-Protection'] = '1; mode=block';
+      }
+      if (headers.contentTypeOptions) {
+        securityHeaders['X-Content-Type-Options'] = 'nosniff';
+      }
+      if (headers.frameOptions) {
+        securityHeaders['X-Frame-Options'] = 'DENY';
+      }
+      if (headers.contentSecurityPolicy) {
+        securityHeaders['Content-Security-Policy'] = headers.contentSecurityPolicyValue ?? "default-src 'self'";
+      }
+    }
+
     this.application.httpRequestInterceptorChain = HttpRequestInterceptorChain([
       CorsInterceptor.instance(),
       I18nInterceptor.instance(),
-      XssInterceptor.instance(),
-      CsrfInterceptor.instance(),
+      XssInterceptor.instance(
+        enabled: xss.enabled,
+        blockRequest: xss.blockRequest,
+        protectedContentTypes: xss.protectedContentTypes,
+        securityHeaders: securityHeaders
+      ),
+      CsrfInterceptor.instance(
+        enabled: csrf.enabled,
+        protectedMethods: csrf.protectedMethods,
+        tokenMaxAge: csrf.tokenMaxAge,
+        cookieSecure: config.httpsConfigure.enabled
+      ),
       UnSupportedContentTypeInterceptor.instance(),
       UnSupportedMethodInterceptor.instance(),
       HttpPrefetchInterceptor.instance()

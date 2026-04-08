@@ -61,12 +61,12 @@ final String SECURITY_AUTH_PUBLIC_PATHS = 'security.auth.publicPaths';
 final String SECURITY_AUTH_PATH_ROLES = 'security.auth.pathRoles';
 final String SECURITY_AUTH_TOKEN_HEADER = 'security.auth.tokenHeader';
 final String SECURITY_AUTH_TOKEN_EXPIRATION = 'security.auth.tokenExpiration';
-final String SECURITY_HEADERS_ENABLED = 'security.securityHeaders.enabled';
-final String SECURITY_HEADERS_XSS_PROTECTION = 'security.securityHeaders.xssProtection';
-final String SECURITY_HEADERS_CONTENT_TYPE_OPTIONS = 'security.securityHeaders.contentTypeOptions';
-final String SECURITY_HEADERS_FRAME_OPTIONS = 'security.securityHeaders.frameOptions';
-final String SECURITY_HEADERS_CONTENT_SECURITY_POLICY = 'security.securityHeaders.contentSecurityPolicy';
-final String SECURITY_HEADERS_CONTENT_SECURITY_POLICY_VALUE = 'security.securityHeaders.contentSecurityPolicyValue';
+final String SECURITY_HEADERS_ENABLED = 'security.headers.enabled';
+final String SECURITY_HEADERS_XSS_PROTECTION = 'security.headers.xssProtection';
+final String SECURITY_HEADERS_CONTENT_TYPE_OPTIONS = 'security.headers.contentTypeOptions';
+final String SECURITY_HEADERS_FRAME_OPTIONS = 'security.headers.frameOptions';
+final String SECURITY_HEADERS_CONTENT_SECURITY_POLICY = 'security.headers.contentSecurityPolicy';
+final String SECURITY_HEADERS_CONTENT_SECURITY_POLICY_VALUE = 'security.headers.contentSecurityPolicyValue';
 
 // HTTPS配置
 final String HTTPS_ENABLED = 'https.enabled';

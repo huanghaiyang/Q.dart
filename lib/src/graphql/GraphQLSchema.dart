@@ -1,23 +1,23 @@
 import 'dart:mirrors';
-import 'package:Q/src/graphql/GraphQLType.dart';
-import 'package:Q/src/graphql/GraphQLField.dart';
-import 'package:Q/src/graphql/annotations/GraphQL.dart';
+import 'package:Q/src/graphql/GraphQLType.dart' as GraphQLTypeDef;
+import 'package:Q/src/graphql/GraphQLField.dart' as GraphQLFieldDef;
+import 'package:Q/src/graphql/annotations/GraphQL.dart' as GraphQLAnnotations;
 import 'package:Q/src/utils/ReflectionCache.dart';
 
 /// GraphQL Schema 类
 /// 用于定义 GraphQL API 的类型和操作
 class GraphQLSchema {
   /// 类型定义
-  final Map<String, GraphQLType> types;
+  final Map<String, GraphQLTypeDef.GraphQLType> types;
   
   /// 查询操作
-  final GraphQLField query;
+  final GraphQLTypeDef.GraphQLObjectType query;
   
   /// 变更操作
-  final GraphQLField mutation;
+  final GraphQLTypeDef.GraphQLObjectType mutation;
   
   /// 订阅操作
-  final GraphQLField subscription;
+  final GraphQLTypeDef.GraphQLObjectType subscription;
 
   /// 构造函数
   GraphQLSchema({
@@ -35,7 +35,7 @@ class GraphQLSchema {
   }
 
   /// 从数据模型类生成类型定义
-  static GraphQLObjectType fromModel(Type modelType, {String typeName, Map<String, GraphQLType> types}) {
+  static GraphQLTypeDef.GraphQLObjectType fromModel(Type modelType, {String typeName, Map<String, GraphQLTypeDef.GraphQLType> types}) {
     // 使用反射缓存获取类镜像
     ClassMirror classMirror = ReflectionCache.instance.getClassMirror(modelType);
     String name = typeName ?? MirrorSystem.getName(classMirror.simpleName);
@@ -43,7 +43,7 @@ class GraphQLSchema {
     // 检查类是否有 @GraphQLType 注解
     List<dynamic> classAnnotations = ReflectionCache.instance.getClassAnnotations(modelType);
     for (var annotation in classAnnotations) {
-      if (annotation is GraphQLType) {
+      if (annotation is GraphQLAnnotations.GraphQLType) {
         name = annotation.name ?? name;
         break;
       }
@@ -51,7 +51,7 @@ class GraphQLSchema {
     
     // 如果类型已经存在，直接返回
     if (types != null && types.containsKey(name)) {
-      return types[name] as GraphQLObjectType;
+      return types[name] as GraphQLTypeDef.GraphQLObjectType;
     }
     
     // 处理嵌套的泛型类型参数
@@ -63,7 +63,7 @@ class GraphQLSchema {
     }
     
     // 扫描字段
-    Map<String, GraphQLField> fields = {};
+    Map<String, GraphQLFieldDef.GraphQLField> fields = {};
     for (var declaration in classMirror.declarations.values) {
       if (declaration is VariableMirror && !declaration.isStatic && !declaration.isPrivate) {
         String fieldName = MirrorSystem.getName(declaration.simpleName);
@@ -75,21 +75,22 @@ class GraphQLSchema {
         // 检查字段是否有 @GraphQLField 注解
         List<dynamic> fieldAnnotations = ReflectionCache.instance.getFieldAnnotations(modelType, declaration.simpleName);
         for (var annotation in fieldAnnotations) {
-          if (annotation is GraphQLField) {
+          if (annotation is GraphQLAnnotations.GraphQLField) {
             fieldName = annotation.name ?? fieldName;
             fieldType = annotation.type ?? fieldType;
             break;
           }
         }
         
-        fields[fieldName] = GraphQLField(
+        fields[fieldName] = GraphQLFieldDef.GraphQLField(
           name: fieldName,
           type: fieldType,
+          arguments: {},
         );
       }
     }
     
-    GraphQLObjectType resultType = GraphQLObjectType(name, fields: fields);
+    GraphQLTypeDef.GraphQLObjectType resultType = GraphQLTypeDef.GraphQLObjectType(name, fields: fields);
     
     // 如果提供了 types 映射，将当前类型添加进去
     if (types != null && !types.containsKey(name)) {
@@ -99,8 +100,8 @@ class GraphQLSchema {
     return resultType;
   }
   
-  /// 处理嵌套类型，递归生成所有必要的类型
-  static void _processNestedTypes(TypeMirror typeMirror, Map<String, GraphQLType> types) {
+  /// 处理嵌套类型
+  static void _processNestedTypes(TypeMirror typeMirror, Map<String, GraphQLTypeDef.GraphQLType> types) {
     if (types == null) return;
     
     // 处理可空类型
@@ -110,8 +111,8 @@ class GraphQLSchema {
     }
     
     // 处理类型参数
-    if (typeMirror is TypeParameterMirror) {
-      _processNestedTypes(typeMirror.bound, types);
+    if (typeMirror is TypeVariableMirror) {
+      _processNestedTypes(typeMirror.upperBound, types);
       return;
     }
     
@@ -154,11 +155,11 @@ class GraphQLSchema {
           }
           
           // 先创建一个占位符，避免循环引用
-          GraphQLObjectType placeholderType = GraphQLObjectType(typeName, fields: {});
+          GraphQLTypeDef.GraphQLObjectType placeholderType = GraphQLTypeDef.GraphQLObjectType(typeName, fields: {});
           types[typeName] = placeholderType;
           
           // 递归生成实际类型
-          GraphQLObjectType nestedType = fromModel(typeMirror.reflectedType, types: types);
+          GraphQLTypeDef.GraphQLObjectType nestedType = fromModel(typeMirror.reflectedType, types: types);
           // 更新占位符为实际类型
           types[typeName] = nestedType;
         }
@@ -179,11 +180,11 @@ class GraphQLSchema {
         }
         
         // 先创建一个占位符，避免循环引用
-        GraphQLObjectType placeholderType = GraphQLObjectType(typeName, fields: {});
+        GraphQLTypeDef.GraphQLObjectType placeholderType = GraphQLTypeDef.GraphQLObjectType(typeName, fields: {});
         types[typeName] = placeholderType;
         
         // 递归生成实际类型
-        GraphQLObjectType nestedType = fromModel(typeMirror.reflectedType, types: types);
+        GraphQLTypeDef.GraphQLObjectType nestedType = fromModel(typeMirror.reflectedType, types: types);
         // 更新占位符为实际类型
         types[typeName] = nestedType;
       }
@@ -206,14 +207,9 @@ class GraphQLSchema {
 
   /// 获取 GraphQL 类型名称
   static String _getGraphQLType(TypeMirror typeMirror, String fieldName) {
-    // 处理可空类型
+    // 处理可空类型和类型参数（用于泛型）
     if (typeMirror is TypeVariableMirror) {
       return _getGraphQLType(typeMirror.upperBound, fieldName);
-    }
-    
-    // 处理类型参数（用于泛型）
-    if (typeMirror is TypeParameterMirror) {
-      return _getGraphQLType(typeMirror.bound, fieldName);
     }
     
     String typeName = MirrorSystem.getName(typeMirror.simpleName);

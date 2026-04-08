@@ -21,7 +21,7 @@ class GraphQLField {
     this.arguments = const {},
     this.resolver,
   }) : name = _sanitizeName(name) {
-    _validateName(name);
+    _validateName(this.name);
   }
 
   /// 转换为 SDL 字符串

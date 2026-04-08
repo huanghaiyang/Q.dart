@@ -9,6 +9,7 @@ class XssInterceptor implements AbstractInterceptor {
   final bool enabled;
   final bool blockRequest;
   final List<String> protectedContentTypes;
+  final Map<String, String> securityHeaders;
 
   XssInterceptor._({
     this.enabled = true,
@@ -18,6 +19,12 @@ class XssInterceptor implements AbstractInterceptor {
       'application/json',
       'multipart/form-data',
     ],
+    this.securityHeaders = const {
+      'X-XSS-Protection': '1; mode=block',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'Content-Security-Policy': "default-src 'self'",
+    },
   });
 
   static XssInterceptor _instance;
@@ -30,11 +37,18 @@ class XssInterceptor implements AbstractInterceptor {
       'application/json',
       'multipart/form-data',
     ],
+    Map<String, String> securityHeaders = const {
+      'X-XSS-Protection': '1; mode=block',
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'Content-Security-Policy': "default-src 'self'",
+    },
   }) {
     return _instance ?? (_instance = XssInterceptor._(
       enabled: enabled,
       blockRequest: blockRequest,
       protectedContentTypes: protectedContentTypes,
+      securityHeaders: securityHeaders,
     ));
   }
 
@@ -86,11 +100,15 @@ class XssInterceptor implements AbstractInterceptor {
   @override
   void postHandle(HttpRequest req, HttpResponse res, InterceptorContext interceptorContext) {
     // 添加安全响应头
-    if (enabled) {
-      res.headers.set('X-XSS-Protection', '1; mode=block');
-      res.headers.set('X-Content-Type-Options', 'nosniff');
-      res.headers.set('X-Frame-Options', 'DENY');
-      res.headers.set('Content-Security-Policy', "default-src 'self'");
+    if (enabled && securityHeaders != null) {
+      try {
+        securityHeaders.forEach((key, value) {
+          res.headers.set(key, value);
+        });
+      } catch (e) {
+        // 忽略 HTTP 头不可变的错误
+        print('Error setting XSS headers: $e');
+      }
     }
   }
 }

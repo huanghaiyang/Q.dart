@@ -89,7 +89,7 @@ class ApplicationConfigureIfYamlNotExist {
         'tokenHeader': 'Authorization<string>',
         'tokenExpiration': '3600<int>'
       },
-      'securityHeaders': {
+      'headers': {
         'enabled': 'true<bool>',
         'xssProtection': 'true<bool>',
         'contentTypeOptions': 'true<bool>',

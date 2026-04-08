@@ -7,7 +7,7 @@ abstract class GraphQLType {
 
   /// 构造函数
   GraphQLType(String name) : name = _sanitizeName(name) {
-    _validateName(name);
+    _validateName(this.name);
   }
 
   /// 转换为 SDL 字符串

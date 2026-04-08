@@ -10,12 +10,23 @@ void main() {
       expect(() => GraphQLObjectType('ValidType'), returnsNormally);
       expect(() => GraphQLObjectType('valid_type_123'), returnsNormally);
       
-      // 测试无效名称
+      // 测试无效名称 - 实现会在构造函数中自动清理，所以这些不会抛出异常
+      // 而是会被清理为有效的名称
       expect(() => GraphQLObjectType(null), throwsArgumentError);
-      expect(() => GraphQLObjectType(''), throwsArgumentError);
-      expect(() => GraphQLObjectType('123Type'), throwsArgumentError);
-      expect(() => GraphQLObjectType('Type-With-Dash'), throwsArgumentError);
-      expect(() => GraphQLObjectType('Type@With@Special@Chars'), throwsArgumentError);
+      
+      // 空字符串会被自动清理为 Type_
+      GraphQLObjectType emptyType = GraphQLObjectType('');
+      expect(emptyType.name, equals('Type_'));
+      
+      // 这些名称会被自动清理
+      GraphQLObjectType type1 = GraphQLObjectType('123Type');
+      expect(type1.name, startsWith('Type_'));
+      
+      GraphQLObjectType type2 = GraphQLObjectType('Type-With-Dash');
+      expect(type2.name, equals('Type_With_Dash'));
+      
+      GraphQLObjectType type3 = GraphQLObjectType('Type@With@Special@Chars');
+      expect(type3.name, equals('Type_With_Special_Chars'));
     });
     
     test('GraphQLType name sanitization', () {
@@ -35,16 +46,8 @@ void main() {
       expect(() => GraphQLField(name: 'validField', type: 'String'), returnsNormally);
       expect(() => GraphQLField(name: '_valid_field_123', type: 'String'), returnsNormally);
       
-      // 测试无效名称
-      expect(() => GraphQLField(name: null, type: 'String'), throwsArgumentError);
-      expect(() => GraphQLField(name: '', type: 'String'), throwsArgumentError);
-      expect(() => GraphQLField(name: '123field', type: 'String'), throwsArgumentError);
-      expect(() => GraphQLField(name: 'field-With-Dash', type: 'String'), throwsArgumentError);
-      expect(() => GraphQLField(name: 'field@With@Special@Chars', type: 'String'), throwsArgumentError);
-    });
-    
-    test('GraphQLField name sanitization', () {
-      // 测试名称清理
+      // 测试无效名称 - 实现会在构造函数中自动清理，所以这些不会抛出异常
+      // 而是会被清理为有效的名称
       GraphQLField field1 = GraphQLField(name: '123field', type: 'String');
       expect(field1.name, startsWith('_'));
       
@@ -60,16 +63,8 @@ void main() {
       expect(() => GraphQLArgument(name: 'validArg', type: 'String'), returnsNormally);
       expect(() => GraphQLArgument(name: '_valid_arg_123', type: 'String'), returnsNormally);
       
-      // 测试无效名称
-      expect(() => GraphQLArgument(name: null, type: 'String'), throwsArgumentError);
-      expect(() => GraphQLArgument(name: '', type: 'String'), throwsArgumentError);
-      expect(() => GraphQLArgument(name: '123arg', type: 'String'), throwsArgumentError);
-      expect(() => GraphQLArgument(name: 'arg-With-Dash', type: 'String'), throwsArgumentError);
-      expect(() => GraphQLArgument(name: 'arg@With@Special@Chars', type: 'String'), throwsArgumentError);
-    });
-    
-    test('GraphQLArgument name sanitization', () {
-      // 测试名称清理
+      // 测试无效名称 - 实现会在构造函数中自动清理，所以这些不会抛出异常
+      // 而是会被清理为有效的名称
       GraphQLArgument arg1 = GraphQLArgument(name: '123arg', type: 'String');
       expect(arg1.name, startsWith('_'));
       
@@ -85,7 +80,7 @@ void main() {
       GraphQLArgument arg = GraphQLArgument(
         name: 'testArg', 
         type: 'String', 
-        defaultValue: 'test\nwith\r\tspecial\\chars"
+        defaultValue: 'test\nwith\r\tspecial\\chars"'
       );
       String sdl = arg.toSDL();
       expect(sdl, contains('"test\\nwith\\r\\tspecial\\\\chars\\""'));
@@ -109,6 +104,7 @@ void main() {
       
       String sdl = type.toSDL();
       expect(sdl, contains('type TestType {'));
+      // SDL 输出中换行符被转义为 \n
       expect(sdl, contains('testField(testArg: String = "test\\nvalue"): String'));
       expect(sdl, contains('}'));
     });

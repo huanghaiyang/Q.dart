@@ -1,11 +1,13 @@
+import 'dart:mirrors';
+
 /// GraphQL 解析器类
 /// 用于处理 GraphQL 查询的解析逻辑
-class _GraphQLResolver {
+class GraphQLResolver {
   /// 解析器映射
   final Map<String, Map<String, Function>> resolvers;
 
   /// 构造函数
-  _GraphQLResolver({this.resolvers = const {}});
+  GraphQLResolver({this.resolvers = const {}});
 
   /// 添加类型解析器
   void addTypeResolver(String typeName, Map<String, Function> typeResolvers) {

@@ -8,7 +8,7 @@ void main() {
   group('yaml tests', () {
     test('decode yaml contents to map', () async {
       Map map = YamlUtil.convertDocumentToMap(
-          loadYamlDocument(await File('${Directory.current.path}/test/example/application.yml').readAsString()));
+          loadYamlDocument(await File('${Directory.current.path}/example/application.yml').readAsString()));
       expect(map, {
         'application': {
           'environment': 'dev',

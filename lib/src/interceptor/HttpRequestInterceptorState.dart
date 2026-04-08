@@ -31,6 +31,10 @@ class _HttpRequestInterceptorState implements HttpRequestInterceptorState {
 
   Map<int, dynamic> store;
 
+  _HttpRequestInterceptorState() {
+    this.store = {};
+  }
+
   @override
   int get preProcessIndex {
     return preProcessIndex_;
@@ -72,12 +76,12 @@ class _HttpRequestInterceptorState implements HttpRequestInterceptorState {
   }
 
   @override
-  void setState(int index, dynamic state) {
-    this.store[index] = state;
+  dynamic setState(int index, dynamic state) {
+    return this.store[index] = state;
   }
 
   @override
-  void getState(int index) {
+  dynamic getState(int index) {
     return this.store[index];
   }
 }

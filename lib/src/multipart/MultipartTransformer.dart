@@ -114,7 +114,12 @@ MultipartValueMap mapResult(List<RequestPart> requestParts, bool fixNameSuffixIf
     } else {
       info = info.substring(CONTENT_DISPOSITION.length);
       CommonValue namedValue = CommonValue();
-      namedValue.value = utf8.decode(contentBytes);
+      try {
+        namedValue.value = utf8.decode(contentBytes);
+      } catch (e) {
+        // 如果不是有效的 UTF-8 编码，就使用 base64 编码
+        namedValue.value = base64.encode(contentBytes);
+      }
       Map props = getProps(info, fixNameSuffixIfArray);
       namedValue.name = props['name'];
       value = namedValue;

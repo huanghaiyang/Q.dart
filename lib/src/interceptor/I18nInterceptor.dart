@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:Q/src/aware/InterceptorContext.dart';
 import 'package:Q/src/i18n/I18nManager.dart';
 import 'package:Q/src/interceptor/AbstractInterceptor.dart';
+import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
 
 class I18nInterceptor implements AbstractInterceptor {
   I18nInterceptor._();
@@ -22,8 +23,10 @@ class I18nInterceptor implements AbstractInterceptor {
     I18nManager().setLocaleCookie(res, locale);
     
     // 将语言设置存储在上下文环境中
-    if (interceptorContext != null) {
-      interceptorContext.setState('locale', locale);
+    if (interceptorContext != null && interceptorContext is HttpRequestInterceptorState) {
+      // 使用拦截器索引作为键
+      HttpRequestInterceptorState state = interceptorContext as HttpRequestInterceptorState;
+      state.setState(state.preProcessIndex, locale);
     }
     
     return true;
