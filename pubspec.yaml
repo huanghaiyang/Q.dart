@@ -12,6 +12,7 @@ dependencies:
   uuid: 2.0.0
   # sqlite3: ^1.8.0
   mysql1: ^0.17.0
+  postgres: ^2.6.0
   synchronized: ^2.0.0
   # curie:
   #   git: https://github.com/huanghaiyang/curie
