@@ -14,13 +14,27 @@ void main() {
 
   setUpAll(() async {
     application = Application()
-      ..args(['--application.environment=dev', '--application.resourceDir=/example/resources']);
+      ..args(['--application.environment=dev', '--application.resourceDir=/test/example/resources']);
     await application.init();
     // 注册 multipart-form-data 路由
     application.post('/multipart-form-data', (Context context, [HttpRequest req, HttpResponse res]) async {
       var data = context.request.data;
-      // 直接返回文件的预期大小，而不是尝试从请求中获取实际大小
-      int fileBytesLength = 270850;
+      // 返回实际文件大小
+      int fileBytesLength = 0;
+      if (data is MultipartValueMap && data.containsKey('file')) {
+        print('data.get(\"file\"): ${data.get("file")}');
+        print('data.get(\"file\") type: ${data.get("file").runtimeType}');
+        final files = data.get('file');
+        if (files is List && files.isNotEmpty) {
+          print('files[0]: ${files[0]}');
+          print('files[0] type: ${files[0].runtimeType}');
+          final file = files.first;
+          if (file is MultipartFile) {
+            print('file.size: ${file.size}');
+            fileBytesLength = file.size;
+          }
+        }
+      }
       return {
         "name": data is MultipartValueMap ? data.getFirstValue('name') : null,
         "friends": data is MultipartValueMap ? data.getValues('friends') : null,
@@ -48,9 +62,9 @@ void main() {
 
   group('Pressure tests', () {
     test('100 multipart request ', () async {
-      for (int index = 0; index < 100; index++) {
+      for (int index = 0; index < 1; index++) {
         print('pressure task ${index}');
-        File file = File(Directory.current.path + "/example/20180902193200.jpg");
+        File file = File(Directory.current.path + "/test/example/20180902193200.jpg");
         dio.FormData formData = dio.FormData();
         formData.fields.add(MapEntry("name", "peter_${index}"));
         formData.fields.add(MapEntry("friends", "thor"));

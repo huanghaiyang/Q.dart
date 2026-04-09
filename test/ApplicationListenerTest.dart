@@ -7,7 +7,7 @@ void main() {
 
     setUp(() {
       application = Application()
-        ..args(['--application.environment=dev', '--application.resourceDir=/example/resources'])
+        ..args(['--application.environment=dev', '--application.resourceDir=/test/example/resources'])
         ..init();
     });
 

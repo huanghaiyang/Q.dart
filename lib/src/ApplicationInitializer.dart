@@ -119,7 +119,7 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
     // 构建安全头部配置
     final securityHeaders = <String, String>{};
-    if (headers.enabled) {
+    if (headers != null && headers.enabled) {
       if (headers.xssProtection) {
         securityHeaders['X-XSS-Protection'] = '1; mode=block';
       }

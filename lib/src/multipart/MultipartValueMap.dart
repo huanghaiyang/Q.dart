@@ -200,6 +200,10 @@ class _MultipartValueMap<K, V> implements MultipartValueMap<K, V> {
 
   @override
   V operator [](Object key) {
+    // 调试：输出store内容
+    print('Store: $store');
+    print('Trying to get key: $key');
+    print('Store contains key: ${store.containsKey(key)}');
     return this.store[key];
   }
 

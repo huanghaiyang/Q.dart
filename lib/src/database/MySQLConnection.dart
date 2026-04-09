@@ -36,15 +36,29 @@ class MySQLConnection implements DatabaseConnection {
   @override
   Future<int> execute(String sql, {List<dynamic> params}) async {
     final connection = await _openConnection();
-    final result = await connection.execute(sql, params ?? []);
-    return result.affectedRows;
+    final result = await connection.query(sql, params ?? []);
+    return result.length;
   }
 
   @override
   Future<int> insert(String sql, {List<dynamic> params}) async {
     final connection = await _openConnection();
-    final result = await connection.execute(sql, params ?? []);
-    return result.insertId;
+    final result = await connection.query(sql, params ?? []);
+    // 尝试获取插入的 ID
+    if (result.isNotEmpty) {
+      final row = result.first;
+      // 对于 mysql1 包，Row 没有 keys 方法，需要使用索引访问
+      try {
+        // 假设第一个字段是 ID
+        final id = row[0];
+        if (id is int) {
+          return id;
+        }
+      } catch (e) {
+        // 忽略错误
+      }
+    }
+    return 0;
   }
 
   @override

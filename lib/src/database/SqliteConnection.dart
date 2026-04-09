@@ -7,8 +7,8 @@ import 'package:sqlite3/sqlite3.dart';
 /// SQLite 数据库连接实现
 class SqliteConnection implements DatabaseConnection {
   final String _databasePath;
-  late File _databaseFile;
-  Database _db;
+  File _databaseFile;
+  dynamic _db;
   
   SqliteConnection({
     String databasePath,
@@ -75,7 +75,7 @@ class SqliteConnection implements DatabaseConnection {
   }
 
   /// 打开数据库连接
-  Future<Database> _openDatabase() async {
+  Future<dynamic> _openDatabase() async {
     if (_db == null) {
       _databaseFile = File(_databasePath);
       _db = sqlite3.open(_databasePath);
@@ -84,7 +84,7 @@ class SqliteConnection implements DatabaseConnection {
   }
 
   /// 将 SQLite 行转换为 Map
-  Map<String, dynamic> _convertRowToMap(Row row) {
+  Map<String, dynamic> _convertRowToMap(dynamic row) {
     final Map<String, dynamic> result = {};
     for (int i = 0; i < row.columnCount; i++) {
       result[row.columnName(i)] = row[i];

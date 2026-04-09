@@ -13,7 +13,7 @@ void main() {
   setUpAll(() async {
     // 创建应用
     app = Application()
-      ..args(['--application.environment=dev', '--application.resourceDir=/example/resources']);
+      ..args(['--application.environment=dev', '--application.resourceDir=/test/example/resources']);
     await app.init();
 
     // 直接注册路由，不使用注解扫描

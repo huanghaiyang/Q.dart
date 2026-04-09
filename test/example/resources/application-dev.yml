@@ -1,0 +1,16 @@
+# 安全配置
+security:
+  # CSRF 配置
+  csrf:
+    enabled: false  # 测试环境中禁用 CSRF 保护
+  # XSS 配置
+  xss:
+    enabled: false  # 是否启用 XSS 保护
+    blockRequest: false  # 是否阻止包含 XSS 的请求
+  # 安全头配置
+  headers:
+    enabled: false  # 是否启用安全头
+
+# HTTPS 配置
+https:
+  enabled: false  # 测试环境中禁用 HTTPS

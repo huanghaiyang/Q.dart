@@ -14,13 +14,17 @@ class I18nResourceBundle {
   static void _loadResource(String locale) {
     try {
       final fileName = 'messages_$locale.json';
-      final relativePath = 'lib/resources/i18n/$fileName';
+      
+      // 获取脚本所在的目录作为根目录
+      String scriptPath = Platform.script.path;
+      String scriptDir = Directory(scriptPath).parent.path;
       
       // 尝试多个路径加载
       final paths = [
-        relativePath,
-        '${Directory.current.path}/$relativePath',
-        '${Directory.current.parent.path}/$relativePath',
+        '${scriptDir}/lib/resources/i18n/$fileName',
+        '${scriptDir}/resources/i18n/$fileName',
+        '${Directory.current.path}/lib/resources/i18n/$fileName',
+        '${Directory.current.path}/resources/i18n/$fileName',
       ];
       
       File file;
@@ -38,7 +42,7 @@ class I18nResourceBundle {
         Map<String, dynamic> data = json.decode(content);
         _resources[locale] = data.cast<String, String>();
       } else {
-        print('I18n resource file not found: $relativePath');
+        print('I18n resource file not found for locale: $locale');
       }
     } catch (e) {
       print('Error loading i18n resource for $locale: $e');

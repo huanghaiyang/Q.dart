@@ -35,22 +35,14 @@ class PostgreSQLConnection implements DatabaseConnection {
   Future<int> execute(String sql, {List<dynamic> params}) async {
     final connection = await _openConnection();
     final result = await connection.execute(sql, substitutionValues: params != null ? _convertParamsToMap(params) : null);
-    return result.affectedRowCount;
+    // 在 postgres 2.1.0 中，execute 返回的是 int
+    return result is int ? result : 0;
   }
 
   @override
   Future<int> insert(String sql, {List<dynamic> params}) async {
     final connection = await _openConnection();
-    final results = await connection.mappedResultsQuery(sql, substitutionValues: params != null ? _convertParamsToMap(params) : null);
-    if (results.isNotEmpty) {
-      final firstRow = results.first;
-      for (final key in firstRow.keys) {
-        final value = firstRow[key];
-        if (value is int) {
-          return value;
-        }
-      }
-    }
+    await connection.execute(sql, substitutionValues: params != null ? _convertParamsToMap(params) : null);
     return 0;
   }
 

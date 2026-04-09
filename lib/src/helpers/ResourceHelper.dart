@@ -19,7 +19,7 @@ class ResourceHelper {
     } else {
       // 否则，返回项目根目录 + 资源目录
       String path = _findProjectRoot(Directory.current.path);
-      result = '${path}${resourceDir}';
+      result = '${path}/${resourceDir}';
     }
     
     // 打印调试信息

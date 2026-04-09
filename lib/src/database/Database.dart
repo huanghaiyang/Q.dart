@@ -6,5 +6,5 @@ export 'Repository.dart';
 export 'Migration.dart';
 export 'MigrationRunner.dart';
 export 'MySQLConnection.dart';
-export 'SqliteConnection.dart';
+// export 'SqliteConnection.dart';
 export 'PostgreSQLConnection.dart';

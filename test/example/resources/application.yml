@@ -2,7 +2,7 @@
 security:
   # CSRF 配置
   csrf:
-    enabled: false  # 测试环境中禁用 CSRF 保护
+    enabled: true  # 测试环境中禁用 CSRF 保护
     protectedMethods: ["POST", "PUT", "DELETE", "PATCH"]  # 需要保护的 HTTP 方法
     tokenMaxAge: 3600000  # Token 最大过期时间（毫秒）
   # XSS 配置
@@ -21,7 +21,7 @@ security:
 
 # HTTPS 配置
 https:
-  enabled: false  # 测试环境中禁用 HTTPS
+  enabled: true  # 测试环境中禁用 HTTPS
   certificatePath: ""  # 证书路径
   privateKeyPath: ""  # 私钥路径
   certificatePassword: ""  # 证书密码
