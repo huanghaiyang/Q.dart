@@ -14,6 +14,11 @@ class _ApplicationErrorListener implements ApplicationErrorListener {
 
   @override
   Future<dynamic> execute(List payload) async {
-    return Function.apply(this.applicationErrorCallback, payload);
+    // 直接调用回调函数，不使用 Function.apply
+    if (payload.length > 1 && payload[1] is StackTrace) {
+      return this.applicationErrorCallback(payload[0], stackTrace: payload[1]);
+    } else {
+      return this.applicationErrorCallback(payload[0]);
+    }
   }
 }

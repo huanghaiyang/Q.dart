@@ -4,6 +4,7 @@ import 'package:Q/src/aware/CloseableAware.dart';
 import 'package:Q/src/delegate/AbstractDelegate.dart';
 import 'package:Q/src/delegate/ApplicationHttpServerDelegate.dart';
 import 'package:Q/src/delegate/ApplicationLifecycleDelegate.dart';
+import 'package:Q/src/listener/ApplicationListenerType.dart';
 
 abstract class ApplicationClosableDelegate extends CloseableAware with AbstractDelegate {
   factory ApplicationClosableDelegate(Application application) => _ApplicationClosableDelegate(application);
@@ -22,6 +23,8 @@ class _ApplicationClosableDelegate implements ApplicationClosableDelegate {
   Future<dynamic> close() async {
     this.application.applicationContext.currentStage = ApplicationStage.STOPPING;
     dynamic prevCloseableResult = await ApplicationHttpServerDelegate.from(application).close();
+    // 触发应用关闭事件
+    this.application.trigger(ApplicationListenerType.CLOSE, [prevCloseableResult]);
     ApplicationLifecycleDelegate applicationLifecycleDelegate = ApplicationLifecycleDelegate.from(this.application);
     await applicationLifecycleDelegate.onClose(prevCloseableResult);
     this.application.applicationContext.currentStage = ApplicationStage.STOPPED;

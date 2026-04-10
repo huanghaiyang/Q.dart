@@ -70,22 +70,43 @@ class _ApplicationInitializer implements ApplicationInitializer {
 
   @override
   Future<void> init() async {
-    this.createApplicationContext();
+    try {
+      // 应用启动前
+      this.application.trigger(ApplicationListenerType.STARTING, []);
 
-    ApplicationConfiguration defaultBootstrapConfiguration = await applicationConfigurationMapper.init();
-    Map<String, dynamic> bootstrapArguments = await this.applicationBootstrapArgsResolver.resolve();
-    ApplicationEnvironment environment = await this.applicationEnvironmentResolver.resolve(bootstrapArguments);
-    List<ApplicationConfigurationResource> resources = await this.applicationConfigurationResourceResolver.resolve(environment);
-    await this.applicationConfigurationResourceValidator.check(resources);
-    List<ApplicationConfiguration> configurations = await this.applicationConfigurationLoader.load(resources);
-    ApplicationConfiguration configuration = 
-        await this.applicationConfigurationMixer.mix(configurations, defaultBootstrapConfiguration: defaultBootstrapConfiguration);
-    await this.initConfiguration(configuration);
+      this.createApplicationContext();
+      // 应用上下文初始化完成
+      this.application.trigger(ApplicationListenerType.CONTEXT_INITIALIZED, []);
 
-    this.initHandlers();
-    this.initConverters();
-    this.initInterceptors();
-    this.initResolvers();
+      ApplicationConfiguration defaultBootstrapConfiguration = await applicationConfigurationMapper.init();
+      Map<String, dynamic> bootstrapArguments = await this.applicationBootstrapArgsResolver.resolve(this.application);
+      ApplicationEnvironment environment = await this.applicationEnvironmentResolver.resolve(bootstrapArguments);
+      // 环境准备完成
+      this.application.trigger(ApplicationListenerType.ENVIRONMENT_PREPARED, [environment]);
+
+      List<ApplicationConfigurationResource> resources = await this.applicationConfigurationResourceResolver.resolve(environment);
+      await this.applicationConfigurationResourceValidator.check(resources);
+      List<ApplicationConfiguration> configurations = await this.applicationConfigurationLoader.load(resources);
+      ApplicationConfiguration configuration = 
+          await this.applicationConfigurationMixer.mix(configurations, defaultBootstrapConfiguration: defaultBootstrapConfiguration);
+      await this.initConfiguration(configuration);
+
+      this.initHandlers();
+      this.initConverters();
+      this.initInterceptors();
+      this.initResolvers();
+
+      // 应用准备完成
+      this.application.trigger(ApplicationListenerType.PREPARED, []);
+      // 应用启动完成
+      this.application.trigger(ApplicationListenerType.STARTUP, []);
+      // 应用准备就绪
+      this.application.trigger(ApplicationListenerType.READY, []);
+    } catch (e, stackTrace) {
+      // 应用启动失败
+      this.application.trigger(ApplicationListenerType.FAILED, [e, stackTrace]);
+      rethrow;
+    }
   }
 
   // 初始化默认处理器

@@ -31,11 +31,11 @@ class _ApplicationLifecycleDelegate implements ApplicationLifecycleDelegate {
 
   @override
   Future<dynamic> onClose(dynamic prevCloseableResult) async {
-    this.application.trigger(ApplicationListenerType.CLOSE, [prevCloseableResult]);
+    // CLOSE事件已经在ApplicationClosableDelegate中触发
   }
 
   @override
   Future<dynamic> onStartup() async {
-    this.application.trigger(ApplicationListenerType.STARTUP, []);
+    // STARTUP事件已经在ApplicationInitializer中触发
   }
 }

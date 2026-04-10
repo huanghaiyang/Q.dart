@@ -20,9 +20,9 @@ abstract class Application extends CloseableAware
         ApplicationHttpServerAware,
         ApplicationArgumentsParsedAware<List<String>, List<String>>,
         MiddlewareAware<Middleware> {
-  factory Application() => _Application.instance();
+  factory Application() => _Application._();
 
-  factory Application.instance() => _Application.instance();
+  factory Application.instance() => _Application._();
 
   static ApplicationContext getApplicationContext() {
     return Application.instance().applicationContext;
@@ -62,10 +62,9 @@ abstract class Application extends CloseableAware
 class _Application implements Application, MiddlewareAware<Middleware> {
   _Application._();
 
-  static _Application _instance;
-
+  // 不再使用单例模式，每个 Application() 调用都返回一个新的实例
   static _Application instance() {
-    return _instance ?? (_instance = _Application._());
+    return _Application._();
   }
 
   ApplicationContext applicationContext_;
@@ -105,6 +104,9 @@ class _Application implements Application, MiddlewareAware<Middleware> {
   ApplicationClosableDelegate applicationClosableDelegate;
 
   ApplicationLifecycleListener applicationLifecycleListener;
+  
+  // 临时存储监听器，在init()方法调用时添加
+  List<AbstractListener> pendingListeners;
 
   HttpRequestContextDelegate httpRequestContextDelegate;
 
@@ -122,11 +124,15 @@ class _Application implements Application, MiddlewareAware<Middleware> {
 
   @override
   Future<void> init() async {
+    // 保存现有的监听器
+    List<AbstractListener> existingListeners = pendingListeners ?? [];
+    
     this.middleWares_ = List();
     this.routers_ = List();
     this.handlers_ = Map();
     this.converters_ = Map();
     this.resolvers_ = Map();
+    this.pendingListeners = [];
 
     applicationInitializer_ = ApplicationInitializer(this);
     applicationLifecycleDelegate = ApplicationLifecycleDelegate(this);
@@ -135,6 +141,14 @@ class _Application implements Application, MiddlewareAware<Middleware> {
     applicationResourceDelegate = ApplicationResourceDelegate(this);
     applicationClosableDelegate = ApplicationClosableDelegate(this);
     applicationLifecycleListener = ApplicationLifecycleListener(this);
+    
+    // 添加所有临时存储的监听器
+    for (AbstractListener listener in existingListeners) {
+      applicationLifecycleListener.addListener(listener);
+    }
+    // 清空临时监听器列表
+    pendingListeners.clear();
+    
     httpRequestLifecycleDelegate = HttpRequestLifecycleDelegate(this);
     httpRequestContextDelegate = HttpRequestContextDelegate(this);
     httpRequestHandlerDelegate = HttpRequestHandlerDelegate(this);
@@ -486,7 +500,15 @@ class _Application implements Application, MiddlewareAware<Middleware> {
   @override
   void addListener(AbstractListener listener) {
     if (listener != null) {
-      applicationLifecycleListener.addListener(listener);
+      if (applicationLifecycleListener != null) {
+        applicationLifecycleListener.addListener(listener);
+      } else {
+        // 暂时存储监听器，在init()方法调用时添加
+        if (pendingListeners == null) {
+          pendingListeners = [];
+        }
+        pendingListeners.add(listener);
+      }
     }
   }
 

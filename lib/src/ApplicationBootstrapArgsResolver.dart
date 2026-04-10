@@ -25,10 +25,16 @@ class ApplicationBootstrapArgsResolver
   Set<String> keys = Set();
 
   @override
-  Future<dynamic> resolve() async {
+  Future<dynamic> resolve([Application application]) async {
     _parser = ArgParser();
     _parser = await this.define(_parser, ApplicationConfigurationMapper.instance());
-    _parsedResult = _parser.parse(Application.instance().parsedArguments);
+    List<String> parsedArguments = [];
+    if (application != null) {
+      parsedArguments = application.parsedArguments;
+    } else {
+      parsedArguments = Application.instance().parsedArguments;
+    }
+    _parsedResult = _parser.parse(parsedArguments);
 
     for (var key in keys) {
       _transformedResult[keyMap[key]] = _parsedResult[key];
