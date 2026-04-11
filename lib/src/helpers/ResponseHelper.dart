@@ -4,10 +4,11 @@ import 'package:Q/Q.dart';
 
 class ResponseHelper {
   static void addCorsHeaders(HttpRequest request, HttpResponse response) async {
-    var config = Application.getApplicationContext().configuration.httpRequestConfigure;
+    var applicationContext = Application.getApplicationContext();
+    var config = applicationContext?.configuration?.httpRequestConfigure;
     
     // 设置允许的源
-    if (config.allowedOrigins != null && config.allowedOrigins.isNotEmpty) {
+    if (config?.allowedOrigins != null && config.allowedOrigins.isNotEmpty) {
       if (config.allowedOrigins.contains('*')) {
         response.headers.add('Access-Control-Allow-Origin', '*');
       } else {
@@ -25,7 +26,7 @@ class ResponseHelper {
     }
     
     // 设置允许的方法
-    if (config.allowedMethods != null && config.allowedMethods.isNotEmpty) {
+    if (config?.allowedMethods != null && config.allowedMethods.isNotEmpty) {
       String methods = config.allowedMethods.map((method) => method.toString().split('.')[1]).join(', ');
       response.headers.add('Access-Control-Allow-Methods', methods);
     } else {
@@ -33,7 +34,7 @@ class ResponseHelper {
     }
     
     // 设置允许的头
-    if (config.allowedHeaders != null && config.allowedHeaders.isNotEmpty) {
+    if (config?.allowedHeaders != null && config.allowedHeaders.isNotEmpty) {
       String headers = config.allowedHeaders.join(', ');
       response.headers.add('Access-Control-Allow-Headers', headers);
     } else {
@@ -41,12 +42,12 @@ class ResponseHelper {
     }
     
     // 设置是否允许凭证
-    if (config.allowedCredentials != null && config.allowedCredentials.contains('true')) {
+    if (config?.allowedCredentials != null && config.allowedCredentials.contains('true')) {
       response.headers.add('Access-Control-Allow-Credentials', 'true');
     }
     
     // 设置预检请求的缓存时间
-    if (config.maxAge != null) {
+    if (config?.maxAge != null) {
       response.headers.add('Access-Control-Max-Age', config.maxAge.toString());
     }
   }

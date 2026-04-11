@@ -4,6 +4,7 @@ import 'package:Q/Q.dart';
 import 'package:cookie_jar/cookie_jar.dart';
 import 'package:dio/dio.dart' as dio;
 import 'package:test/test.dart';
+import 'TestHelper.dart';
 
 const server = 'http://localhost:8081';
 
@@ -11,11 +12,7 @@ void main() {
   Application application;
 
   setUpAll(() async {
-    application = Application();
-    // 设置命令行参数
-    application.args([]);
-    // 初始化应用
-    await application.init();
+    application = await TestHelper.initTestApplication();
     // 注册测试路由
     application.post('/request_no_content_type', (Context context, [HttpRequest req, HttpResponse res]) async {
       return {"contentType": req.headers.contentType?.mimeType};
@@ -73,20 +70,14 @@ void main() {
       return {'timeout': 5};
     });
     // 启动服务器
-    application.listen(8081);
+    TestHelper.startTestServer(application, 8081);
     // 等待应用启动完成
-    await Future.delayed(Duration(milliseconds: 500));
+    await TestHelper.waitForApplicationStart();
   });
 
   tearDownAll(() async {
-    if (application != null) {
-      try {
-        await application.close();
-      } catch (e) {
-        // 忽略关闭时的错误
-      }
-      application = null;
-    }
+    await TestHelper.closeTestApplication(application);
+    application = null;
   });
 
   group('Router', () {

@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:Q/Q.dart';
 import 'package:Q/src/annotation/Route.dart';
 import 'package:Q/src/annotation/Timeout.dart' as QTimeout;
+import 'TestHelper.dart';
 
 void main() {
   Application app;
@@ -12,9 +13,7 @@ void main() {
 
   setUpAll(() async {
     // 创建应用
-    app = Application()
-      ..args(['--application.environment=dev', '--application.resourceDir=/test/example/resources']);
-    await app.init();
+    app = await TestHelper.initTestApplication();
 
     // 直接注册路由，不使用注解扫描
     app.get('/fast', (Context context, [HttpRequest req, HttpResponse res]) async {
@@ -38,22 +37,16 @@ void main() {
     ));
 
     // 启动服务器
-    app.listen(port);
+    TestHelper.startTestServer(app, port);
     print('Test server started on port $port');
     
     // 等待应用启动完成
-    await Future.delayed(Duration(milliseconds: 500));
+    await TestHelper.waitForApplicationStart();
   });
 
   tearDownAll(() async {
-    if (app != null) {
-      try {
-        await app.close();
-      } catch (e) {
-        // 忽略关闭时的错误
-      }
-      app = null;
-    }
+    await TestHelper.closeTestApplication(app);
+    app = null;
     print('Test server stopped');
   });
 

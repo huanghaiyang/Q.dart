@@ -17,9 +17,10 @@ class OKHandler implements HandlerAdapter {
   Future<Context> handle(Context context) async {
     HttpResponse httpResponse = context.response.res;
     httpResponse.statusCode = context.response.status;
+    var applicationContext = Application.getApplicationContext();
     httpResponse.headers.contentType = context?.router?.produceType != null
         ? context.router.produceType
-        : Application.getApplicationContext().configuration.httpResponseConfigure.defaultProducedType;
+        : applicationContext?.configuration?.httpResponseConfigure?.defaultProducedType ?? ContentType.json;
     httpResponse.headers.add('Access-Control-Allow-Origin', '*');
     httpResponse.headers.add('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     httpResponse.write(context.response.responseEntry.convertedResult);

@@ -20,9 +20,9 @@ abstract class Application extends CloseableAware
         ApplicationHttpServerAware,
         ApplicationArgumentsParsedAware<List<String>, List<String>>,
         MiddlewareAware<Middleware> {
-  factory Application() => _Application._();
+  factory Application() => _Application.instance();
 
-  factory Application.instance() => _Application._();
+  factory Application.instance() => _Application.instance();
 
   static ApplicationContext getApplicationContext() {
     return Application.instance().applicationContext;
@@ -62,9 +62,13 @@ abstract class Application extends CloseableAware
 class _Application implements Application, MiddlewareAware<Middleware> {
   _Application._();
 
-  // 不再使用单例模式，每个 Application() 调用都返回一个新的实例
+  // 单例模式实现
+  static _Application _instance;
   static _Application instance() {
-    return _Application._();
+    if (_instance == null) {
+      _instance = _Application._();
+    }
+    return _instance;
   }
 
   ApplicationContext applicationContext_;

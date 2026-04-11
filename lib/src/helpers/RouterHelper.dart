@@ -196,22 +196,50 @@ class RouterHelper {
     final match = regExp.matchAsPrefix(requestPath);
     
     // 提取参数
-    Map<String, String> params = extract(parameters, match);
+    Map<String, String> params = {};
+    if (match != null) {
+      params = extract(parameters, match);
+    }
     
     // 验证和过滤参数
+    Map<String, String> filteredParams = {};
     params.forEach((key, value) {
+      // 验证参数名称的合法性
+      if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(key)) {
+        return; // 跳过非法参数名
+      }
+      
       // 移除可能的恶意字符
-      params[key] = value.replaceAll(RegExp(r'[<>"&]'), '');
+      String filteredValue = value.replaceAll(RegExp(r'[<"&]'), '');
       // 移除控制字符
-      params[key] = params[key].replaceAll(RegExp(r'[\x00-\x1F\x7F]'), '');
+      filteredValue = filteredValue.replaceAll(RegExp(r'[\x00-\x1F\x7F]'), '');
+      // 限制参数值长度，防止过大的参数值
+      if (filteredValue.length > 1000) {
+        filteredValue = filteredValue.substring(0, 1000);
+      }
+      
+      filteredParams[key] = filteredValue;
     });
     
-    return params;
+    return filteredParams;
   }
 
   // 检查路由路径是否有效
   static bool checkPathAvailable(String path) {
     if (path == null || path.isEmpty) return false;
+    // 防止路径遍历攻击
+    if (path.contains('..') || path.contains('./') || path.contains('//')) {
+      return false;
+    }
+    // 确保路径以 / 开头
+    if (!path.startsWith('/')) {
+      return false;
+    }
+    // 防止包含控制字符
+    if (RegExp(r'[\x00-\x1F\x7F]').hasMatch(path)) {
+      return false;
+    }
+    // 允许路由参数（如 :id）
     return true;
   }
 
@@ -229,6 +257,14 @@ class RouterHelper {
 
   // 反射获取路由处理器方法的参数列表
   static Future<List<dynamic>> listParameters(Router router) async {
+    // 验证参数的合法性
+    if (router == null) {
+      throw ArgumentError('Router cannot be null');
+    }
+    if (router.handle == null) {
+      throw ArgumentError('Router handle cannot be null');
+    }
+    
     // 检查缓存
     if (_parameterReflectionCache.containsKey(router.handle)) {
       List<Future<dynamic>> cachedFutures = _parameterReflectionCache[router.handle];
@@ -238,6 +274,12 @@ class RouterHelper {
     List<Future<dynamic>> futures = [];
     try {
       FunctionTypeMirror functionTypeMirror = reflect(router.handle).type;
+      // 限制参数数量，防止过多参数导致的安全问题
+      if (functionTypeMirror.parameters.length > 100) {
+        print('Warning: Router handle has too many parameters: ${functionTypeMirror.parameters.length}');
+        return futures;
+      }
+      
       functionTypeMirror.parameters.forEach((ParameterMirror parameterMirror) {
         List<InstanceMirror> instanceMirrors = parameterMirror.metadata;
         if (instanceMirrors.isNotEmpty) {
@@ -247,6 +289,11 @@ class RouterHelper {
             if (SUPPORTED_ROUTER_HANDLER_PARAMETER_ANNOTATION_CLASSES.indexWhere((classMirror) => classMirror == type) == -1) {
               continue; // 跳过不支持的注解
             }
+            // 限制注解数量，防止恶意注解
+            if (instanceMirrors.length > 30) {
+              continue; // 每个参数最多3个注解
+            }
+            
             List params = [router, parameterMirror, instanceMirror];
             // 安全地应用反射辅助方法
             if (type == reflectClass(PathVariable)) {
