@@ -37,4 +37,32 @@ class ConfigureUtil {
     }
     return null;
   }
+
+  /**
+   * 解析整数类型的配置值
+   * 
+   * @param value 配置值
+   * @param defaultValue 默认值
+   * @param configName 配置名称
+   * @return 解析后的整数值，如果解析失败则返回默认值
+   */
+  static int parseIntConfig(dynamic value, int defaultValue, String configName) {
+    if (value == null) {
+      return defaultValue;
+    }
+    
+    if (value is int) {
+      return value;
+    } else if (value is String) {
+      try {
+        return int.parse(value);
+      } catch (e) {
+        // 解析失败，使用默认值
+        print('Warning: Invalid $configName value, using default: $defaultValue');
+        return defaultValue;
+      }
+    }
+    
+    return defaultValue;
+  }
 }

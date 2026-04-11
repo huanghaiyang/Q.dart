@@ -85,6 +85,11 @@ final String I18N_DEFAULT_LOCALE = 'i18n.defaultLocale';
 final String I18N_SUPPORTED_LOCALES = 'i18n.supportedLocales';
 final String I18N_RESOURCE_PATH = 'i18n.resourcePath';
 
+// 服务器配置名称
+const String SERVER_SESSION_TIMEOUT = 'server.sessionTimeout';
+const String SERVER_CONNECTION_TIMEOUT = 'server.connectionTimeout';
+const String SERVER_MAX_CONCURRENT_CONNECTIONS = 'server.maxConcurrentConnections';
+
 // 日志配置
 final String LOGGING_LEVEL = 'logging.level';
 final String LOGGING_FORMAT = 'logging.format';

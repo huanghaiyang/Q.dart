@@ -7,6 +7,7 @@ import 'package:Q/src/configure/RouterMappingConfigure.dart';
 import 'package:Q/src/configure/DatabaseConfigure.dart';
 import 'package:Q/src/configure/CacheConfigure.dart';
 import 'package:Q/src/configure/SecurityConfigure.dart';
+import 'package:Q/src/configure/ServerConfigure.dart';
 
 // 应用程序配置
 abstract class Configuration {
@@ -25,6 +26,8 @@ abstract class Configuration {
   CacheConfigure get cacheConfigure;
 
   SecurityConfigure get securityConfigure;
+
+  ServerConfigure get serverConfigure;
 
   Future<dynamic> init(ApplicationConfiguration applicationConfiguration);
 
@@ -49,6 +52,8 @@ class _Configuration implements Configuration {
   CacheConfigure _cacheConfigure = CacheConfigure();
 
   SecurityConfigure _securityConfigure = SecurityConfigure();
+
+  ServerConfigure _serverConfigure = ServerConfigure();
 
   @override
   MultipartConfigure get multipartConfigure {
@@ -91,6 +96,11 @@ class _Configuration implements Configuration {
   }
 
   @override
+  ServerConfigure get serverConfigure {
+    return this._serverConfigure;
+  }
+
+  @override
   Future<dynamic> init(ApplicationConfiguration applicationConfiguration) async {
     await Future.wait([
       _multipartConfigure.init(applicationConfiguration),
@@ -101,6 +111,7 @@ class _Configuration implements Configuration {
       _databaseConfigure.init(applicationConfiguration),
       _cacheConfigure.init(applicationConfiguration),
       _securityConfigure.init(applicationConfiguration),
+      _serverConfigure.init(applicationConfiguration),
     ]);
   }
 }

@@ -9,6 +9,7 @@ import 'package:Q/src/Redirect.dart';
 import 'package:Q/src/ResponseEntry.dart';
 import 'package:Q/src/Router.dart';
 import 'package:Q/src/aware/ApplicationHttpServerAware.dart';
+import 'package:Q/src/configure/ServerConfigure.dart';
 import 'package:Q/src/delegate/AbstractDelegate.dart';
 import 'package:Q/src/delegate/ApplicationLifecycleDelegate.dart';
 import 'package:Q/src/delegate/HttpRequestLifecycleDelegate.dart';
@@ -16,6 +17,8 @@ import 'package:Q/src/helpers/ApplicationHelper.dart';
 import 'package:Q/src/helpers/AsyncHelper.dart';
 import 'package:Q/src/helpers/ResponseHelper.dart';
 import 'package:Q/src/helpers/RouterHelper.dart';
+import 'package:Q/src/utils/connectionpool/RouterConnectionPool.dart';
+import 'package:Q/src/utils/connectionpool/ConnectionPool.dart';
 import 'package:Q/src/interceptor/HttpRequestInterceptorState.dart';
 import 'package:Q/src/request/RequestTimeout.dart';
 import 'package:Q/src/request/RouterStage.dart';
@@ -34,24 +37,55 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
   final Application application;
 
   HttpServer server;
+  
+  // 路由连接池
+  RouterConnectionPool _routerConnectionPool;
 
-  _ApplicationHttpServerDelegate(this.application);
+  _ApplicationHttpServerDelegate(this.application) {}
+
+  /// 初始化路由连接池
+  void _initRouterConnectionPool() async {
+    ServerConfigure serverConfigure = this.application.applicationContext.configuration.serverConfigure;
+    // 初始化路由连接池
+    _routerConnectionPool = RouterConnectionPool(
+      maxConcurrentConnections: serverConfigure.maxConcurrentConnections,
+      connectionTimeout: Duration(seconds: serverConfigure.connectionTimeout)
+    );
+  }
 
   // ip/端口监听
   @override
-  void listen(int port, {InternetAddress internetAddress}) async {
+  void listen(int port, {InternetAddress internetAddress, int backlog = 2000, bool v6Only = false, bool shared = true}) async {
+    // 初始化路由连接池
+    await _initRouterConnectionPool();
+
     this.application.applicationContext.currentStage = ApplicationStage.STARTING;
     // 默认ipv4
     internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;
-    // 创建服务
-    this.server = await HttpServer.bind(internetAddress, port)
+    // 创建服务，启用连接池
+    this.server = await HttpServer.bind(
+      internetAddress, 
+      port,
+      backlog: backlog,
+      v6Only: v6Only,
+      shared: shared
+    )
         .catchError(ApplicationLifecycleDelegate.from(application).onError)
         .whenComplete(ApplicationLifecycleDelegate.from(application).onStartup);
+    
+    // 配置连接池参数
+    this.server.sessionTimeout = this.application.applicationContext.configuration.serverConfigure.sessionTimeout;
     this.application.applicationContext.currentStage = ApplicationStage.RUNNING;
+    print('Server started with connection pool enabled.');
+    
     // 处理请求
     await for (HttpRequest req in this.server) {
       try {
-        await this.handleRequest(req);
+        // 使用异步处理，避免阻塞事件循环
+        handleRequest(req).catchError((e, s) {
+          print('Exception details:\n $e');
+          print('Stack trace:\n $s');
+        });
       } catch (e, s) {
         print('Exception details:\n $e');
         print('Stack trace:\n $s');
@@ -61,6 +95,9 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
 
   @override
   dynamic close() {
+    // 关闭路由连接池
+    _routerConnectionPool.close();
+    // 关闭服务器
     return this.server.close();
   }
 
@@ -148,15 +185,32 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
 
   // 路由处理，响应请求
   Future<Context> handleRouter(Router router, Context context, HttpRequest req) async {
-    await this._applyRouterChain(router, router);
-    List positionArguments = await this._applyReflectParams(router, context);
-    dynamic result = await this._applyHandler(router, positionArguments);
-    // 如果执行的结果是一个重定向
-    if (result is Redirect) {
-      await this._applyRedirect(router, context, result, req);
-    } else {
-      await this._applyConvertResult(router, result, context);
-      await this._applyWrite(router, context);
+    Connection connection = null;
+    try {
+      // 获取路由连接
+      connection = await _routerConnectionPool.acquireConnection();
+      
+      // 处理路由请求
+      await this._applyRouterChain(router, router);
+      List positionArguments = await this._applyReflectParams(router, context);
+      dynamic result = await this._applyHandler(router, positionArguments);
+      // 如果执行的结果是一个重定向
+      if (result is Redirect) {
+        await this._applyRedirect(router, context, result, req);
+      } else {
+        await this._applyConvertResult(router, result, context);
+        await this._applyWrite(router, context);
+      }
+    } catch (e, s) {
+      print('Router handling error: $e');
+      print('Stack trace: $s');
+      // 处理错误
+      await this.application.handlers[HttpStatus.internalServerError].handle(context);
+    } finally {
+      // 释放连接
+      if (connection != null) {
+        _routerConnectionPool.releaseConnection(connection);
+      }
     }
     return context;
   }

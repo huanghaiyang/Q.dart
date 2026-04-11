@@ -120,6 +120,11 @@ class ApplicationConfigureIfYamlNotExist {
       'format': 'json<string>',
       'output': 'console<string>',
       'file': 'logs/app.log<string>'
+    },
+    'server': {
+      'sessionTimeout': '30<int>',
+      'connectionTimeout': '30<int>',
+      'maxConcurrentConnections': '1000<int>'
     }
   };
 }
