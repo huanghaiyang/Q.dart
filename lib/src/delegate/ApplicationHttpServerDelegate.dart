@@ -55,40 +55,66 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
 
   // ip/端口监听
   @override
-  void listen(int port, {InternetAddress internetAddress, int backlog = 2000, bool v6Only = false, bool shared = true}) async {
-    // 初始化路由连接池
-    await _initRouterConnectionPool();
+  void listen(int port, {InternetAddress internetAddress, int backlog = 5000, bool v6Only = false, bool shared = true}) async {
+    try {
+      // 初始化路由连接池
+      await _initRouterConnectionPool();
 
-    this.application.applicationContext.currentStage = ApplicationStage.STARTING;
-    // 默认ipv4
-    internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;
-    // 创建服务，启用连接池
-    this.server = await HttpServer.bind(
-      internetAddress, 
-      port,
-      backlog: backlog,
-      v6Only: v6Only,
-      shared: shared
-    )
-        .catchError(ApplicationLifecycleDelegate.from(application).onError)
-        .whenComplete(ApplicationLifecycleDelegate.from(application).onStartup);
-    
-    // 配置连接池参数
-    this.server.sessionTimeout = this.application.applicationContext.configuration.serverConfigure.sessionTimeout;
-    this.application.applicationContext.currentStage = ApplicationStage.RUNNING;
-    print('Server started with connection pool enabled.');
-    
-    // 处理请求
-    await for (HttpRequest req in this.server) {
-      try {
+      this.application.applicationContext.currentStage = ApplicationStage.STARTING;
+      // 默认ipv4
+      internetAddress = internetAddress != null ? internetAddress : InternetAddress.loopbackIPv4;
+      // 创建服务，启用连接池
+      print('Starting server on $internetAddress:$port with backlog=$backlog');
+      this.server = await HttpServer.bind(
+        internetAddress, 
+        port,
+        backlog: backlog,
+        v6Only: v6Only,
+        shared: shared
+      )
+          .catchError((e) {
+            print('Error binding server: $e');
+            throw e;
+          })
+          .whenComplete(() {
+            print('Server bound successfully');
+            ApplicationLifecycleDelegate.from(application).onStartup();
+          });
+      
+      // 配置连接池参数
+      int sessionTimeout = this.application.applicationContext.configuration.serverConfigure.sessionTimeout;
+      this.server.sessionTimeout = sessionTimeout;
+      this.application.applicationContext.currentStage = ApplicationStage.RUNNING;
+      print('Server started with connection pool enabled.');
+      print('Server session timeout: $sessionTimeout seconds');
+      print('Max concurrent connections: ${this.application.applicationContext.configuration.serverConfigure.maxConcurrentConnections}');
+      
+      // 处理请求
+      print('Starting to handle requests...');
+      int requestCount = 0;
+      await for (HttpRequest req in this.server) {
+        requestCount++;
+        if (requestCount % 100 == 0) {
+          print('Handled $requestCount requests');
+        }
         // 使用异步处理，避免阻塞事件循环
-        handleRequest(req).catchError((e, s) {
-          print('Exception details:\n $e');
-          print('Stack trace:\n $s');
+        Future.microtask(() {
+          handleRequest(req).catchError((e, s) {
+            print('Exception details:\n $e');
+            print('Stack trace:\n $s');
+          });
         });
-      } catch (e, s) {
-        print('Exception details:\n $e');
-        print('Stack trace:\n $s');
+      }
+    } catch (e, s) {
+      print('Server error: $e');
+      print('Stack trace: $s');
+      // 尝试关闭服务器
+      try {
+        if (this.server != null) {
+          await this.server.close();
+        }
+      } catch (closeError) {
+        print('Error closing server: $closeError');
       }
     }
   }
@@ -106,30 +132,77 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
     if (this.application.applicationContext.currentStage == ApplicationStage.RUNNING) {
       HttpResponse res = req.response;
       HttpRequestInterceptorState interceptorState = HttpRequestInterceptorState();
-      // 处理拦截
-      bool suspend = await this.application.httpRequestInterceptorChain.applyPreHandle(req, res, interceptorState);
-      // 如果返回false，则表示拦截器已经处理了当前请求，不需要再匹配路由、处理请求、消费中间件
-      if (suspend) {
-        // 创建请求上下文
-        Context context = await this.application.createContext(req, res, interceptorState: interceptorState);
-        // 前置中间件处理
-        await this.handleWithMiddleware(
-            context,
-            MiddlewareType.BEFORE,
-            this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddleware,
-            this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddlewareError);
-        // 匹配路由并处理请求
-        await this.applyRouter(context, req);
-        // 后置中间件处理
-        await this.handleWithMiddleware(
-            context,
-            MiddlewareType.AFTER,
-            this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddleware,
-            this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddlewareError);
-        // 执行后置拦截器方法
-        await this.application.httpRequestInterceptorChain.applyPostHandle(req, res, interceptorState);
+      
+      try {
+        // 处理拦截
+        bool suspend = await this.application.httpRequestInterceptorChain.applyPreHandle(req, res, interceptorState);
+        
+        // 如果返回true，则继续处理请求
+        if (suspend) {
+          // 创建请求上下文
+          Context context = await this.application.createContext(req, res, interceptorState: interceptorState);
+          // 前置中间件处理
+          await this.handleWithMiddleware(
+              context,
+              MiddlewareType.BEFORE,
+              this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddleware,
+              this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddlewareError);
+          // 匹配路由并处理请求
+          await this.applyRouter(context, req);
+          // 后置中间件处理
+          await this.handleWithMiddleware(
+              context,
+              MiddlewareType.AFTER,
+              this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddleware,
+              this.application.getDelegate(HttpRequestLifecycleDelegate).onMiddlewareError);
+          // 执行后置拦截器方法
+          await this.application.httpRequestInterceptorChain.applyPostHandle(req, res, interceptorState);
+        }
+      } on SocketException catch (e, s) {
+        print('SocketException: $e');
+        print('Stack trace: $s');
+        // 处理网络异常，确保响应被正确关闭
+        try {
+          res.statusCode = HttpStatus.serviceUnavailable;
+          await res.flush();
+        } catch (flushError) {
+          print('Error flushing response: $flushError');
+        }
+      } catch (e, s) {
+        print('Request handling error: $e');
+        print('Stack trace: $s');
+        // 处理其他错误
+        try {
+          // 尝试使用已有的上下文或创建新的上下文
+          Context errorContext;
+          try {
+            errorContext = await this.application.createContext(req, res);
+            await this.application.handlers[HttpStatus.internalServerError].handle(errorContext);
+          } catch (contextError) {
+            print('Error creating context: $contextError');
+            // 如果创建上下文失败，直接设置状态码
+            res.statusCode = HttpStatus.internalServerError;
+            await res.flush();
+          }
+        } catch (errorHandlingError) {
+          print('Error handling error: $errorHandlingError');
+          // 如果错误处理也失败，确保响应被正确关闭
+          try {
+            res.statusCode = HttpStatus.internalServerError;
+            await res.flush();
+          } catch (flushError) {
+            print('Error flushing response: $flushError');
+          }
+        }
+      } finally {
+        // 确保响应被正确释放
+        try {
+          await ApplicationHelper.makeSureResponseRelease(res);
+        } catch (e) {
+          print('Error releasing response: $e');
+        }
       }
-      await ApplicationHelper.makeSureResponseRelease(res);
+      
       return true;
     }
     return false;
@@ -201,11 +274,42 @@ class _ApplicationHttpServerDelegate implements ApplicationHttpServerDelegate {
         await this._applyConvertResult(router, result, context);
         await this._applyWrite(router, context);
       }
+    } on SocketException catch (e, s) {
+      print('Router handling SocketException: $e');
+      print('Stack trace: $s');
+      // 处理网络异常
+      try {
+        context.response.res.statusCode = HttpStatus.serviceUnavailable;
+        await context.response.res.flush();
+      } catch (flushError) {
+        print('Error flushing response: $flushError');
+      }
+    } on TimeoutException catch (e, s) {
+      print('Router handling TimeoutException: $e');
+      print('Stack trace: $s');
+      // 处理超时异常
+      try {
+        context.response.res.statusCode = HttpStatus.gatewayTimeout;
+        await context.response.res.flush();
+      } catch (flushError) {
+        print('Error flushing response: $flushError');
+      }
     } catch (e, s) {
       print('Router handling error: $e');
       print('Stack trace: $s');
-      // 处理错误
-      await this.application.handlers[HttpStatus.internalServerError].handle(context);
+      // 处理其他错误
+      try {
+        await this.application.handlers[HttpStatus.internalServerError].handle(context);
+      } catch (errorHandlingError) {
+        print('Error handling error: $errorHandlingError');
+        // 如果错误处理也失败，确保响应被正确关闭
+        try {
+          context.response.res.statusCode = HttpStatus.internalServerError;
+          await context.response.res.flush();
+        } catch (flushError) {
+          print('Error flushing response: $flushError');
+        }
+      }
     } finally {
       // 释放连接
       if (connection != null) {

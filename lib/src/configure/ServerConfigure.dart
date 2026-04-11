@@ -18,7 +18,7 @@ class _ServerConfigure implements ServerConfigure {
 
   int connectionTimeout_ = 30;
   
-  int maxConcurrentConnections_ = 1000;
+  int maxConcurrentConnections_ = 2000;
 
   @override
   int get sessionTimeout {

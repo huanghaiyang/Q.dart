@@ -47,6 +47,7 @@ class ConnectionPool {
       } else {
         // 连接无效，创建新连接
         Connection newConnection = Connection(this);
+        _totalConnectionsCreated++;
         _inUseConnections++;
         return newConnection;
       }
@@ -64,8 +65,10 @@ class ConnectionPool {
       Completer<Connection> completer = Completer<Connection>();
       _waitQueue.add(completer);
       // 添加超时处理，避免无限等待
-      Future.delayed(Duration(seconds: 30), () {
+      Future.delayed(_connectionTimeout, () {
         if (!completer.isCompleted) {
+          // 从等待队列中移除
+          _waitQueue.remove(completer);
           completer.completeError(Exception('Connection acquisition timeout'));
         }
       });

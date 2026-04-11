@@ -26,8 +26,8 @@ void main() {
     
     test('路由连接池性能测试', () async {
       // 测试配置
-      const int totalRequests = 1000;
-      const int concurrentRequests = 100;
+      const int totalRequests = 10000;
+      const int concurrentRequests = 1000;
       const int maxRetries = 3;
       
       print('开始压力测试...');
@@ -85,9 +85,14 @@ void main() {
           futures = newFutures;
         }
         
-        // 每发送50个请求，等待一段时间
-        if ((i + 1) % 50 == 0) {
-          await Future.delayed(Duration(milliseconds: 100)); // 等待100ms
+        // 每发送20个请求，等待一段时间
+        if ((i + 1) % 20 == 0) {
+          await Future.delayed(Duration(milliseconds: 200)); // 等待200ms
+        }
+        
+        // 每发送100个请求，等待更长时间
+        if ((i + 1) % 100 == 0) {
+          await Future.delayed(Duration(milliseconds: 500)); // 等待500ms
         }
       }
       
